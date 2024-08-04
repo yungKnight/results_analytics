@@ -1,5 +1,18 @@
 from django.db import models
 
+class Department(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+class Student(models.Model):
+    ENTRY_TYPE_CHOICES = [
+        ('Diploma', 'Diploma'),
+        ('UTME', 'UTME'),
+    ]
+
+    name = models.CharField(max_length=255)
+    entry_type = models.CharField(max_length=10, choices=ENTRY_TYPE_CHOICES)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='students')
+
 class Course(models.Model):
     COURSE_BRANCHES = [
         ('Microeconomics', 'Microeconomics'),
@@ -9,13 +22,18 @@ class Course(models.Model):
     ]
 
     title = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     units = models.PositiveIntegerField()
     branch = models.CharField(max_length=30, choices=COURSE_BRANCHES)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses')
+
+    class Meta:
+        unique_together = ('code', 'department')
 
 
 class CourseResult(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='results')
+	course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='results')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results')
     session = models.CharField(max_length=20)
     semester = models.CharField(max_length=20)
     grade = models.CharField(max_length=5)
