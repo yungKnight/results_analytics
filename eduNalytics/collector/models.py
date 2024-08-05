@@ -9,7 +9,7 @@ class Student(models.Model):
         ('UTME', 'UTME'),
     ]
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
     entry_type = models.CharField(max_length=10, choices=ENTRY_TYPE_CHOICES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='students')
 
@@ -25,15 +25,14 @@ class Course(models.Model):
     code = models.CharField(max_length=10)
     units = models.PositiveIntegerField()
     branch = models.CharField(max_length=30, choices=COURSE_BRANCHES)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
 
     class Meta:
         unique_together = ('code', 'department')
 
-
 class CourseResult(models.Model):
-	course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='results')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='results')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results', null=True, blank=True)
     session = models.CharField(max_length=20)
     semester = models.CharField(max_length=20)
     grade = models.CharField(max_length=5)
@@ -43,3 +42,4 @@ class CourseResult(models.Model):
         verbose_name = "Course Result"
         verbose_name_plural = "Course Results"
         ordering = ['session', 'semester', 'course__code']
+
