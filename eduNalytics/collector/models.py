@@ -42,4 +42,3 @@ class CourseResult(models.Model):
         verbose_name = "Course Result"
         verbose_name_plural = "Course Results"
         ordering = ['session', 'semester', 'course__code']
-
