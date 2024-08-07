@@ -17,7 +17,7 @@
 <div id="main-content" class="container mt-5" style="display:none;">
     <div class="card">
         <div class="card-header">
-            <span id="greeting">What's your name?</span>
+            <span id="greeting"></span>
         </div>
         <div class="card-body">
             <form method="POST" action=".">
@@ -36,45 +36,7 @@
     </div>
 </div>
 
-<style>
-.overlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.75);
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<script src="{% static 'js/index.js' %}"></script>
 
-.overlay-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const nameForm = document.getElementById('name-form');
-    const overlay = document.getElementById('name-overlay');
-    const mainContent = document.getElementById('main-content');
-    const greeting = document.getElementById('greeting');
-
-    nameForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const username = document.getElementById('username').value;
-        greeting.textContent = 'Hello, ' + username;
-        overlay.style.display = 'none';
-        mainContent.style.display = 'block';
-    });
-});
-</script>
 {% endblock %}
-
