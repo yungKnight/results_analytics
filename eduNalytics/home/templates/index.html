@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} EduLytica {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            What's your name?
+        </div>
+        <div class="card-body">
+            <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="matric_number">Matric Number</label>
+                    <input type="text" class="form-control" id="matric_number" name="matric_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
