@@ -1,13 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} EduLytica {% endblock %}
+{% block title %} Home {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div id="name-overlay" class="overlay">
+    <div class="overlay-content">
+        <h2>Please enter your name</h2>
+        <form id="name-form">
+            <input type="text" id="username" class="form-control" placeholder="Your Name" required>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="main-content" class="container mt-5" style="display:none;">
     <div class="card">
         <div class="card-header">
-            What's your name?
+            <span id="greeting">What's your name?</span>
         </div>
         <div class="card-body">
             <form method="POST" action=".">
@@ -25,4 +35,46 @@
         </div>
     </div>
 </div>
+
+<style>
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const nameForm = document.getElementById('name-form');
+    const overlay = document.getElementById('name-overlay');
+    const mainContent = document.getElementById('main-content');
+    const greeting = document.getElementById('greeting');
+
+    nameForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        greeting.textContent = 'Hello, ' + username;
+        overlay.style.display = 'none';
+        mainContent.style.display = 'block';
+    });
+});
+</script>
 {% endblock %}
+
