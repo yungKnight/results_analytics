@@ -20,7 +20,7 @@
             <span id="greeting" class="text-4xl font-bold"></span>
         </div>
         <div class="card-body">
-            <form method="POST" action=".">
+            <form method="POST" action="{% url 'collector:scrape' %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="matric_number">Matric Number</label>

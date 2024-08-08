@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Assessment Results for {{ student_info.Name }}</h2>
+    <table class="table table-bordered" id="assessment">
+        <thead>
+            <tr>
+                <th>Session</th>
+                <th>Semester</th>
+                <th>Course Code</th>
+                <th>Branch</th>
+                <th>Grade</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in course_details %}
+            <tr>
+                <td>{{ course.session }}</td>
+                <td>{{ course.semester }}</td>
+                <td>{{ course.course_code }}</td>
+                <td>{{ course.branch }}</td>
+                <td>{{ course.grade }}</td>
+                <td>{{ course.unit }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
