@@ -1,8 +1,11 @@
+# urls.py
+
 from django.urls import path
-from .views import scrape
+from . import views
 
 app_name = 'collector'
 
 urlpatterns = [
-    path('scrape/', scrape, name='scrape'),
+    path('scrape/', views.scrape, name='scrape'),
+    path('scrape/results/', views.results, name='results'),
 ]

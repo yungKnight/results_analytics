@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect
 import asyncio
 from .scrape import run_scrape_script
 
+# views.py
+
+from django.shortcuts import render, redirect
+import asyncio
+from .scrape import run_scrape_script  # Import your scraping function
+
 def scrape(request):
     if request.method == "POST":
         matric_number = request.POST.get("matric_number")
@@ -20,11 +26,21 @@ def scrape(request):
                 'unit': 'unavailable'
             })
 
-        context = {
+        request.session['context'] = {
             'course_details': course_details,
             'student_info': scrape_result['StudentInfo'],
         }
 
+        return redirect('collector:results')
+
+    return redirect('home:home')
+
+def results(request):
+    context = request.session.get('context')
+
+    if context:
+        del request.session['context']
         return render(request, 'assessment.html', context)
 
     return redirect('home:home')
+
