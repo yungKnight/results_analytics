@@ -2,12 +2,6 @@ from django.shortcuts import render, redirect
 import asyncio
 from .scrape import run_scrape_script
 
-# views.py
-
-from django.shortcuts import render, redirect
-import asyncio
-from .scrape import run_scrape_script  # Import your scraping function
-
 def scrape(request):
     if request.method == "POST":
         matric_number = request.POST.get("matric_number")
@@ -43,4 +37,3 @@ def results(request):
         return render(request, 'assessment.html', context)
 
     return redirect('home:home')
-
