@@ -9,6 +9,9 @@ def scrape(request):
 
         scrape_result = asyncio.run(run_scrape_script(matric_number, password))
 
+        if 'error' in scrape_result:
+            return redirect('home:home')
+
         course_details = []
         for course in scrape_result['CourseResults']:
             course_details.append({
