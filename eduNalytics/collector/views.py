@@ -7,9 +7,15 @@ def scrape(request):
         matric_number = request.POST.get("matric_number")
         password = request.POST.get("password")
 
-        scrape_result = asyncio.run(run_scrape_script(matric_number, password))
+        try:
+            scrape_result = asyncio.run(run_scrape_script(matric_number, password))
+        except Exception as e:
+            # Handle scrape exceptions (e.g., network issues, invalid credentials)
+            request.session['error_message'] = str(e)
+            return redirect('home:home')
 
         if 'error' in scrape_result:
+            request.session['error_message'] = scrape_result.get('error', 'Unknown error occurred')
             return redirect('home:home')
 
         course_details = []

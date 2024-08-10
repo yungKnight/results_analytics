@@ -1,11 +1,21 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
+
+class WelcomeView(TemplateView):
+    template_name = 'welcome.html'
+
+    def post(self, request):
+        username = request.POST.get('username')
+        if username:
+            request.session['username'] = username
+            return redirect('home:home')
+        return render(request, self.template_name)
 
 class HomeView(TemplateView):
     template_name = 'index.html'
 
-    def post(self, request):
-        matric_number = request.POST.get('matric_number')
-        password = request.POST.get('password')
-        context = {'matric_number': matric_number, 'password': password}
-        return render(request, 'home/index.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.session.get('username', '')
+        context['error_message'] = self.request.session.pop('error_message', None)
+        return context

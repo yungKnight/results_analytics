@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Welcome {% endblock %}
+
+{% block content %}
+<div class="overlay">
+    <div class="overlay-content">
+        <h2>Please enter your name</h2>
+        <form id="name-form" method="POST">
+            {% csrf_token %}
+            <input type="text" id="username" name="username" class="form-control" placeholder="Your Name" required>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        </form>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'css/welcome.css' %}">
+
+{% endblock %}

@@ -4,22 +4,16 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
-<div id="name-overlay" class="overlay">
-    <div class="overlay-content">
-        <h2>Please enter your name</h2>
-        <form id="name-form">
-            <input type="text" id="username" class="form-control" placeholder="Your Name" required>
-            <button type="submit" class="btn btn-primary mt-2">Submit</button>
-        </form>
-    </div>
-</div>
 
-<div id="main-content" class="container mt-5" style="display:none;">
+<div id="main-content" class="container mt-5">
     <div class="card">
         <div class="card-header">
-            <span id="greeting" class="text-4xl font-bold"></span>
+            <span id="greeting" class="text-4xl font-bold">Hello, {{ username }}</span>
         </div>
         <div class="card-body">
+            {% if error_message %}
+            <div class="alert alert-danger">{{ error_message }}</div>
+            {% endif %}
             <form method="POST" action="{% url 'collector:scrape' %}">
                 {% csrf_token %}
                 <div class="form-group">
