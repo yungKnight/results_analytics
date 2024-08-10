@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 import asyncio
 from .scrape import run_scrape_script
+from .models import Course
 
 def scrape(request):
     if request.method == "POST":
@@ -20,13 +21,23 @@ def scrape(request):
 
         course_details = []
         for course in scrape_result['CourseResults']:
+            course_code = course.get('Course', 'unavailable')
+            course_obj = Course.objects.filter(code=course_code).first()
+
+            if course_obj:
+                branch = course_obj.branch
+                units = course_obj.units
+            else:
+                branch = 'unavailable'
+                units = 'unavailable'
+
             course_details.append({
                 'session': course.get('Session', 'unavailable'),
                 'semester': course.get('Semester', 'unavailable'),
-                'course_code': course.get('Course', 'unavailable'),
-                'branch': 'unavailable',
+                'course_code': course_code,
+                'branch': branch,
                 'grade': course.get('Grade', 'unavailable'),
-                'unit': 'unavailable'
+                'unit': units
             })
 
         request.session['context'] = {
