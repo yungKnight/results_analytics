@@ -11,7 +11,6 @@ def scrape(request):
         try:
             scrape_result = asyncio.run(run_scrape_script(matric_number, password))
         except Exception as e:
-            # Handle scrape exceptions (e.g., network issues, invalid credentials)
             request.session['error_message'] = str(e)
             return redirect('home:home')
 
