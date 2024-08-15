@@ -8,8 +8,19 @@ from playwright.async_api import async_playwright
 async def run_scrape_script(matric, pword):
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
+            browser = await p.chromium.launch(headless=False)
+
+            context = await browser.new_context()
+            page = await context.new_page()
+
+            async def handle_request(route, request):
+                if request.resource_type == 'image':
+                    await route.abort()
+                else:
+                    await route.continue_()
+
+            await page.route("**/*", handle_request)
+
             url = 'https://stdportal.oouagoiwoye.edu.ng/index.php'
             await page.goto(url, timeout=0)
 
@@ -66,7 +77,7 @@ async def run_scrape_script(matric, pword):
                 'Name': formatted_name,
                 'Status': status.capitalize(),
                 'Department': department,
-                'EntryType': type_of_entry
+                'EntryType': type_of_entry.capitalize()
             }
 
             result_data = {
