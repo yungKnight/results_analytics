@@ -64,9 +64,7 @@ class CourseResult(models.Model):
         max_length=2,
         choices=[(chr(i), chr(i)) for i in range(ord('A'), ord('F')+1)]
     )
-    score = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2,
+    score = models.PositiveIntegerField(
         validators=[MaxValueValidator(100)]
     )
 
