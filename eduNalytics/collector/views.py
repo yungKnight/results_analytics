@@ -39,7 +39,6 @@ def scrape(request):
             if course_obj:
                 course_offering = CourseOffering.objects.filter(course=course_obj, department=department).first()
                 if not course_offering:
-                    # If course offering is not found, continue to the next course
                     course_details.append({
                         'session': course.get('Session', 'unavailable'),
                         'semester': course.get('Semester', 'unavailable'),
@@ -72,7 +71,6 @@ def scrape(request):
                     'unit': course_offering.units
                 })
             else:
-                # Handle case where course code is unavailable or course not found
                 course_details.append({
                     'session': course.get('Session', 'unavailable'),
                     'semester': course.get('Semester', 'unavailable'),
