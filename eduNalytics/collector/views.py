@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 import asyncio
 from .scrape import run_scrape_script
 from .models import Course
+from datetime import timedelta
+from django.utils import timezone
 
 def scrape(request):
     if request.method == "POST":
@@ -34,7 +36,7 @@ def scrape(request):
                 'session': course.get('Session', 'unavailable'),
                 'semester': course.get('Semester', 'unavailable'),
                 'course_code': course_code,
-                'branch': branch,
+                'branch': course.get('Branch', 'unavailable'),
                 'grade': course.get('Grade', 'unavailable'),
                 'unit': units
             })
@@ -43,6 +45,7 @@ def scrape(request):
             'course_details': course_details,
             'student_info': scrape_result['StudentInfo'],
         }
+        request.session.set_expiry(timedelta(minutes=15))
 
         return redirect('collector:results')
 
@@ -52,7 +55,6 @@ def results(request):
     context = request.session.get('context')
 
     if context:
-        del request.session['context']
         return render(request, 'assessment.html', context)
 
     return redirect('home:home')

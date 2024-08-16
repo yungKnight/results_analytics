@@ -1,14 +1,19 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MaxValueValidator
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+class CourseBranch(models.Model):
+    name = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='branches')
+
+    def __str__(self):
+        return f"{self.name} ({self.department.name})"
 
 class Student(models.Model):
     ENTRY_TYPE_CHOICES = [
@@ -24,21 +29,23 @@ class Student(models.Model):
         return self.name
 
 class Course(models.Model):
-    COURSE_BRANCHES = [
-        ('Microeconomics', 'Microeconomics'),
-        ('Macroeconomics', 'Macroeconomics'),
-        ('Mathematics for Economists', 'Mathematics for Economists'),
-        ('Accessories', 'Accessories'),
-    ]
-
     title = models.CharField(max_length=100)
-    code = models.CharField(max_length=10)
-    units = models.PositiveIntegerField()
-    branch = models.CharField(max_length=30, choices=COURSE_BRANCHES)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
+    code = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return f"{self.title} ({self.code})"
+
+class CourseOffering(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='offerings')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='course_offerings')
+    branch = models.ForeignKey(CourseBranch, on_delete=models.CASCADE, related_name='course_offerings')
+    units = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('course', 'department')
+
+    def __str__(self):
+        return f"{self.course.code} ({self.branch.name} - {self.department.name})"
 
 class CourseResult(models.Model):
     SEMESTER_CHOICES = [
@@ -51,7 +58,7 @@ class CourseResult(models.Model):
         validators=[RegexValidator(regex=r'^\d{4}/\d{4}$', message='Session must be in the format YYYY/YYYY')]
     )
     semester = models.CharField(max_length=9, choices=SEMESTER_CHOICES)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='results')
+    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, related_name='results')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results', null=True, blank=True)
     grade = models.CharField(
         max_length=2,
@@ -73,9 +80,9 @@ class CourseResult(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"
+        return f"{self.course_offering.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"
 
     class Meta:
         verbose_name = "Course Result"
         verbose_name_plural = "Course Results"
-        ordering = ['session', 'semester', 'course__code']
+        ordering = ['session', 'semester', 'course_offering__course__code']
