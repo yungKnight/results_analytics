@@ -48,16 +48,10 @@ class CourseOffering(models.Model):
         return f"{self.course.code} ({self.branch.name} - {self.department.name})"
 
 class CourseResult(models.Model):
-    SEMESTER_CHOICES = [
-        ('Harmattan', 'Harmattan'),
-        ('Rain', 'Rain'),
-    ]
-
     session = models.CharField(
         max_length=9,
         validators=[RegexValidator(regex=r'^\d{4}/\d{4}$', message='Session must be in the format YYYY/YYYY')]
     )
-    semester = models.CharField(max_length=9, choices=SEMESTER_CHOICES)
     course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, related_name='results')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results', null=True, blank=True)
     grade = models.CharField(
@@ -68,19 +62,16 @@ class CourseResult(models.Model):
         validators=[MaxValueValidator(100)]
     )
 
-    def clean(self):
-        if self.score > 100:
-            raise ValidationError('Score must be less than or equal to 100.')
-
     def save(self, *args, **kwargs):
         if self.session and len(self.session) == 8 and self.session[4] != '/':
             self.session = f"{self.session[:4]}/{self.session[4:]}"
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.course_offering.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"
+        return f"{self.course_offering.course} - {self.student} - {self.session} {self.grade} {self.score}"
 
     class Meta:
         verbose_name = "Course Result"
         verbose_name_plural = "Course Results"
-        ordering = ['session', 'semester', 'course_offering__course__code']
+        ordering = ['session', 'course_offering__course__code']
+

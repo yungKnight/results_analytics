@@ -38,9 +38,9 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseOfferingInline]
 
 class CourseResultAdmin(admin.ModelAdmin):
-    list_display = ('course_offering', 'student', 'session', 'semester', 'grade', 'score')
-    search_fields = ('course_offering__course__title', 'student__name', 'session', 'semester')
-    list_filter = ('session', 'semester', 'course_offering__branch', 'course_offering__department')
+    list_display = ('course_offering', 'student', 'session', 'grade', 'score')
+    search_fields = ('course_offering__course__title', 'student__name', 'session')
+    list_filter = ('session', 'course_offering__branch', 'course_offering__department')
 
 admin.site.register(models.Department, DepartmentAdmin)
 admin.site.register(models.Student, StudentAdmin)
