@@ -4,11 +4,12 @@ import re
 import json
 from scrapy.http import HtmlResponse
 from playwright.async_api import async_playwright
+from .utils import get_semester
 
 async def run_scrape_script(matric, pword):
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=False)
+            browser = await p.chromium.launch(headless=True)
 
             context = await browser.new_context()
             page = await context.new_page()
@@ -65,13 +66,21 @@ async def run_scrape_script(matric, pword):
             response = HtmlResponse(url=page.url, body=html_content.encode(), encoding='utf-8')
             results = response.css('div.form-group')[1:-2]
 
-            your_result = [{
-                'Session': result.css('div.col-sm-2::text').get().strip(),
-                'Semester': result.css('div.col-sm-2:nth-child(2)::text').get().strip(),
-                'Course': result.css('div.col-sm-1::text').get().strip(),
-                'Grade': result.css('div.col-sm-1:nth-child(6)::text').get().strip(),
-                'Score': result.css('div.col-sm-2:nth-child(4)::text').get().strip()
-            } for result in results]
+            your_result = []
+            for result in results:
+                course_code = result.css('div.col-sm-1::text').get().strip()
+                try:
+                    semester = get_semester(course_code)
+                except ValidationError:
+                    semester = 'Unknown'
+
+                your_result.append({
+                    'Session': result.css('div.col-sm-2::text').get().strip(),
+                    'Course': course_code,
+                    'Grade': result.css('div.col-sm-1:nth-child(6)::text').get().strip(),
+                    'Score': result.css('div.col-sm-2:nth-child(4)::text').get().strip(),
+                    'Semester': semester 
+                })
 
             student_info = {
                 'Name': formatted_name,

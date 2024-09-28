@@ -61,17 +61,12 @@ class CourseResult(models.Model):
     score = models.PositiveIntegerField(
         validators=[MaxValueValidator(100)]
     )
-
-    def save(self, *args, **kwargs):
-        if self.session and len(self.session) == 8 and self.session[4] != '/':
-            self.session = f"{self.session[:4]}/{self.session[4:]}"
-        super().save(*args, **kwargs)
+    semester = models.CharField(max_length=10, editable=False)  
 
     def __str__(self):
-        return f"{self.course_offering.course} - {self.student} - {self.session} {self.grade} {self.score}"
+        return f"{self.course_offering.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"
 
     class Meta:
         verbose_name = "Course Result"
         verbose_name_plural = "Course Results"
         ordering = ['session', 'course_offering__course__code']
-
