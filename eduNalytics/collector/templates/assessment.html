@@ -15,6 +15,7 @@
         <thead>
             <tr>
                 <th>Session</th>
+                <th>Level</th>
                 <th>Semester</th>
                 <th>Course Code</th>
                 <th>Branch</th>
@@ -26,6 +27,7 @@
             {% for course in course_details %}
             <tr>
                 <td>{{ course.session }}</td>
+                <td>{{ course.level }}</td>
                 <td>{{ course.semester }}</td>
                 <td>{{ course.course_code }}</td>
                 <td>{{ course.branch }}</td>

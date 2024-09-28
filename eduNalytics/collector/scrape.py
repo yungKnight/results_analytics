@@ -4,7 +4,7 @@ import re
 import json
 from scrapy.http import HtmlResponse
 from playwright.async_api import async_playwright
-from .utils import get_semester
+from .utils import get_semester, get_level
 
 async def run_scrape_script(matric, pword):
     try:
@@ -74,12 +74,18 @@ async def run_scrape_script(matric, pword):
                 except ValidationError:
                     semester = 'Unknown'
 
+                try:
+                    level = get_level(course_code, department)
+                except ValidationError:
+                    level = 'Unknown'
+
                 your_result.append({
                     'Session': result.css('div.col-sm-2::text').get().strip(),
                     'Course': course_code,
                     'Grade': result.css('div.col-sm-1:nth-child(6)::text').get().strip(),
                     'Score': result.css('div.col-sm-2:nth-child(4)::text').get().strip(),
-                    'Semester': semester 
+                    'Semester': semester, 
+                    'Level': level
                 })
 
             student_info = {

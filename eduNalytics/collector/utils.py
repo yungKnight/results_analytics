@@ -1,15 +1,13 @@
 from django.core.exceptions import ValidationError
 import re
 
-# Program lengths based on departments
 program_lengths = {
-    'Economics': 5,   # Economics is a 5-year program
-    'Medicine': 7,    # Medicine is a 7-year program
-    'Engineering': 5, # Engineering is a 5-year program
-    # Add more departments and their lengths as needed
+    'Economics': 4,   
+    'Medicine': 7,   
+    'Engineering': 5,
+    # Add more departments needed
 }
 
-# Dictionary to track repetition counts for each course code
 repetition_count_map = {}
 
 def get_program_length_by_department(department):
@@ -35,34 +33,25 @@ def get_level(course_code, department):
     Determine the academic level based on the course code and department.
     Handles repetition counts and extra years if the course is repeated.
     """
-    # Extract the first integer from the course code (e.g., 101, 504)
     first_integer_match = re.search(r'\d+', course_code)
 
     if first_integer_match:
         first_integer = int(first_integer_match.group())
 
-        # Determine the program length dynamically based on the department
         program_length = get_program_length_by_department(department)
-        final_level = program_length * 100  # E.g., 5-year program -> 500 level
-
-        # Sanitize the course code by replacing spaces with underscores
+        final_level = program_length * 100 
+        
         sanitized_course_code = course_code.replace(" ", "_")
 
-        # Get the current repetition count, defaulting to 0
         repetition_count = repetition_count_map.get(sanitized_course_code, 0)
 
-        # Adjust the level based on the repetition count
         if repetition_count == 0:
-            # If no repetitions, determine the level normally
             adjusted_level = first_integer
         else:
-            # Repetition count starts only after the first completion
             adjusted_level = first_integer + (repetition_count * 100)
 
-        # Update the repetition count in the dictionary
         repetition_count_map[sanitized_course_code] = repetition_count + 1
 
-        # Determine the level based on the adjusted level and the program length
         if adjusted_level < 100:
             return 'Invalid course code'
 
@@ -84,7 +73,6 @@ def get_level(course_code, department):
             if program_length >= 7:
                 return '700 level' if repetition_count == 0 else 'Extra year (repeating courses)'
 
-        # After completing the program's final level, any further repetitions are "Extra year"
         if adjusted_level >= final_level:
             return 'Extra year (repeating courses)'
 

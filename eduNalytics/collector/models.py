@@ -61,7 +61,8 @@ class CourseResult(models.Model):
     score = models.PositiveIntegerField(
         validators=[MaxValueValidator(100)]
     )
-    semester = models.CharField(max_length=10, editable=False)  
+    semester = models.CharField(max_length=10, editable=False)
+    level = models.CharField(max_length=20, editable=False)  
 
     def __str__(self):
         return f"{self.course_offering.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"

@@ -6,6 +6,7 @@ from datetime import timedelta
 
 def scrape(request):
     if request.method == "POST":
+
         matric_number = request.POST.get("matric_number")
         password = request.POST.get("password")
 
@@ -42,6 +43,7 @@ def scrape(request):
                     course_details.append({
                         'session': course.get('Session', 'unavailable'),
                         'semester': course.get('Semester', 'unavailable'),
+                        'level': course.get('Level', 'unavailable'),
                         'course_code': course_code,
                         'branch': 'unavailable',
                         'grade': course.get('Grade', 'unavailable'),
@@ -51,6 +53,7 @@ def scrape(request):
 
                 session = course.get('Session', 'unavailable')
                 semester = course.get('Semester', 'unavailable')
+                level = course.get('Level', 'unavailable')
                 grade = course.get('Grade', 'unavailable')
                 score = course.get('Score', 0)
 
@@ -59,12 +62,14 @@ def scrape(request):
                     course_offering=course_offering,
                     session=session,
                     semester=semester,
+                    level=level,
                     defaults={'grade': grade, 'score': score}
                 )
 
                 course_details.append({
                     'session': session,
                     'semester': semester,
+                    'level': level,
                     'course_code': course_code,
                     'branch': course_offering.branch.name,
                     'grade': grade,
@@ -74,6 +79,7 @@ def scrape(request):
                 course_details.append({
                     'session': course.get('Session', 'unavailable'),
                     'semester': course.get('Semester', 'unavailable'),
+                    'level': course.get('Level', 'unavailable'),
                     'course_code': course_code,
                     'branch': 'unavailable',
                     'grade': course.get('Grade', 'unavailable'),
@@ -88,7 +94,7 @@ def scrape(request):
 
         return redirect('collector:results')
 
-    return redirect('home:home')
+    return redirect('home:welcome')
 
 def results(request):
     context = request.session.get('context')
