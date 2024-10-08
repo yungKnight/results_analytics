@@ -41,12 +41,11 @@ def scrape(request):
                 course_offering = CourseOffering.objects.filter(course=course_obj, department=department).first()
 
                 if not course_offering:
-                    # Get level directly for courses without a CourseOffering
                     level = get_level(course_code, department)
                     course_details.append({
                         'session': course.get('Session', 'unavailable'),
                         'semester': course.get('Semester', 'unavailable'),
-                        'level': level,  # Store the level determined from the code
+                        'level': level,
                         'course_code': course_code,
                         'branch': 'unavailable',
                         'grade': course.get('Grade', 'unavailable'),
@@ -69,12 +68,10 @@ def scrape(request):
                 ).first()
 
                 if existing_result:
-                    # Update the existing CourseResult
                     existing_result.grade = grade
                     existing_result.score = score
                     existing_result.save()
                 else:
-                    # Create a new CourseResult
                     CourseResult.objects.create(
                         student=student,
                         course_offering=course_offering,
@@ -95,12 +92,11 @@ def scrape(request):
                     'unit': course_offering.units
                 })
             else:
-                # Get level for non-existing courses
                 level = get_level(course_code, department)
                 course_details.append({
                     'session': course.get('Session', 'unavailable'),
                     'semester': course.get('Semester', 'unavailable'),
-                    'level': level,  # Store the level determined from the code
+                    'level': level,
                     'course_code': course_code,
                     'branch': 'unavailable',
                     'grade': course.get('Grade', 'unavailable'),
