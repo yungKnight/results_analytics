@@ -11,8 +11,14 @@ class WelcomeView(TemplateView):
             return redirect('home:home')
         return render(request, self.template_name)
 
+
 class HomeView(TemplateView):
     template_name = 'index.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'username' not in request.session:
+            return redirect('home:welcome')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
