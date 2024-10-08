@@ -3,10 +3,10 @@ import asyncio
 from .scrape import run_scrape_script
 from .models import Course, CourseOffering, CourseResult, Student, Department
 from datetime import timedelta
+from .utils import get_level
 
 def scrape(request):
     if request.method == "POST":
-
         matric_number = request.POST.get("matric_number")
         password = request.POST.get("password")
 
@@ -39,11 +39,14 @@ def scrape(request):
 
             if course_obj:
                 course_offering = CourseOffering.objects.filter(course=course_obj, department=department).first()
+
                 if not course_offering:
+                    # Get level directly for courses without a CourseOffering
+                    level = get_level(course_code, department)
                     course_details.append({
                         'session': course.get('Session', 'unavailable'),
                         'semester': course.get('Semester', 'unavailable'),
-                        'level': course.get('Level', 'unavailable'),
+                        'level': level,  # Store the level determined from the code
                         'course_code': course_code,
                         'branch': 'unavailable',
                         'grade': course.get('Grade', 'unavailable'),
@@ -57,14 +60,30 @@ def scrape(request):
                 grade = course.get('Grade', 'unavailable')
                 score = course.get('Score', 0)
 
-                CourseResult.objects.update_or_create(
+                existing_result = CourseResult.objects.filter(
                     student=student,
                     course_offering=course_offering,
                     session=session,
                     semester=semester,
-                    level=level,
-                    defaults={'grade': grade, 'score': score}
-                )
+                    level=level
+                ).first()
+
+                if existing_result:
+                    # Update the existing CourseResult
+                    existing_result.grade = grade
+                    existing_result.score = score
+                    existing_result.save()
+                else:
+                    # Create a new CourseResult
+                    CourseResult.objects.create(
+                        student=student,
+                        course_offering=course_offering,
+                        session=session,
+                        semester=semester,
+                        level=level,
+                        grade=grade,
+                        score=score
+                    )
 
                 course_details.append({
                     'session': session,
@@ -76,10 +95,12 @@ def scrape(request):
                     'unit': course_offering.units
                 })
             else:
+                # Get level for non-existing courses
+                level = get_level(course_code, department)
                 course_details.append({
                     'session': course.get('Session', 'unavailable'),
                     'semester': course.get('Semester', 'unavailable'),
-                    'level': course.get('Level', 'unavailable'),
+                    'level': level,  # Store the level determined from the code
                     'course_code': course_code,
                     'branch': 'unavailable',
                     'grade': course.get('Grade', 'unavailable'),
@@ -95,6 +116,7 @@ def scrape(request):
         return redirect('collector:results')
 
     return redirect('home:welcome')
+
 
 def results(request):
     context = request.session.get('context')

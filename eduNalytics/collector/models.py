@@ -16,6 +16,7 @@ class CourseBranch(models.Model):
         return f"{self.name} ({self.department.name})"
 
 class Student(models.Model):
+    id = models.AutoField(primary_key=True)
     ENTRY_TYPE_CHOICES = [
         ('Diploma', 'Diploma'),
         ('UTME', 'UTME'),
@@ -26,7 +27,7 @@ class Student(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='students')
 
     def __str__(self):
-        return self.name
+        return f"{self.id} - {self.name}"
 
 class Course(models.Model):
     title = models.CharField(max_length=100)
@@ -53,7 +54,7 @@ class CourseResult(models.Model):
         validators=[RegexValidator(regex=r'^\d{4}/\d{4}$', message='Session must be in the format YYYY/YYYY')]
     )
     course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, related_name='results')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='results', null=True, blank=True)
+    student = models.ForeignKey(Student, to_field='id', on_delete=models.CASCADE, related_name='results', null=True, blank=True)
     grade = models.CharField(
         max_length=2,
         choices=[(chr(i), chr(i)) for i in range(ord('A'), ord('F')+1)]

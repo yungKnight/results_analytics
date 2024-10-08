@@ -2,13 +2,11 @@ from django.core.exceptions import ValidationError
 import re
 
 program_lengths = {
-    'Economics': 4,   
-    'Medicine': 7,   
+    'Economics': 4,
+    'Medicine': 7,
     'Engineering': 5,
-    # Add more departments needed
+    # Add more departments as needed
 }
-
-repetition_count_map = {}
 
 def get_program_length_by_department(department):
     """
@@ -22,13 +20,11 @@ def get_semester(course_code):
     """
     try:
         last_digit = int(course_code[-1])
-        if last_digit % 2 == 0:
-            return 'Rain'
-        return 'Harmattan'
+        return 'Rain' if last_digit % 2 == 0 else 'Harmattan'
     except ValueError:
         raise ValidationError(f"Invalid course code: {course_code}")
 
-def get_level(course_code, department):
+def get_level(course_code, department, repetition_count=0):
     """
     Determine the academic level based on the course code and department.
     Handles repetition counts and extra years if the course is repeated.
@@ -37,20 +33,10 @@ def get_level(course_code, department):
 
     if first_integer_match:
         first_integer = int(first_integer_match.group())
-
         program_length = get_program_length_by_department(department)
-        final_level = program_length * 100 
-        
-        sanitized_course_code = course_code.replace(" ", "_")
+        final_level = program_length * 100
 
-        repetition_count = repetition_count_map.get(sanitized_course_code, 0)
-
-        if repetition_count == 0:
-            adjusted_level = first_integer
-        else:
-            adjusted_level = first_integer + (repetition_count * 100)
-
-        repetition_count_map[sanitized_course_code] = repetition_count + 1
+        adjusted_level = first_integer + (repetition_count * 100)
 
         if adjusted_level < 100:
             return 'Invalid course code'

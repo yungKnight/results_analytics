@@ -8,8 +8,8 @@ class DepartmentAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'entry_type', 'department')
-    search_fields = ('name', 'entry_type')
+    list_display = ('id', 'name', 'entry_type', 'department')
+    search_fields = ('id', 'name', 'entry_type')
     list_filter = ('entry_type', 'department')
 
 class CourseForm(ModelForm):
