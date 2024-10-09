@@ -4,6 +4,7 @@ from .scrape import run_scrape_script
 from .models import Course, CourseOffering, CourseResult, Student, Department
 from datetime import timedelta
 from .utils import get_level
+from analyzer.utils import process_detailed_course_results
 
 def scrape(request):
     if request.method == "POST":
@@ -49,7 +50,8 @@ def scrape(request):
                         'course_code': course_code,
                         'branch': 'unavailable',
                         'grade': course.get('Grade', 'unavailable'),
-                        'unit': 'unavailable'
+                        'unit': 'unavailable',
+                        'score': course.get('Score', 0)
                     })
                     continue
 
@@ -89,7 +91,8 @@ def scrape(request):
                     'course_code': course_code,
                     'branch': course_offering.branch.name,
                     'grade': grade,
-                    'unit': course_offering.units
+                    'unit': course_offering.units,
+                    'score': score
                 })
             else:
                 level = get_level(course_code, department)
@@ -100,8 +103,11 @@ def scrape(request):
                     'course_code': course_code,
                     'branch': 'unavailable',
                     'grade': course.get('Grade', 'unavailable'),
-                    'unit': 'unavailable'
+                    'unit': 'unavailable',
+                    'score': course.get('Score', 0)
                 })
+
+        process_detailed_course_results(student_info, course_details)
 
         request.session['context'] = {
             'course_details': course_details,

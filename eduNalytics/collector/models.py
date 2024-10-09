@@ -54,7 +54,7 @@ class CourseResult(models.Model):
         validators=[RegexValidator(regex=r'^\d{4}/\d{4}$', message='Session must be in the format YYYY/YYYY')]
     )
     course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, related_name='results')
-    student = models.ForeignKey(Student, to_field='id', on_delete=models.CASCADE, related_name='results', null=True, blank=True)
+    student = models.ForeignKey(Student, to_field='id', on_delete=models.CASCADE, related_name='results')
     grade = models.CharField(
         max_length=2,
         choices=[(chr(i), chr(i)) for i in range(ord('A'), ord('F')+1)]
