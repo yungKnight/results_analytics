@@ -37,3 +37,4 @@ def process_detailed_course_results(student_info, course_details):
                 existing_result.unit = unit
                 existing_result.branch = course['branch']
                 existing_result.save()
+

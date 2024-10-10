@@ -62,7 +62,8 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'static/templates'),
             os.path.join(BASE_DIR, 'home/template'),
-            os.path.join(BASE_DIR, 'collector/templates')
+            os.path.join(BASE_DIR, 'collector/templates'),
+            os.path.join(BASE_DIR, 'analyzer/templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
