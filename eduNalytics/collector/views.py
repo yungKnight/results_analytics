@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 import asyncio
 from .scrape import run_scrape_script
-from .models import Course, CourseOffering, CourseResult, Student, Department
+from .models import Course, CourseOffering, Student, Department
 from datetime import timedelta
 from .utils import get_level
 from analyzer.utils import process_detailed_course_results
+import re
+from collections import defaultdict
 
 def scrape(request):
     if request.method == "POST":
@@ -33,61 +35,34 @@ def scrape(request):
             department=department
         )
 
-        course_details = []
+        # Initialize a dictionary to group course details by semester and level
+        grouped_course_details = defaultdict(list)
+
         for course in scrape_result['CourseResults']:
             course_code = course.get('Course', 'unavailable')
             course_obj = Course.objects.filter(code=course_code).first()
+
+            session = course.get('Session', 'unavailable')
+            semester = course.get('Semester', 'unavailable')
+            level = course.get('Level', 'unavailable')
+            grade = course.get('Grade', 'unavailable')
+            score = course.get('Score', 0)
 
             if course_obj:
                 course_offering = CourseOffering.objects.filter(course=course_obj, department=department).first()
 
                 if not course_offering:
                     level = get_level(course_code, department)
-                    course_details.append({
-                        'session': course.get('Session', 'unavailable'),
-                        'semester': course.get('Semester', 'unavailable'),
-                        'level': level,
+                    grouped_course_details[(session, semester, level)].append({
                         'course_code': course_code,
                         'branch': 'unavailable',
-                        'grade': course.get('Grade', 'unavailable'),
+                        'grade': grade,
                         'unit': 'unavailable',
-                        'score': course.get('Score', 0)
+                        'score': score
                     })
                     continue
 
-                session = course.get('Session', 'unavailable')
-                semester = course.get('Semester', 'unavailable')
-                level = course.get('Level', 'unavailable')
-                grade = course.get('Grade', 'unavailable')
-                score = course.get('Score', 0)
-
-                existing_result = CourseResult.objects.filter(
-                    student=student,
-                    course_offering=course_offering,
-                    session=session,
-                    semester=semester,
-                    level=level
-                ).first()
-
-                if existing_result:
-                    existing_result.grade = grade
-                    existing_result.score = score
-                    existing_result.save()
-                else:
-                    CourseResult.objects.create(
-                        student=student,
-                        course_offering=course_offering,
-                        session=session,
-                        semester=semester,
-                        level=level,
-                        grade=grade,
-                        score=score
-                    )
-
-                course_details.append({
-                    'session': session,
-                    'semester': semester,
-                    'level': level,
+                grouped_course_details[(session, semester, level)].append({
                     'course_code': course_code,
                     'branch': course_offering.branch.name,
                     'grade': grade,
@@ -95,17 +70,31 @@ def scrape(request):
                     'score': score
                 })
             else:
-                level = get_level(course_code, department)
-                course_details.append({
-                    'session': course.get('Session', 'unavailable'),
-                    'semester': course.get('Semester', 'unavailable'),
-                    'level': level,
+                # Handle non-course object instances
+                level_string = course.get('Level', 'unavailable')
+                if re.search(r'\d+', level_string):  # Handle numerical levels
+                    level = re.search(r'\d+', level_string).group(0)
+                else:
+                    level = 'extra year'  # Default to 'extra year' for non-numerical levels
+
+                grouped_course_details[(session, semester, level)].append({
                     'course_code': course_code,
                     'branch': 'unavailable',
-                    'grade': course.get('Grade', 'unavailable'),
+                    'grade': grade,
                     'unit': 'unavailable',
-                    'score': course.get('Score', 0)
+                    'score': score
                 })
+
+        # Flatten the grouped course details into a list for rendering
+        course_details = []
+        for (session, semester, level), courses in grouped_course_details.items():
+            for course in courses:
+                course.update({
+                    'session': session,
+                    'semester': semester,
+                    'level': level
+                })
+                course_details.append(course)
 
         process_detailed_course_results(student_info, course_details)
 
@@ -115,15 +104,6 @@ def scrape(request):
         }
         request.session.set_expiry(timedelta(minutes=15))
 
-        return redirect('collector:results')
-
-    return redirect('home:welcome')
-
-
-def results(request):
-    context = request.session.get('context')
-
-    if context:
-        return render(request, 'assessment.html', context)
+        return redirect('analyzer:cleaned_results')
 
     return redirect('home:welcome')

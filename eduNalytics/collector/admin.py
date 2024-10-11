@@ -37,14 +37,8 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('title', 'code')
     inlines = [CourseOfferingInline]
 
-class CourseResultAdmin(admin.ModelAdmin):
-    list_display = ('course_offering', 'student', 'session', 'grade', 'score', 'semester')
-    search_fields = ('course_offering__course__title', 'student__name', 'session')
-    list_filter = ('session', 'course_offering__branch', 'course_offering__department')
-
 admin.site.register(models.Department, DepartmentAdmin)
 admin.site.register(models.Student, StudentAdmin)
 admin.site.register(models.Course, CourseAdmin)
-admin.site.register(models.CourseResult, CourseResultAdmin)
 admin.site.register(models.CourseBranch)
 admin.site.register(models.CourseOffering)
