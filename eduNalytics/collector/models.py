@@ -66,7 +66,7 @@ class CourseResult(models.Model):
     level = models.CharField(max_length=20, editable=False)  
 
     def __str__(self):
-        return f"{self.course_offering.course} - {self.student} - {self.session} {self.semester} {self.grade} {self.score}"
+        return f"{self.course_offering.course} - {self.student} - {self.session} {self.level} {self.semester} {self.grade} {self.score}"
 
     class Meta:
         verbose_name = "Course Result"

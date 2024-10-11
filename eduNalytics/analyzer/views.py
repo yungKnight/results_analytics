@@ -34,7 +34,7 @@ def student_cleaned_results(request):
 
         filter_results_by_semester(student)
 
-        sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (int(x.split()[0]), x))
+        sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (x.split()[0], x))
 
         serialized_cleaned_results_by_semester = {
             semester: [detailed_course_result_to_dict(result) for result in cleaned_results_by_semester[semester]]

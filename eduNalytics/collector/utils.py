@@ -50,17 +50,17 @@ def get_level(course_code, department, repetition_count=0):
         elif adjusted_level >= 400 and adjusted_level < 500:
             return '400 level'
         elif adjusted_level >= 500 and adjusted_level < 600:
-            if program_length >= 5:
-                return '500 level' if repetition_count == 0 else 'Extra year (repeating courses)'
+            if program_length == 5:
+                return '500 level' if repetition_count == 0 else 'Extra year'
         elif adjusted_level >= 600 and adjusted_level < 700:
-            if program_length >= 6:
-                return '600 level' if repetition_count == 0 else 'Extra year (repeating courses)'
+            if program_length == 6:
+                return '600 level' if repetition_count == 0 else 'Extra year'
         elif adjusted_level >= 700 and adjusted_level < 800:
-            if program_length >= 7:
-                return '700 level' if repetition_count == 0 else 'Extra year (repeating courses)'
+            if program_length == 7:
+                return '700 level' if repetition_count == 0 else 'Extra year'
 
         if adjusted_level >= final_level:
-            return 'Extra year (repeating courses)'
+            return 'Extra year'
 
         return 'Unknown level'
     else:

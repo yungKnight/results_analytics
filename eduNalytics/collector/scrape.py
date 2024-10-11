@@ -41,7 +41,7 @@ async def run_scrape_script(matric, pword):
 
             name = await name_element.inner_text()
             status = await status_element.inner_text()
-            
+
             pattern = re.compile(r'^([A-Z]+),\s*([A-Z])[a-z]*(?:\s+([A-Z]))?[a-z]*')
             match = re.match(pattern, name)
             formatted_name = f"{match.group(1)} {match.group(2)}.{match.group(3) or ''}"
@@ -67,24 +67,32 @@ async def run_scrape_script(matric, pword):
             results = response.css('div.form-group')[1:-2]
 
             your_result = []
+            course_repetition_count = {}
+
             for result in results:
                 course_code = result.css('div.col-sm-1::text').get().strip()
+                session = result.css('div.col-sm-2::text').get().strip()
+                grade = result.css('div.col-sm-1:nth-child(6)::text').get().strip()
+                score = result.css('div.col-sm-2:nth-child(4)::text').get().strip()
+
+                if course_code not in course_repetition_count:
+                    course_repetition_count[course_code] = 0
+                else:
+                    course_repetition_count[course_code] += 1
+
                 try:
                     semester = get_semester(course_code)
                 except ValidationError:
                     semester = 'Unknown'
 
-                try:
-                    level = get_level(course_code, department)
-                except ValidationError:
-                    level = 'Unknown'
+                level = get_level(course_code, department, course_repetition_count[course_code])
 
                 your_result.append({
-                    'Session': result.css('div.col-sm-2::text').get().strip(),
+                    'Session': session,
                     'Course': course_code,
-                    'Grade': result.css('div.col-sm-1:nth-child(6)::text').get().strip(),
-                    'Score': result.css('div.col-sm-2:nth-child(4)::text').get().strip(),
-                    'Semester': semester, 
+                    'Grade': grade,
+                    'Score': score,
+                    'Semester': semester,
                     'Level': level
                 })
 
@@ -102,7 +110,7 @@ async def run_scrape_script(matric, pword):
 
             await browser.close()
             return result_data
-        
+
     except ValueError:
         return {'error': 'Wrong credentials. Try again'}
     except Exception:
