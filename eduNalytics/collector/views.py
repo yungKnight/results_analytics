@@ -126,4 +126,4 @@ def results(request):
     if context:
         return render(request, 'assessment.html', context)
 
-    return redirect('home:home')
+    return redirect('home:welcome')

@@ -1,6 +1,6 @@
 from .models import DetailedCourseResult
 from collector.models import Student
-from collector.utils import get_semester  # Import the get_semester function
+from collector.utils import get_semester
 from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
 
@@ -21,14 +21,18 @@ def filter_results_by_semester(student):
     cleaned_results_by_semester.clear()
 
     try:
-        results = DetailedCourseResult.objects.filter(student=student).order_by('level', 'course')  # Order by course to determine semester correctly
-        
+        results = DetailedCourseResult.objects.filter(student=student).order_by('level', 'course')
+
         for result in results:
-            # Determine semester using the get_semester function
-            semester = get_semester(result.course)  # Use the function to determine the semester
-            semester_key = f"{result.level} level {semester}"
-            cleaned_results_by_semester[semester_key].append(result)
+            semester = get_semester(result.course)
+            # Create a unique key for level and semester
+            semester_key = f"{result.level} {semester}"
             
+            if semester_key not in cleaned_results_by_semester:
+                cleaned_results_by_semester[semester_key] = []
+            
+            cleaned_results_by_semester[semester_key].append(result)
+
     except ObjectDoesNotExist:
         return []
         
@@ -46,6 +50,6 @@ def calculate_gpa(course_results):
         total_units += unit
     
     if total_units == 0:
-        return 0  # Avoid division by zero
+        return 0 
     
     return total_points / total_units
