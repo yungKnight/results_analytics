@@ -2,9 +2,9 @@ from django.contrib import admin
 from .models import DetailedCourseResult  
 
 class DetailedCourseResultAdmin(admin.ModelAdmin):
-    list_display = ('student', 'level', 'semester', 'course', 'unit', 'branch', 'grade', 'score')  # Fields to display in the list view
-    list_filter = ('level', 'semester', 'branch', 'grade')  # Fields to filter by in the admin panel
-    search_fields = ('student__name', 'course', 'level', 'semester')  # Fields to search by in the admin panel
+    list_display = ('student', 'level', 'semester', 'course', 'unit', 'branch', 'grade', 'score') 
+    list_filter = ('level', 'semester', 'branch', 'grade')
+    search_fields = ('student__name', 'course', 'level', 'semester')  
 
     readonly_fields = ('student', 'level', 'semester', 'course', 'unit', 'branch', 'grade', 'score')
 

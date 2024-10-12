@@ -3,6 +3,7 @@ from collector.models import Student
 from collector.utils import get_semester
 from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
+import re
 
 GRADE_POINTS = {
     'A': 5,
@@ -25,8 +26,11 @@ def filter_results_by_semester(student):
 
         for result in results:
             semester = get_semester(result.course)
-            # Create a unique key for level and semester
-            semester_key = f"{result.level} {semester}"
+            
+            level = re.search(r'\d+', result.level).group(0) if re.search(r'\d+', result.level) else result.level
+            formatted_level = f"{level} level" if 'level' not in result.level else result.level.strip()
+            
+            semester_key = f"{formatted_level} {semester}".strip()
             
             if semester_key not in cleaned_results_by_semester:
                 cleaned_results_by_semester[semester_key] = []
@@ -35,6 +39,7 @@ def filter_results_by_semester(student):
 
     except ObjectDoesNotExist:
         return []
+
         
 def calculate_gpa(course_results):
     """Calculate GPA based on course results."""

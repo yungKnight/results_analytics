@@ -35,7 +35,6 @@ def scrape(request):
             department=department
         )
 
-        # Initialize a dictionary to group course details by semester and level
         grouped_course_details = defaultdict(list)
 
         for course in scrape_result['CourseResults']:
@@ -70,12 +69,12 @@ def scrape(request):
                     'score': score
                 })
             else:
-                # Handle non-course object instances
                 level_string = course.get('Level', 'unavailable')
-                if re.search(r'\d+', level_string):  # Handle numerical levels
+                if re.search(r'\d+', level_string):  
                     level = re.search(r'\d+', level_string).group(0)
+                    level_string = f"{level} level"
                 else:
-                    level = 'extra year'  # Default to 'extra year' for non-numerical levels
+                    level_string = 'extra year'
 
                 grouped_course_details[(session, semester, level)].append({
                     'course_code': course_code,
@@ -85,7 +84,6 @@ def scrape(request):
                     'score': score
                 })
 
-        # Flatten the grouped course details into a list for rendering
         course_details = []
         for (session, semester, level), courses in grouped_course_details.items():
             for course in courses:

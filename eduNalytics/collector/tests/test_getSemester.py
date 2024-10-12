@@ -6,7 +6,7 @@ from collector.utils import get_semester
     ('ECO101', 'Harmattan', False),
     ('ENG102', 'Rain', False),
     ('MED201', 'Harmattan', False),
-    ('XXX', None, True),  # Invalid course code that raises an error
+    ('XXX', None, True),
 ])
 
 def test_get_semester(course_code, expected_semester, expect_error):
