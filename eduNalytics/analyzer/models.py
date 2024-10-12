@@ -1,5 +1,5 @@
 from django.db import models
-from collector.models import Student
+from collector.models import Student, Department
 from django.core.validators import MaxValueValidator
 
 class DetailedCourseResult(models.Model):

@@ -4,7 +4,7 @@ from .scrape import run_scrape_script
 from .models import Course, CourseOffering, Student, Department
 from datetime import timedelta
 from .utils import get_level
-from analyzer.utils import process_detailed_course_results
+from analyzer.utils import process_detailed_course_results, filter_results_by_level_semester
 import re
 from collections import defaultdict
 

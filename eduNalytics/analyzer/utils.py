@@ -1,5 +1,6 @@
 from .models import DetailedCourseResult 
 from collector.models import Student
+from collections import defaultdict
 
 def process_detailed_course_results(student_info, course_details):
     student_name = student_info['Name']
@@ -38,3 +39,21 @@ def process_detailed_course_results(student_info, course_details):
                 existing_result.branch = course['branch']
                 existing_result.save()
 
+def filter_results_by_level_semester(student):
+    grouped_results = defaultdict(list)
+
+    # Query the DetailedCourseResult model to get all courses for the student
+    all_courses = DetailedCourseResult.objects.filter(student=student)
+
+    for course in all_courses:
+        level_semester_key = f"{course.level} level {course.semester}"
+        
+        grouped_results[level_semester_key].append({
+            'course': course.course,  # Change this to store the course code
+            'branch': course.branch,
+            'grade': course.grade,
+            'unit': course.unit,
+            'score': course.score,
+        })
+
+    return grouped_results
