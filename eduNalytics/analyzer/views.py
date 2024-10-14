@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import timedelta
 from .models import DetailedCourseResult
-from .results_utils import filter_results_by_semester, cleaned_results_by_semester
+from .results_utils import filter_results_by_semester, cleaned_results_by_semester, calculate_branch_gpa_for_each_semester, calculate_gpa_for_each_semester
 from collector.models import Student
 
 def detailed_course_result_to_dict(result):
@@ -34,6 +34,10 @@ def student_cleaned_results(request):
 
         filter_results_by_semester(student)
 
+        gpa_data_by_semester = calculate_gpa_for_each_semester()
+
+        calculate_branch_gpa_for_each_semester()
+
         sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (x.split()[0], x))
 
         serialized_cleaned_results_by_semester = {
@@ -42,12 +46,14 @@ def student_cleaned_results(request):
         }
 
         context['cleaned_results_by_semester'] = serialized_cleaned_results_by_semester
+        context['gpa_data_by_semester'] = gpa_data_by_semester 
 
         request.session.set_expiry(timedelta(minutes=15))
 
         return render(request, 'cleaned.html', {
             'student': student,
             'cleaned_results_by_semester': serialized_cleaned_results_by_semester.items(),
+            'gpa_data_by_semester': gpa_data_by_semester.items(),
         })
 
     return redirect('home:welcome')

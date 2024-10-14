@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load custom_tags %}  <!-- Load your custom template tags -->
+
 {% block title %}
    {{ student.name }} Results
 {% endblock %}
@@ -34,6 +36,8 @@
                 </tbody>
             </table>
         {% endfor %}
+        <div>{{ gpa_data_by_semester }}</div>
+
     {% else %}
         <p>No results available for this student.</p>
     {% endif %}

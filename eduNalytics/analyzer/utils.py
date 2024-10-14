@@ -37,6 +37,7 @@ def process_detailed_course_results(student_info, course_details):
             else:
                 existing_result.unit = unit
                 existing_result.branch = course['branch']
+                existing_result.level = course['level']
                 existing_result.save()
 
 def filter_results_by_level_semester(student):

@@ -15,6 +15,7 @@ GRADE_POINTS = {
 }
 
 cleaned_results_by_semester = defaultdict(list)
+gpa_data_by_semester = defaultdict(dict)
 
 def filter_results_by_semester(student):
     """Filter detailed course results by level and semester and store in global scope."""
@@ -40,7 +41,7 @@ def filter_results_by_semester(student):
     except ObjectDoesNotExist:
         return []
 
-        
+
 def calculate_gpa(course_results):
     """Calculate GPA based on course results."""
     total_points = 0
@@ -58,3 +59,47 @@ def calculate_gpa(course_results):
         return 0 
     
     return total_points / total_units
+
+
+def calculate_gpa_for_each_semester():
+    """Calculate GPA for each semester and structure it for frontend use."""
+    global gpa_data_by_semester
+    gpa_data_by_semester.clear()
+
+    for semester_key, course_results in cleaned_results_by_semester.items():
+        gpa = calculate_gpa(course_results)
+        
+        gpa_data_by_semester[semester_key] = gpa_data_by_semester.get(semester_key, {})
+        gpa_data_by_semester[semester_key]['GPA'] = gpa  
+        gpa_data_by_semester[semester_key]['Branch_GPA'] = gpa_data_by_semester[semester_key].get('Branch_GPA', None)  
+        gpa_data_by_semester[semester_key]['CGPA'] = None 
+
+    return gpa_data_by_semester
+
+
+def calculate_branch_gpa_for_each_semester():
+    """Calculate Branch GPA for each semester and append it to the GPA data."""
+    global gpa_data_by_semester
+
+    for semester_key, course_results in cleaned_results_by_semester.items():
+        branch_gpa_dict = defaultdict(list)
+    
+        for result in course_results:
+            branch = result.branch if result.branch else 'General' 
+            branch_gpa_dict[branch].append(result)
+        
+        branch_gpa = {}
+        for branch, branch_results in branch_gpa_dict.items():
+            gpa = calculate_gpa(branch_results)
+            branch_gpa[branch] = gpa
+
+        if semester_key in gpa_data_by_semester:
+            gpa_data_by_semester[semester_key]['Branch_GPA'] = branch_gpa
+        else:
+            gpa_data_by_semester[semester_key] = {
+                'GPA': None, 
+                'Branch_GPA': branch_gpa,
+                'CGPA': None   
+            }
+
+    return gpa_data_by_semester
