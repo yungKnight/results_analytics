@@ -60,7 +60,6 @@ def calculate_gpa(course_results):
     
     return total_points / total_units
 
-
 def calculate_gpa_for_each_semester():
     """Calculate GPA for each semester and structure it for frontend use."""
     global gpa_data_by_semester
@@ -70,12 +69,44 @@ def calculate_gpa_for_each_semester():
         gpa = calculate_gpa(course_results)
         
         gpa_data_by_semester[semester_key] = gpa_data_by_semester.get(semester_key, {})
-        gpa_data_by_semester[semester_key]['GPA'] = gpa  
+        gpa_data_by_semester[semester_key]['GPA'] = round(gpa, 2)
         gpa_data_by_semester[semester_key]['Branch_GPA'] = gpa_data_by_semester[semester_key].get('Branch_GPA', None)  
-        gpa_data_by_semester[semester_key]['CGPA'] = None 
+        gpa_data_by_semester[semester_key]['CGPA'] = gpa_data_by_semester[semester_key].get('CGPA', None)
 
     return gpa_data_by_semester
 
+def calculate_cgpa(student):
+    """Calculate CGPA step-by-step based on detailed course results for a student."""
+    global gpa_data_by_semester
+
+    results = DetailedCourseResult.objects.filter(student=student).order_by('level', 'semester')
+
+    total_points = 0
+    total_units = 0
+    cumulative_gpa = 0
+
+    for result in results:    
+        grade_point = GRADE_POINTS.get(result.grade, 0)
+        total_points += grade_point * result.unit
+        total_units += result.unit
+        
+        if total_units > 0:
+            cumulative_gpa = round(total_points / total_units, 2)
+
+        level = re.search(r'\d+', result.level).group(0) if re.search(r'\d+', result.level) else result.level
+        formatted_level = f"{level} level" if 'level' not in result.level else result.level.strip()
+        semester_key = f"{formatted_level} {get_semester(result.course)}".strip()
+
+        if semester_key in gpa_data_by_semester:
+            gpa_data_by_semester[semester_key]['CGPA'] = cumulative_gpa
+        else:
+            gpa_data_by_semester[semester_key] = {
+                'GPA': None, 
+                'Branch_GPA': None,
+                'CGPA': cumulative_gpa   
+            }
+
+    return gpa_data_by_semester
 
 def calculate_branch_gpa_for_each_semester():
     """Calculate Branch GPA for each semester and append it to the GPA data."""
@@ -91,7 +122,7 @@ def calculate_branch_gpa_for_each_semester():
         branch_gpa = {}
         for branch, branch_results in branch_gpa_dict.items():
             gpa = calculate_gpa(branch_results)
-            branch_gpa[branch] = gpa
+            branch_gpa[branch] = round(gpa, 2)
 
         if semester_key in gpa_data_by_semester:
             gpa_data_by_semester[semester_key]['Branch_GPA'] = branch_gpa

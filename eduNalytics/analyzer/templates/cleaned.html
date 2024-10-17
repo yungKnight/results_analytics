@@ -1,12 +1,39 @@
 {% extends 'base.html' %}
 
-{% load custom_tags %}  <!-- Load your custom template tags -->
+{% load custom_tags %} <!-- Load your custom template tags -->
 
 {% block title %}
    {{ student.name }} Results
 {% endblock %}
 
 {% block content %}
+<style>
+    .btn-lightgreen {
+        background-color: #90ee90;
+        color: black;
+        border: none;
+    }
+    .btn-lightgreen:hover {
+        background-color: #76c76a;
+        color: white;
+    }
+
+   .btn-glass {
+        border-radius: 12px; /* Rounded corners */
+        color: white; /* Text color */
+        border: none; /* Remove border */
+        padding: 10px 20px; /* Padding for the button */
+        font-size: 1.2em; /* Font size */
+        box-shadow: 0 4px 20px rgba(0, 200, 0, 2.15);
+        transition: background 0.3s; /* Smooth background tra on */
+    }
+
+    .align-right {
+        display: flex;
+        justify-content: flex-end; /* Align to the right */
+    }
+</style>
+
 <div class="container mt-5">
     <h1 class="text-center">Detailed Course Results for {{ student.name }}</h1>
 
@@ -36,8 +63,10 @@
                 </tbody>
             </table>
         {% endfor %}
-        <div>{{ gpa_data_by_semester }}</div>
-
+        <div class="container mt-2 align-right">
+            <button class="btn btn-lightgreen" href="#">View Analysis</button>
+        </div>
+        <div class="p-4">{{ gpa_data_by_semester }}</div>
     {% else %}
         <p>No results available for this student.</p>
     {% endif %}
