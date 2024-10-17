@@ -30,7 +30,7 @@ def student_cleaned_results(request):
         student = Student.objects.filter(name=student_name, entry_type=entry_type).first()
 
         if not student:
-            return redirect('home:welcome')
+            return redirect('home:home')
 
         filter_results_by_semester(student)
 
