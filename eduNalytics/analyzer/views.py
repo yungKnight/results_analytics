@@ -59,3 +59,7 @@ def student_cleaned_results(request):
         })
 
     return redirect('home:welcome')
+
+def display_insights(request):
+
+    return render(request, 'visual.html')
