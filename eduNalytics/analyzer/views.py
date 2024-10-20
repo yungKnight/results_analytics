@@ -55,7 +55,7 @@ def student_cleaned_results(request):
         return render(request, 'cleaned.html', {
             'student': student,
             'cleaned_results_by_semester': serialized_cleaned_results_by_semester.items(),
-            'gpa_data_by_semester': gpa_data_by_semester.items(),
+            'gpa_data_by_semester': gpa_data_by_semester,
         })
 
     return redirect('home:welcome')
