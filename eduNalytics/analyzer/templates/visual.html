@@ -1,10 +1,42 @@
 {% extends 'base.html' %}
 
 {% block title %}
-   My Results Insights
+   My Results Insight
 {% endblock %}
 
 {% block content %}
 
+<h1 class="px-4 pt-4 pb-2">Semester Insights</h1>
+
+{% if processed_semester_data %}
+    <table>
+        <thead>
+            <tr>
+                <th class="px-4 pt-4 pb-1">Semester</th>
+                <th class="px-4 pt-4 pb-1">GPA</th>
+                <th class="px-4 pt-4 pb-1">CGPA</th>
+                <th class="px-4 pt-4 pb-1">Branch GPA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semester, data in processed_semester_data.items %}
+            <tr>
+                <td class="px-4 py-1">{{ semester }}</td>
+                <td class="px-4 py-1">{{ data.GPA }}</td>
+                <td class="px-4 py-1">{{ data.CGPA }}</td>
+                <td class="px-4 py-2">
+                    <ul>
+                        {% for branch, gpa in data.Branch_GPA.items %}
+                        <li>{{ branch }}: {{ gpa }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No GPA data available for display.</p>
+{% endif %}
 
 {% endblock %}

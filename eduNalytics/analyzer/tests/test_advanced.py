@@ -52,3 +52,5 @@ def test_process_gpa_data(multi_branch_scenario):
         assert 'Mathematics For Economists' in data['Branch_GPA']
         assert 'Microeconomics' in data['Branch_GPA']
         assert 'Macroeconomics' in data['Branch_GPA']
+
+    print(type(processed_data))

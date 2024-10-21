@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import DetailedCourseResult
 from .results_utils import filter_results_by_semester, cleaned_results_by_semester, calculate_branch_gpa_for_each_semester, calculate_gpa_for_each_semester, calculate_cgpa
+from .advanced_utils import process_gpa_data
 from collector.models import Student
 
 def detailed_course_result_to_dict(result):
@@ -61,5 +62,15 @@ def student_cleaned_results(request):
     return redirect('home:welcome')
 
 def display_insights(request):
+    context = request.session.get('context')
 
-    return render(request, 'visual.html')
+    if context:
+        processed_semester_data = process_gpa_data()
+
+        request.session.set_expiry(timedelta(minutes=15))
+
+        return render(request, 'visual.html', {
+            'processed_semester_data': processed_semester_data,
+        })
+    
+    return redirect('home:welcome')

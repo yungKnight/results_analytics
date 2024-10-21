@@ -65,12 +65,21 @@ def calculate_gpa_for_each_semester():
     global gpa_data_by_semester
     gpa_data_by_semester.clear()
 
-    for semester_key, course_results in cleaned_results_by_semester.items():
+    def sort_key(semester_key):
+        level, semester = semester_key.split(' level ')
+        level_num = int(level)
+        semester_order = 0 if semester.lower() == 'harmattan' else 1  
+        return (level_num, semester_order)
+
+    sorted_semester_keys = sorted(cleaned_results_by_semester.keys(), key=sort_key)
+
+    for semester_key in sorted_semester_keys:
+        course_results = cleaned_results_by_semester[semester_key]
         gpa = calculate_gpa(course_results)
-        
+
         gpa_data_by_semester[semester_key] = gpa_data_by_semester.get(semester_key, {})
         gpa_data_by_semester[semester_key]['GPA'] = round(gpa, 2)
-        gpa_data_by_semester[semester_key]['Branch_GPA'] = gpa_data_by_semester[semester_key].get('Branch_GPA', None)  
+        gpa_data_by_semester[semester_key]['Branch_GPA'] = gpa_data_by_semester[semester_key].get('Branch_GPA', None)
         gpa_data_by_semester[semester_key]['CGPA'] = gpa_data_by_semester[semester_key].get('CGPA', None)
 
     return gpa_data_by_semester
