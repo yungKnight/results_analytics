@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import timedelta
 from .models import DetailedCourseResult
-from .results_utils import filter_results_by_semester, cleaned_results_by_semester, calculate_branch_gpa_for_each_semester, calculate_gpa_for_each_semester, calculate_cgpa
+from .results_utils import filter_results_by_semester, cleaned_results_by_semester, calculate_branch_gpa_for_each_semester, calculate_gpa_for_each_semester, calculate_cgpa, calculate_total_units_for_semester
 from .advanced_utils import process_gpa_data
 from collector.models import Student
 
@@ -40,6 +40,8 @@ def student_cleaned_results(request):
         calculate_cgpa(student)
 
         calculate_branch_gpa_for_each_semester()
+
+        calculate_total_units_for_semester()
 
         sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (x.split()[0], x))
 

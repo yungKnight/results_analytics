@@ -56,6 +56,7 @@ def extract_semester_data(gpa_data_by_semester):
         semester_data[semester] = {
             'GPA': data.get('GPA', 0.0),
             'CGPA': data.get('CGPA', 0.0),
+            'Total_units': data.get('Total_units', 0),
             'Branch_GPA': data.get('Branch_GPA', {})
         }
     return semester_data

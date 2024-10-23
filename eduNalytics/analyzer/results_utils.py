@@ -81,8 +81,7 @@ def calculate_gpa_for_each_semester():
         gpa_data_by_semester[semester_key]['GPA'] = round(gpa, 2)
         gpa_data_by_semester[semester_key]['Branch_GPA'] = gpa_data_by_semester[semester_key].get('Branch_GPA', None)
         gpa_data_by_semester[semester_key]['CGPA'] = gpa_data_by_semester[semester_key].get('CGPA', None)
-        gpa_data_by_semester[semester_key]['Total_units'] = gpa_data_by_semester[semester_key].get('Total_units', None)
-
+        gpa_data_by_semester[semester_key]['Total_units'] = gpa_data_by_semester[semester_key].get('Total_units', 0)
 
     return gpa_data_by_semester
 
@@ -153,6 +152,7 @@ def calculate_total_units_for_semester():
 
     for semester_key, course_results in cleaned_results_by_semester.items():
         total_units = 0
+
         for result in course_results:
             units = result.unit if result.unit else 2  # Default to 2 if unit is missing
             total_units += units

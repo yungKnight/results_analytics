@@ -100,7 +100,7 @@ def scrape(request):
             'course_details': course_details,
             'student_info': student_info,
         }
-        request.session.set_expiry(timedelta(minutes=15))
+        #request.session.set_expiry(timedelta(minutes=15))
 
         return redirect('analyzer:cleaned_results')
 
