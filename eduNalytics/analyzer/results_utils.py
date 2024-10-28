@@ -41,7 +41,6 @@ def filter_results_by_semester(student):
     except ObjectDoesNotExist:
         return []
 
-
 def calculate_gpa(course_results):
     """Calculate GPA based on course results."""
     total_points = 0
@@ -154,7 +153,7 @@ def calculate_total_units_for_semester():
         total_units = 0
 
         for result in course_results:
-            units = result.unit if result.unit else 2  # Default to 2 if unit is missing
+            units = result.unit if result.unit else 2 
             total_units += units
 
         if semester_key in gpa_data_by_semester:
