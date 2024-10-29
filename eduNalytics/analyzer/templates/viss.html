@@ -1,13 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+   Result Visualizer
+{% endblock %}
+
+{% block content %}
+
 <div>
   <div style="display: flex; flex-wrap: wrap; width: 100vw; flex-direction: row;">
     <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 2rem;">
-      <h2 style="text-align: center;">Branch GPA</h2>
+      <h2 style="text-align: center;" class="text-4xl">Branch GPA</h2>
       {{ branch_gpa_chart_html|safe }}
     </div>
 
     <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 2rem;">
-      <h2 style="text-align: center;">CGPA & GPA</h2>
+      <h2 style="text-align: center;" class="text-4xl">CGPA & GPA</h2>
       {{ combined_chart_html|safe }}
     </div>
   </div>
 </div>
+
+{% endblock %}

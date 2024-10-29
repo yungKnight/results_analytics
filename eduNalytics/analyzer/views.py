@@ -11,12 +11,8 @@ from .results_utils import (
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
 from .visualizer_utils import (
-    extract_gpa_data,
-    extract_cgpa_data,
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
-    generate_gpa_chart,
-    generate_cgpa_chart,
     generate_branch_gpa_chart,
     generate_combined_gpa_cgpa_chart
 )
@@ -80,41 +76,10 @@ def gpa_time_series_chart(request):
     if not gpa_data:
         return redirect('home:home')
 
-    # Extract data for GPA chart
     semesters, gpa_values = extract_gpa_data(gpa_data)
     chart_html = generate_gpa_chart(semesters, gpa_values)
 
     return render(request, 'gpa_chart.html', {'chart': chart_html})
-
-def cgpa_time_series_chart(request):
-    """Generates a CGPA time series chart for students."""
-    cgpa_data = request.session.get('gpa_data_by_semester')
-
-    if not cgpa_data:
-        return redirect('home:home')
-
-    # Extract data for CGPA chart
-    semesters, cgpa_values = extract_cgpa_data(cgpa_data)
-    chart_html = generate_cgpa_chart(semesters, cgpa_values)
-
-    return render(request, 'cgpa_chart.html', {'chart': chart_html})
-
-def branch_gpa_time_series_chart(request):
-    """Generates a Branch GPA time series chart for students."""
-    gpa_data = request.session.get('gpa_data_by_semester')
-
-    if not gpa_data:
-        return redirect('home:home')
-
-    # Extract branch GPA data
-    branch_gpa_data = extract_branch_gpa_data(gpa_data)
-
-    # Process data for the branch GPA chart
-    branches = list(branch_gpa_data.keys())
-    branch_gpa_values = [branch_gpa_data[branch] for branch in branches]
-    chart_html = generate_branch_gpa_chart(branches, branch_gpa_values)
-
-    return render(request, 'branch_gpa_chart.html', {'chart': chart_html})
 
 def display_insights(request):
     """Displays insights based on processed GPA data."""
@@ -145,13 +110,8 @@ def plot_view(request):
 
     gpa_data = request.session.get('gpa_data_by_semester')
     
-    # Extract combined GPA and CGPA data
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     
-    gpa_chart_html = generate_gpa_chart(semesters_gpa, gpa_values)
-    cgpa_chart_html = generate_cgpa_chart(semesters_gpa, cgpa_values)
-
-    # Extract branch GPA data
     branch_gpa_data = {}
     if gpa_data:
         for semester, data in gpa_data.items():
@@ -162,15 +122,11 @@ def plot_view(request):
                 branch_gpa_data[branch]['semesters'].append(semester)
                 branch_gpa_data[branch]['gpas'].append(branch_gpa)
 
-    # Generate branch GPA chart
     branch_gpa_chart_html = generate_branch_gpa_chart(branch_gpa_data) if branch_gpa_data else ''
 
-    # Generate combined GPA and CGPA chart
     combined_chart_html = generate_combined_gpa_cgpa_chart(semesters_gpa, gpa_values, cgpa_values)
 
     return render(request, 'viss.html', {
-        'gpa_chart_html': gpa_chart_html,
-        'cgpa_chart_html': cgpa_chart_html,
         'branch_gpa_chart_html': branch_gpa_chart_html,
-        'combined_chart_html': combined_chart_html  # Add combined chart to context
+        'combined_chart_html': combined_chart_html
     })
