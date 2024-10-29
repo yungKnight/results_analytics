@@ -5,6 +5,6 @@ app_name = 'analyzer'
 
 urlpatterns = [
     path('results/', views.student_cleaned_results, name='cleaned_results'),
-    path('results/insight', views.display_insights, name='results_insight'),
+    path('results/insight/', views.display_insights, name='results_insight'),
     path('results/insight/visual', views.plot_view, name='visual'),
 ]
