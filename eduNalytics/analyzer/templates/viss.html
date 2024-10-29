@@ -1,29 +1,28 @@
 <div>
-  <div style="display: flex; flex-wrap: wrap; width: 100vw;flex-direction: row;">
-    <div style="height: 450px; width: 45vw; padding-bottom: 1rem;">
+  <div style="display: flex; flex-wrap: wrap; width: 100vw; flex-direction: row;">
+    <!--<div style="height: 450px; width: 45vw; padding-bottom: 1rem;">
       <h2 style="text-align: center;">Boxplot of Scores by Level</h2>
       {{ boxplot_html|safe }}
     </div>
 
-    <div style="height: 450px; width: 55vw; padding-bottom: 1rem;">
+    <div style="height: 450px; width: 50vw; padding-bottom: 1rem;">
       <h2 style="text-align: center;">GPA Time Series</h2>
       {{ gpa_chart_html|safe }}
     </div>
 
-    <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 2rem;">
+    <div style="height: 450px; width: 50vw; padding-bottom: 1rem;">
       <h2 style="text-align: center;">CGPA Time Series</h2>
       {{ cgpa_chart_html|safe }}
+    </div>-->
+
+    <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 2rem;">
+      <h2 style="text-align: center;">Branch GPA</h2>
+      {{ branch_gpa_chart_html|safe }}
     </div>
 
     <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 2rem;">
-      <h2 style="text-align: center;">More...</h2>
-      {{ more_html|safe }}
+      <h2 style="text-align: center;">CGPA & GPA</h2>
+      {{ combined_chart_html|safe }}
     </div>
   </div>
-  
-  <div style="height: 450px; width: 100vw; padding-top: 2rem;">
-    <h2 style="text-align: center;">Scatterplot of Scores by Course</h2>
-    {{ scatterplot_html|safe }}
-  </div>
-
 </div>

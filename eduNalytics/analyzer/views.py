@@ -10,7 +10,16 @@ from .results_utils import (
 )
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
-import plotly.graph_objs as go
+from .visualizer_utils import (
+    extract_gpa_data,
+    extract_cgpa_data,
+    extract_branch_gpa_data,
+    extract_combined_gpa_cgpa_data,
+    generate_gpa_chart,
+    generate_cgpa_chart,
+    generate_branch_gpa_chart,
+    generate_combined_gpa_cgpa_chart
+)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -65,54 +74,50 @@ def student_cleaned_results(request):
     return redirect('home:welcome')
 
 def gpa_time_series_chart(request):
-    """Generates a GPA time series chart from the session data."""
+    """Generates a GPA time series chart for students."""
     gpa_data = request.session.get('gpa_data_by_semester')
 
     if not gpa_data:
         return redirect('home:home')
 
-    semesters = list(gpa_data.keys())
-    gpa_values = [gpa_data[semester].get('GPA') for semester in semesters]
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=semesters, y=gpa_values, mode='lines+markers', name='GPA'))
-    
-    fig.update_layout(
-        title="GPA Time Series",
-        xaxis_title="Semester",
-        yaxis_title="GPA",
-        template="plotly_white"
-    )
-
-    chart_html = fig.to_html(full_html=False)
+    # Extract data for GPA chart
+    semesters, gpa_values = extract_gpa_data(gpa_data)
+    chart_html = generate_gpa_chart(semesters, gpa_values)
 
     return render(request, 'gpa_chart.html', {'chart': chart_html})
 
 def cgpa_time_series_chart(request):
-    """Generates a CGPA time series chart from the session data."""
+    """Generates a CGPA time series chart for students."""
     cgpa_data = request.session.get('gpa_data_by_semester')
 
     if not cgpa_data:
         return redirect('home:home')
 
-    semesters = list(cgpa_data.keys())
-    cgpa_values = [cgpa_data[semester].get('CGPA') for semester in semesters]
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=semesters, y=cgpa_values, mode='lines+markers', name='CGPA'))
-
-    fig.update_layout(
-        title="CGPA Time Series",
-        xaxis_title="Semester",
-        yaxis_title="CGPA",
-        template="plotly_white"
-    )
-
-    chart_html = fig.to_html(full_html=False)
+    # Extract data for CGPA chart
+    semesters, cgpa_values = extract_cgpa_data(cgpa_data)
+    chart_html = generate_cgpa_chart(semesters, cgpa_values)
 
     return render(request, 'cgpa_chart.html', {'chart': chart_html})
 
+def branch_gpa_time_series_chart(request):
+    """Generates a Branch GPA time series chart for students."""
+    gpa_data = request.session.get('gpa_data_by_semester')
+
+    if not gpa_data:
+        return redirect('home:home')
+
+    # Extract branch GPA data
+    branch_gpa_data = extract_branch_gpa_data(gpa_data)
+
+    # Process data for the branch GPA chart
+    branches = list(branch_gpa_data.keys())
+    branch_gpa_values = [branch_gpa_data[branch] for branch in branches]
+    chart_html = generate_branch_gpa_chart(branches, branch_gpa_values)
+
+    return render(request, 'branch_gpa_chart.html', {'chart': chart_html})
+
 def display_insights(request):
+    """Displays insights based on processed GPA data."""
     context = request.session.get('context')
 
     if context:
@@ -124,7 +129,7 @@ def display_insights(request):
     return redirect('home:welcome')
 
 def plot_view(request):
-    """Generates boxplot, scatterplot, and includes GPA and CGPA time series charts if session data is available."""
+    """Displays GPA, CGPA, and Branch GPA charts for the student."""
     if not request.session.get('context') or not request.session['context'].get('student_info'):
         return redirect('home:welcome')
 
@@ -139,30 +144,33 @@ def plot_view(request):
         return render(request, 'error_template.html', {"error_message": "Student or Department not found"})
 
     gpa_data = request.session.get('gpa_data_by_semester')
-    semesters_gpa = list(gpa_data.keys()) if gpa_data else []
-    gpa_values = [gpa_data[sem].get('GPA') for sem in semesters_gpa] if gpa_data else []
+    
+    # Extract combined GPA and CGPA data
+    semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
+    
+    gpa_chart_html = generate_gpa_chart(semesters_gpa, gpa_values)
+    cgpa_chart_html = generate_cgpa_chart(semesters_gpa, cgpa_values)
 
-    gpa_fig = go.Figure()
-    gpa_fig.add_trace(go.Scatter(x=semesters_gpa, y=gpa_values, mode='lines+markers', name='GPA'))
-    gpa_fig.update_layout(
-        xaxis_title="Semester",
-        yaxis_title="GPA",
-        template="plotly_white"
-    )
-    gpa_chart_html = gpa_fig.to_html(full_html=False)
+    # Extract branch GPA data
+    branch_gpa_data = {}
+    if gpa_data:
+        for semester, data in gpa_data.items():
+            branch_gpas = data.get('Branch_GPA', {})
+            for branch, branch_gpa in branch_gpas.items():
+                if branch not in branch_gpa_data:
+                    branch_gpa_data[branch] = {'semesters': [], 'gpas': []}
+                branch_gpa_data[branch]['semesters'].append(semester)
+                branch_gpa_data[branch]['gpas'].append(branch_gpa)
 
-    cgpa_values = [gpa_data[sem].get('CGPA') for sem in semesters_gpa] if gpa_data else []
+    # Generate branch GPA chart
+    branch_gpa_chart_html = generate_branch_gpa_chart(branch_gpa_data) if branch_gpa_data else ''
 
-    cgpa_fig = go.Figure()
-    cgpa_fig.add_trace(go.Scatter(x=semesters_gpa, y=cgpa_values, mode='lines+markers', name='CGPA'))
-    cgpa_fig.update_layout(
-        xaxis_title="Semester",
-        yaxis_title="CGPA",
-        template="plotly_white"
-    )
-    cgpa_chart_html = cgpa_fig.to_html(full_html=False)
+    # Generate combined GPA and CGPA chart
+    combined_chart_html = generate_combined_gpa_cgpa_chart(semesters_gpa, gpa_values, cgpa_values)
 
     return render(request, 'viss.html', {
         'gpa_chart_html': gpa_chart_html,
-        'cgpa_chart_html': cgpa_chart_html
+        'cgpa_chart_html': cgpa_chart_html,
+        'branch_gpa_chart_html': branch_gpa_chart_html,
+        'combined_chart_html': combined_chart_html  # Add combined chart to context
     })
