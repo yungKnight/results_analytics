@@ -9,6 +9,15 @@ def extract_gpa_data(gpa_data):
     gpa_values = [gpa_data[sem].get('GPA') for sem in semesters]
     return semesters, gpa_values
 
+def extract_total_units(gpa_data):
+    """Extract semesters and total units values for plotting."""
+    if not gpa_data:
+        return [], []
+    
+    semesters = list(gpa_data.keys())
+    total_units = [gpa_data[sem].get('Total_units', 0) for sem in semesters]
+    return semesters, total_units
+
 def extract_cgpa_data(gpa_data):
     """Extract semesters and CGPA values for plotting."""
     if not gpa_data:
