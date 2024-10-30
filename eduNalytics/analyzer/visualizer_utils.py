@@ -35,6 +35,24 @@ def extract_combined_gpa_cgpa_data(gpa_data):
     cgpa_values = [gpa_data[sem].get('CGPA') for sem in semesters]
     return semesters, gpa_values, cgpa_values
 
+def extract_from_cleaned_semester(cleaned_results_by_semester):
+    """Extract values for semesters, courses, units, branches, grades, and scores respectively for plotting."""
+    
+    if not cleaned_results_by_semester:
+        return [], [], [], [], [], []
+
+    semesters = list(cleaned_results_by_semester.keys())
+    courses, units, branches, grades, scores = [], [], [], [], []
+    
+    for semester in semesters:
+        for course_info in cleaned_results_by_semester[semester]:
+            courses.append(course_info.get('course'))
+            units.append(course_info.get('unit'))
+            branches.append(course_info.get('branch'))
+            grades.append(course_info.get('grade'))
+            scores.append(course_info.get('score'))
+    
+    return semesters, courses, units, branches, grades, scores
 
 def generate_branch_gpa_chart(branch_gpa_data):
     """Generate a time series chart for each branch GPA."""
@@ -78,6 +96,6 @@ def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
     fig.update_layout(
         xaxis_title="Semester",
         yaxis_title="Value",
-        template="plotly_white"
+        template="plotly_white",
     )
     return fig.to_html(full_html=False)
