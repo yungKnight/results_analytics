@@ -13,8 +13,10 @@ from collector.models import Student, Department
 from .visualizer_utils import (
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
+    extract_from_cleaned_semester,
     generate_branch_gpa_chart,
-    generate_combined_gpa_cgpa_chart
+    generate_combined_gpa_cgpa_chart,
+    generate_boxplot_charts
 )
 
 def detailed_course_result_to_dict(result):
@@ -69,18 +71,6 @@ def student_cleaned_results(request):
 
     return redirect('home:welcome')
 
-def gpa_time_series_chart(request):
-    """Generates a GPA time series chart for students."""
-    gpa_data = request.session.get('gpa_data_by_semester')
-
-    if not gpa_data:
-        return redirect('home:home')
-
-    semesters, gpa_values = extract_gpa_data(gpa_data)
-    chart_html = generate_gpa_chart(semesters, gpa_values)
-
-    return render(request, 'gpa_chart.html', {'chart': chart_html})
-
 def display_insights(request):
     """Displays insights based on processed GPA data."""
     context = request.session.get('context')
@@ -93,8 +83,32 @@ def display_insights(request):
     
     return redirect('home:welcome')
 
+def gpa_time_series_chart(request):
+    """Generates a GPA time series chart for students."""
+    gpa_data = request.session.get('gpa_data_by_semester')
+
+    if not gpa_data:
+        return redirect('home:home')
+
+    semesters, gpa_values = extract_gpa_data(gpa_data)
+    chart_html = generate_gpa_chart(semesters, gpa_values)
+
+    return render(request, 'gpa_chart.html', {'chart': chart_html})
+
+def boxplots(request):
+    """Extract and generate boxplots for per-semester and per-level scores."""
+    
+    cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
+    if not cleaned_results_by_semester:
+        return '', ''
+
+    semester_boxplot_html, level_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
+    
+    return semester_boxplot_html, level_boxplot_html
+
 def plot_view(request):
-    """Displays GPA, CGPA, and Branch GPA charts for the student."""
+    """Displays GPA, CGPA, Branch GPA charts, and boxplots for the student."""
+    
     if not request.session.get('context') or not request.session['context'].get('student_info'):
         return redirect('home:welcome')
 
@@ -109,7 +123,6 @@ def plot_view(request):
         return render(request, 'error_template.html', {"error_message": "Student or Department not found"})
 
     gpa_data = request.session.get('gpa_data_by_semester')
-    
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     
     branch_gpa_data = {}
@@ -123,10 +136,15 @@ def plot_view(request):
                 branch_gpa_data[branch]['gpas'].append(branch_gpa)
 
     branch_gpa_chart_html = generate_branch_gpa_chart(branch_gpa_data) if branch_gpa_data else ''
-
     combined_chart_html = generate_combined_gpa_cgpa_chart(semesters_gpa, gpa_values, cgpa_values)
+
+    # Retrieve cleaned_results_by_semester from session and pass it to generate_boxplot_charts
+    cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
+    semester_boxplot_html, level_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html,
-        'combined_chart_html': combined_chart_html
+        'combined_chart_html': combined_chart_html,
+        'semester_boxplot_html': semester_boxplot_html,
+        'level_boxplot_html': level_boxplot_html,
     })

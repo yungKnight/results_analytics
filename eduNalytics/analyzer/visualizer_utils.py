@@ -99,3 +99,57 @@ def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
         template="plotly_white",
     )
     return fig.to_html(full_html=False)
+
+def generate_boxplot_charts(course_data):
+    """
+    Generate boxplots for scores per semester and per level.
+    
+    Args:
+        course_data (dict): Dictionary with semesters as keys and lists of course details as values.
+        
+    Returns:
+        tuple: HTML strings for per-semester and per-level boxplot figures.
+    """
+    # Per-semester boxplot
+    semester_fig = go.Figure()
+    level_fig = go.Figure()
+
+    # Create per-semester boxplot
+    for semester, courses in course_data.items():
+        scores = [course['score'] for course in courses]
+        semester_fig.add_trace(go.Box(
+            y=scores,
+            name=semester,
+            boxmean=True,
+            marker=dict(color='blue')
+        ))
+
+    semester_fig.update_layout(
+        title="Scores per Semester",
+        yaxis_title="Scores",
+        template="plotly_white"
+    )
+
+    # Create per-level boxplot
+    level_scores = {}
+    for semester, courses in course_data.items():
+        level = semester.split(' ')[0] + " level"
+        if level not in level_scores:
+            level_scores[level] = []
+        level_scores[level].extend([course['score'] for course in courses])
+
+    for level, scores in level_scores.items():
+        level_fig.add_trace(go.Box(
+            y=scores,
+            name=level,
+            boxmean=True,
+            marker=dict(color='green')
+        ))
+
+    level_fig.update_layout(
+        title="Scores per Level",
+        yaxis_title="Scores",
+        template="plotly_white"
+    )
+
+    return semester_fig.to_html(full_html=False), level_fig.to_html(full_html=False)
