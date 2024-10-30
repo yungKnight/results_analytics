@@ -153,3 +153,34 @@ def generate_boxplot_charts(course_data):
     )
 
     return semester_fig.to_html(full_html=False), level_fig.to_html(full_html=False)
+
+
+def generate_scatter_plot(courses, scores):
+    """
+    Generate a scatter plot for courses and scores.
+    
+    Args:
+        courses (list): List of course names.
+        scores (list): List of corresponding scores for each course.
+        
+    Returns:
+        str: HTML string for the scatter plot figure.
+    """
+    scatter_fig = go.Figure()
+
+    scatter_fig.add_trace(go.Scatter(
+        x=courses,
+        y=scores,
+        mode='markers',
+        marker=dict(size=7, color='blue', opacity=0.6),
+        text=courses
+    ))
+
+    scatter_fig.update_layout(
+        xaxis_title="Courses",
+        yaxis_title="Scores",
+        template="plotly_white",
+        xaxis=dict(tickangle=60, tickfont=dict(size=11, style="italic"))
+    )
+
+    return scatter_fig.to_html(full_html=False)
