@@ -1,4 +1,5 @@
 import plotly.graph_objs as go
+import plotly.colors as pc
 
 def extract_total_units(gpa_data):
     """Extract semesters and total units values for plotting."""
@@ -110,18 +111,19 @@ def generate_boxplot_charts(course_data):
     Returns:
         tuple: HTML strings for per-semester and per-level boxplot figures.
     """
-    # Per-semester boxplot
+    
     semester_fig = go.Figure()
     level_fig = go.Figure()
 
-    # Create per-semester boxplot
-    for semester, courses in course_data.items():
+    colors = pc.qualitative.Plotly
+    num_colors = len(colors)
+
+    for i, (semester, courses) in enumerate(course_data.items()):
         scores = [course['score'] for course in courses]
         semester_fig.add_trace(go.Box(
             y=scores,
             name=semester,
-            boxmean=True,
-            marker=dict(color='blue')
+            marker=dict(color=colors[i % num_colors]) 
         ))
 
     semester_fig.update_layout(
@@ -130,7 +132,6 @@ def generate_boxplot_charts(course_data):
         template="plotly_white"
     )
 
-    # Create per-level boxplot
     level_scores = {}
     for semester, courses in course_data.items():
         level = semester.split(' ')[0] + " level"
@@ -138,12 +139,11 @@ def generate_boxplot_charts(course_data):
             level_scores[level] = []
         level_scores[level].extend([course['score'] for course in courses])
 
-    for level, scores in level_scores.items():
+    for i, (level, scores) in enumerate(level_scores.items()):
         level_fig.add_trace(go.Box(
             y=scores,
             name=level,
-            boxmean=True,
-            marker=dict(color='green')
+            marker=dict(color=colors[i % num_colors])
         ))
 
     level_fig.update_layout(
