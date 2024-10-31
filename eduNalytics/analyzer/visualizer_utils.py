@@ -119,23 +119,19 @@ def generate_boxplot_charts(course_data):
     colors = pc.qualitative.Plotly
     num_colors = len(colors)
 
-    # Generate per-semester boxplot
     for i, (semester, courses) in enumerate(course_data.items()):
         scores = [course['score'] for course in courses]
         semester_fig.add_trace(go.Box(
             y=scores,
             name=semester,
-            marker=dict(color=colors[i % num_colors]),
-            boxmean=True  # Display mean line within each box
+            marker=dict(color=colors[i % num_colors])
         ))
 
     semester_fig.update_layout(
-        title="Scores Distribution per Semester",
         yaxis_title="Scores",
         template="plotly_white"
     )
 
-    # Generate per-level boxplot
     level_scores = {}
     for semester, courses in course_data.items():
         level = semester.split(' ')[0] + " level"
@@ -147,31 +143,26 @@ def generate_boxplot_charts(course_data):
         level_fig.add_trace(go.Box(
             y=scores,
             name=level,
-            marker=dict(color=colors[i % num_colors]),
-            boxmean=True  # Display mean line within each box
+            marker=dict(color=colors[i % num_colors])
         ))
 
     level_fig.update_layout(
-        title="Scores Distribution per Level",
         yaxis_title="Scores",
         template="plotly_white"
     )
 
-    # Generate all-courses boxplot and overlay individual course scores as scatter points
     all_scores = [course['score'] for courses in course_data.values() for course in courses]
     all_scores_fig.add_trace(go.Box(
         y=all_scores,
         name="All Courses",
-        marker_color='brown',
-        boxmean=True  # Display mean line within the all-courses boxplot
+        marker_color='brown'
     ))
 
-    # Overlay scatter plot for individual course scores within the all-courses boxplot
     scatter_scores = [course['score'] for courses in course_data.values() for course in courses]
     course_names = [course['course'] for courses in course_data.values() for course in courses]
     all_scores_fig.add_trace(go.Scatter(
         y=scatter_scores,
-        x=["All Courses"] * len(scatter_scores),  # Align scatter points within the all-courses box
+        x=["All Courses"] * len(scatter_scores), 
         mode='markers',
         marker=dict(size=8, color='red', opacity=0.6),
         text=course_names,
@@ -180,7 +171,6 @@ def generate_boxplot_charts(course_data):
     ))
 
     all_scores_fig.update_layout(
-        title="Overall Scores Distribution with Course Scores Overlay",
         yaxis_title="Scores",
         template="plotly_white"
     )
