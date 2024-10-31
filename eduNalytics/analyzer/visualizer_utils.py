@@ -103,17 +103,18 @@ def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
 
 def generate_boxplot_charts(course_data):
     """
-    Generate boxplots for scores per semester and per level.
+    Generate boxplots for scores per semester, per level, and a combined boxplot for all courses.
     
     Args:
         course_data (dict): Dictionary with semesters as keys and lists of course details as values.
         
     Returns:
-        tuple: HTML strings for per-semester and per-level boxplot figures.
+        tuple: HTML strings for per-semester, per-level, and all-course boxplot figures.
     """
     
     semester_fig = go.Figure()
     level_fig = go.Figure()
+    all_scores_fig = go.Figure()
 
     colors = pc.qualitative.Plotly
     num_colors = len(colors)
@@ -152,7 +153,24 @@ def generate_boxplot_charts(course_data):
         template="plotly_white"
     )
 
-    return semester_fig.to_html(full_html=False), level_fig.to_html(full_html=False)
+    all_scores = [course['score'] for courses in course_data.values() for course in courses]
+    all_scores_fig.add_trace(go.Box(
+        y=all_scores,
+        name="All Courses",
+        marker_color='brown'
+    ))
+
+    all_scores_fig.update_layout(
+        title="Aggregate Score Distribution Across All Courses",
+        yaxis_title="Scores",
+        template="plotly_white"
+    )
+
+    return (
+        semester_fig.to_html(full_html=False),
+        level_fig.to_html(full_html=False),
+        all_scores_fig.to_html(full_html=False)
+    )
 
 
 def generate_scatter_plot(courses, scores):
@@ -172,7 +190,7 @@ def generate_scatter_plot(courses, scores):
         x=courses,
         y=scores,
         mode='markers',
-        marker=dict(size=7, color='blue', opacity=0.6),
+        marker=dict(size=7, color='red', opacity=0.6),
         text=courses
     ))
 
@@ -184,3 +202,4 @@ def generate_scatter_plot(courses, scores):
     )
 
     return scatter_fig.to_html(full_html=False)
+

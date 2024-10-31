@@ -96,17 +96,6 @@ def gpa_time_series_chart(request):
 
     return render(request, 'gpa_chart.html', {'chart': chart_html})
 
-def boxplots(request):
-    """Extract and generate boxplots for per-semester and per-level scores."""
-    
-    cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
-    if not cleaned_results_by_semester:
-        return '', ''
-
-    semester_boxplot_html, level_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
-    
-    return semester_boxplot_html, level_boxplot_html
-
 def plot_view(request):
     """Displays GPA, CGPA, Branch GPA charts, boxplots, and scatter plot for the student."""
     
@@ -146,12 +135,13 @@ def plot_view(request):
     else:
         scatter_plot_html = ''
         
-    semester_boxplot_html, level_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
+    semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html,
         'combined_chart_html': combined_chart_html,
         'semester_boxplot_html': semester_boxplot_html,
         'level_boxplot_html': level_boxplot_html,
+        'all_scores_boxplot_html': all_scores_boxplot_html,
         'scatter_plot_html': scatter_plot_html,
     })
