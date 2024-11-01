@@ -152,26 +152,23 @@ def generate_boxplot_charts(course_data):
     )
 
     all_scores = [course['score'] for courses in course_data.values() for course in courses]
+    
     all_scores_fig.add_trace(go.Box(
         y=all_scores,
         name="All Courses",
-        marker_color='brown'
+        boxpoints="all",  
+        marker_color='brown',
+        jitter=0.7, 
+        pointpos=0, 
     ))
-
-    scatter_scores = [course['score'] for courses in course_data.values() for course in courses]
-    course_names = [course['course'] for courses in course_data.values() for course in courses]
-    all_scores_fig.add_trace(go.Scatter(
-        y=scatter_scores,
-        x=["All Courses"] * len(scatter_scores), 
-        mode='markers',
-        marker=dict(size=8, color='red', opacity=0.6),
-        text=course_names,
-        hoverinfo='text',
-        showlegend=False
-    ))
-
+    
     all_scores_fig.update_layout(
+        title="Boxplot with Built-in Points",
         yaxis_title="Scores",
+        xaxis=dict(
+            showticklabels=False,
+            showgrid=False
+        ),
         template="plotly_white"
     )
 
