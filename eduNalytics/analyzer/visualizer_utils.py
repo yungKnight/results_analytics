@@ -152,14 +152,17 @@ def generate_boxplot_charts(course_data):
     )
 
     all_scores = [course['score'] for courses in course_data.values() for course in courses]
-    
+    all_courses_text = [f"Course: {course['course']} \nScore: {course['score']}" for courses in course_data.values() for course in courses]
+
     all_scores_fig.add_trace(go.Box(
         y=all_scores,
         name="All Courses",
         boxpoints="all",  
         marker_color='brown',
         jitter=0.7, 
-        pointpos=0, 
+        pointpos=0,
+        text=all_courses_text,
+        hoverinfo="text" 
     ))
     
     all_scores_fig.update_layout(
