@@ -1,6 +1,7 @@
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import plotly.colors as pc
+import random
 
 def extract_total_units(gpa_data):
     """Extract semesters and total units values for plotting."""
@@ -167,7 +168,6 @@ def generate_boxplot_charts(course_data):
     ))
     
     all_scores_fig.update_layout(
-        title="Boxplot with Built-in Points",
         yaxis_title="Scores",
         xaxis=dict(
             showticklabels=False,
@@ -211,12 +211,18 @@ def generate_scatter_plot(courses, scores):
     )
 
     return scatter_fig.to_html(full_html=False)
+branch_colors = {}
+
+def get_branch_color(branch):
+    """Get color for the branch, generating a new one if not already assigned."""
+    if branch not in branch_colors:
+        branch_colors[branch] = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+    return branch_colors[branch]
 
 def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester):
     """Generate a pie chart showing the overall representation of branches."""
     branch_counts = {}
 
-    # Count occurrences of each branch across all semesters
     for semester, courses in cleaned_results_by_semester.items():
         for course_info in courses:
             branch = course_info.get('branch')
@@ -226,10 +232,15 @@ def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester
 
     labels = list(branch_counts.keys())
     values = list(branch_counts.values())
+    colors = [get_branch_color(branch) for branch in labels]
 
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-    fig.update_layout(title_text='Overall Branch Representation in Courses', template="plotly_white", height=550)
-    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))])
+    fig.update_layout(
+        template="plotly_white",
+        margin=dict(l=40, r=40, t=50, b=5),
+        height=580
+    )
+
     return fig.to_html(full_html=False)
 
 def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
@@ -237,7 +248,6 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
     if not cleaned_results_by_semester:
         return []
 
-    # Calculate total courses per branch for each semester
     branch_distribution = {}
     for semester, courses in cleaned_results_by_semester.items():
         branch_distribution[semester] = {}
@@ -252,12 +262,13 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
     for semester, distribution in branch_distribution.items():
         labels = list(distribution.keys())
         values = list(distribution.values())
+        colors = [get_branch_color(branch) for branch in labels]
 
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))])
         fig.update_layout(
             title_text=f'{semester}', 
             template="plotly_white",
-            margin=dict(l=20, r=20, t=40, b=5),  # Adjust margins to reduce space
+            margin=dict(l=10, r=20, t=50, b=5),
             height=300,
             showlegend=False
         )

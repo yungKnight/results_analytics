@@ -135,10 +135,8 @@ def plot_view(request):
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
         scatter_plot_html = generate_scatter_plot(courses, scores)
 
-        # Generate the overall branch representation pie chart
         overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
 
-        # Generate individual pie charts for branch distribution per semester
         semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
     else:
         scatter_plot_html = ''
@@ -155,6 +153,6 @@ def plot_view(request):
         'all_scores_boxplot_html': all_scores_boxplot_html,
         'scatter_plot_html': scatter_plot_html,
         'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
-        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,  # List of semester pie chart HTML
+        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list, 
     })
 
