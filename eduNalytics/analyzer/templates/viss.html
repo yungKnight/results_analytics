@@ -45,11 +45,14 @@
 
     <div style="height: 650px; width: 60vw; padding-bottom: 1rem; padding-top: 9rem;">
       <h2 style="text-align: center;" class="text-4xl">Branch Distribution of Courses per Semester</h2>
-    {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
-        {{ pie_chart_html|safe }}
-    {% endfor %}
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+          {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
+              <div style="flex: 0 0 calc(25% - 20px);">
+                  {{ pie_chart_html|safe }}
+              </div>
+          {% endfor %}
+      </div>
     </div>
-
     <!--<div style="height: 450px; width: 100vw; padding-bottom: 1rem; padding-top: 6.7rem;">
         {% for semester, chart in branch_course_charts.items %}
           <div class="chart-container">

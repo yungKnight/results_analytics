@@ -228,10 +228,10 @@ def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester
     values = list(branch_counts.values())
 
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-    fig.update_layout(title_text='Overall Branch Representation in Courses', template="plotly_white")
+    fig.update_layout(title_text='Overall Branch Representation in Courses', template="plotly_white", height=550)
     
     return fig.to_html(full_html=False)
-    
+
 def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
     """Generate individual pie charts for branch distribution of courses per semester."""
     if not cleaned_results_by_semester:
@@ -254,7 +254,13 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
         values = list(distribution.values())
 
         fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-        fig.update_layout(title_text=f'Branch Distribution of Courses in {semester}', template="plotly_white")
+        fig.update_layout(
+            title_text=f'{semester}', 
+            template="plotly_white",
+            margin=dict(l=20, r=20, t=40, b=5),  # Adjust margins to reduce space
+            height=300,
+            showlegend=False
+        )
         
         pie_chart_html_list.append(fig.to_html(full_html=False))
 
