@@ -18,7 +18,8 @@ from .visualizer_utils import (
     generate_combined_gpa_cgpa_chart,
     generate_boxplot_charts,
     generate_scatter_plot,
-    generate_branch_percentage_pie_chart
+    generate_overall_branch_representation_pie_chart,
+    generate_branch_distribution_pie_charts
 )
 
 def detailed_course_result_to_dict(result):
@@ -99,7 +100,7 @@ def gpa_time_series_chart(request):
 
 def plot_view(request):
     """Displays GPA, CGPA, Branch GPA charts, boxplots, and scatter plot for the student."""
-    
+
     if not request.session.get('context') or not request.session['context'].get('student_info'):
         return redirect('home:welcome')
 
@@ -133,13 +134,18 @@ def plot_view(request):
     if cleaned_results_by_semester:
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
         scatter_plot_html = generate_scatter_plot(courses, scores)
+
+        # Generate the overall branch representation pie chart
+        overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
+
+        # Generate individual pie charts for branch distribution per semester
+        semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
     else:
         scatter_plot_html = ''
-        
-    semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
+        overall_branch_pie_chart_html = ''
+        semester_distribution_pie_chart_html_list = []
 
-    # Generate the pie chart
-    pie_chart_html = generate_branch_percentage_pie_chart(cleaned_results_by_semester) if cleaned_results_by_semester else ''
+    semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html,
@@ -148,5 +154,7 @@ def plot_view(request):
         'level_boxplot_html': level_boxplot_html,
         'all_scores_boxplot_html': all_scores_boxplot_html,
         'scatter_plot_html': scatter_plot_html,
-        'pie_chart_html': pie_chart_html,  # Add pie chart to context
+        'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
+        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,  # List of semester pie chart HTML
     })
+

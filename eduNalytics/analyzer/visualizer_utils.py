@@ -211,33 +211,51 @@ def generate_scatter_plot(courses, scores):
     )
 
     return scatter_fig.to_html(full_html=False)
-    
-def generate_branch_percentage_pie_chart(cleaned_results_by_semester):
-    """Generate a pie chart showing the percentage of courses offered per branch."""
-    branch_counts = {}
-    total_courses = 0
 
-    # Count courses by branch
+def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester):
+    """Generate a pie chart showing the overall representation of branches."""
+    branch_counts = {}
+
+    # Count occurrences of each branch across all semesters
     for semester, courses in cleaned_results_by_semester.items():
         for course_info in courses:
             branch = course_info.get('branch')
-            total_courses += 1
-            if branch in branch_counts:
-                branch_counts[branch] += 1
-            else:
-                branch_counts[branch] = 1
+            if branch not in branch_counts:
+                branch_counts[branch] = 0
+            branch_counts[branch] += 1
 
-    # Prepare data for the pie chart
-    branch_names = list(branch_counts.keys())
-    branch_values = list(branch_counts.values())
-    branch_percentages = [(count / total_courses) * 100 for count in branch_values]
+    labels = list(branch_counts.keys())
+    values = list(branch_counts.values())
 
-    # Generate the pie chart
-    fig = go.Figure(data=[go.Pie(labels=branch_names, values=branch_percentages, hole=.3)])
-    
-    fig.update_layout(
-        title_text='Percentage of Courses Offered by Branch',
-        template='plotly_white'
-    )
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    fig.update_layout(title_text='Overall Branch Representation in Courses', template="plotly_white")
     
     return fig.to_html(full_html=False)
+    
+def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
+    """Generate individual pie charts for branch distribution of courses per semester."""
+    if not cleaned_results_by_semester:
+        return []
+
+    # Calculate total courses per branch for each semester
+    branch_distribution = {}
+    for semester, courses in cleaned_results_by_semester.items():
+        branch_distribution[semester] = {}
+        for course_info in courses:
+            branch = course_info.get('branch')
+            if branch not in branch_distribution[semester]:
+                branch_distribution[semester][branch] = 0
+            branch_distribution[semester][branch] += 1
+
+    pie_chart_html_list = []
+
+    for semester, distribution in branch_distribution.items():
+        labels = list(distribution.keys())
+        values = list(distribution.values())
+
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+        fig.update_layout(title_text=f'Branch Distribution of Courses in {semester}', template="plotly_white")
+        
+        pie_chart_html_list.append(fig.to_html(full_html=False))
+
+    return pie_chart_html_list

@@ -38,9 +38,16 @@
       {{ all_scores_boxplot_html|safe }}
     </div>
 
-    <div style="height: 450px; width: 40vw; padding-bottom: 1rem; padding-top: 6.7rem;">
-      <h2 style="text-align: center;" class="text-4xl">Overall Boxplot</h2>
-      {{ pie_chart_html|safe }}
+    <div style="height: 650px; width: 40vw; padding-bottom: 1rem; padding-top: 9rem;">
+      <h2 style="text-align: center;" class="text-4xl">Overall Pie-Chart</h2>
+       {{ overall_branch_pie_chart_html|safe }}
+    </div>
+
+    <div style="height: 650px; width: 60vw; padding-bottom: 1rem; padding-top: 9rem;">
+      <h2 style="text-align: center;" class="text-4xl">Branch Distribution of Courses per Semester</h2>
+    {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
+        {{ pie_chart_html|safe }}
+    {% endfor %}
     </div>
 
     <!--<div style="height: 450px; width: 100vw; padding-bottom: 1rem; padding-top: 6.7rem;">
