@@ -19,7 +19,8 @@ from .visualizer_utils import (
     generate_boxplot_charts,
     generate_scatter_plot,
     generate_overall_branch_representation_pie_chart,
-    generate_branch_distribution_pie_charts
+    generate_branch_distribution_pie_charts,
+    generate_branch_distribution_stacked_bar_chart
 )
 
 def detailed_course_result_to_dict(result):
@@ -99,7 +100,7 @@ def gpa_time_series_chart(request):
     return render(request, 'gpa_chart.html', {'chart': chart_html})
 
 def plot_view(request):
-    """Displays GPA, CGPA, Branch GPA charts, boxplots, and scatter plot for the student."""
+    """Displays GPA, CGPA, Branch GPA charts, boxplots, scatter plot, and branch distribution bar chart for the student."""
 
     if not request.session.get('context') or not request.session['context'].get('student_info'):
         return redirect('home:welcome')
@@ -138,10 +139,14 @@ def plot_view(request):
         overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
 
         semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
+
+        # Generate the stacked bar chart for branch distribution per semester
+        branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
     else:
         scatter_plot_html = ''
         overall_branch_pie_chart_html = ''
         semester_distribution_pie_chart_html_list = []
+        branch_distribution_stacked_bar_chart_html = ''
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
@@ -153,6 +158,6 @@ def plot_view(request):
         'all_scores_boxplot_html': all_scores_boxplot_html,
         'scatter_plot_html': scatter_plot_html,
         'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
-        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list, 
+        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,
+        'branch_distribution_stacked_bar_chart_html': branch_distribution_stacked_bar_chart_html,
     })
-
