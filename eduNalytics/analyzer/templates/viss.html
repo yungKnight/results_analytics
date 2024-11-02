@@ -38,6 +38,11 @@
       {{ all_scores_boxplot_html|safe }}
     </div>
 
+    <div style="height: 450px; width: 40vw; padding-bottom: 1rem; padding-top: 6.7rem;">
+      <h2 style="text-align: center;" class="text-4xl">Overall Boxplot</h2>
+      {{ pie_chart_html|safe }}
+    </div>
+
     <!--<div style="height: 450px; width: 100vw; padding-bottom: 1rem; padding-top: 6.7rem;">
         {% for semester, chart in branch_course_charts.items %}
           <div class="chart-container">

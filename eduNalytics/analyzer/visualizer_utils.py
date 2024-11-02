@@ -211,73 +211,33 @@ def generate_scatter_plot(courses, scores):
     )
 
     return scatter_fig.to_html(full_html=False)
-
-
-
-def generate_branch_course_frequency_charts(cleaned_results_by_semester):
-    """
-    Generates pie charts showing course frequency per branch for each semester.
     
-    Args:
-        cleaned_results_by_semester (dict): Data containing branch, grade, and course details by semester.
-    
-    Returns:
-        dict: A dictionary with Plotly figure objects for the charts.
-    """
-    figs = {}
+def generate_branch_percentage_pie_chart(cleaned_results_by_semester):
+    """Generate a pie chart showing the percentage of courses offered per branch."""
+    branch_counts = {}
+    total_courses = 0
 
-    # Loop through each semester to create course frequency pie charts
+    # Count courses by branch
     for semester, courses in cleaned_results_by_semester.items():
-        # Calculate data for course frequency per branch
-        branch_counts = {}
-        for course in courses:
-            branch = course.get('branch')
-            branch_counts[branch] = branch_counts.get(branch, 0) + 1
-        
-        # Generate course frequency pie chart for this semester
-        fig = go.Figure()
-        fig.add_trace(
-            go.Pie(
-                labels=list(branch_counts.keys()),
-                values=list(branch_counts.values()),
-                name=f"Course Frequency for {semester}",
-                textinfo="label+percent"
-            )
-        )
-        fig.update_layout(title_text=f"Course Frequency for {semester}")
-        
-        # Store the figure in the dictionary
-        figs[semester] = fig
+        for course_info in courses:
+            branch = course_info.get('branch')
+            total_courses += 1
+            if branch in branch_counts:
+                branch_counts[branch] += 1
+            else:
+                branch_counts[branch] = 1
 
-    return figs
+    # Prepare data for the pie chart
+    branch_names = list(branch_counts.keys())
+    branch_values = list(branch_counts.values())
+    branch_percentages = [(count / total_courses) * 100 for count in branch_values]
 
-def generate_overall_course_frequency_chart(cleaned_results_by_semester):
-    """
-    Generates a single pie chart that shows the overall course frequency across all semesters.
+    # Generate the pie chart
+    fig = go.Figure(data=[go.Pie(labels=branch_names, values=branch_percentages, hole=.3)])
     
-    Args:
-        cleaned_results_by_semester (dict): Data containing branch, grade, and course details by semester.
-    
-    Returns:
-        str: HTML string for the overall course frequency pie chart.
-    """
-    overall_branch_counts = {}
-
-    # Aggregate data for course frequency across all semesters
-    for courses in cleaned_results_by_semester.values():
-        for course in courses:
-            branch = course.get('branch')
-            overall_branch_counts[branch] = overall_branch_counts.get(branch, 0) + 1
-    
-    # Generate the overall course frequency pie chart
-    fig = go.Figure()
-    fig.add_trace(
-        go.Pie(
-            labels=list(overall_branch_counts.keys()),
-            values=list(overall_branch_counts.values()),
-            textinfo="label+percent"
-        )
+    fig.update_layout(
+        title_text='Percentage of Courses Offered by Branch',
+        template='plotly_white'
     )
-    fig.update_layout(title_text="Overall Course Frequency Across Semesters")
     
     return fig.to_html(full_html=False)

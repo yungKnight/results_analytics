@@ -17,7 +17,8 @@ from .visualizer_utils import (
     generate_branch_gpa_chart,
     generate_combined_gpa_cgpa_chart,
     generate_boxplot_charts,
-    generate_scatter_plot
+    generate_scatter_plot,
+    generate_branch_percentage_pie_chart
 )
 
 def detailed_course_result_to_dict(result):
@@ -137,6 +138,9 @@ def plot_view(request):
         
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
+    # Generate the pie chart
+    pie_chart_html = generate_branch_percentage_pie_chart(cleaned_results_by_semester) if cleaned_results_by_semester else ''
+
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html,
         'combined_chart_html': combined_chart_html,
@@ -144,4 +148,5 @@ def plot_view(request):
         'level_boxplot_html': level_boxplot_html,
         'all_scores_boxplot_html': all_scores_boxplot_html,
         'scatter_plot_html': scatter_plot_html,
+        'pie_chart_html': pie_chart_html,  # Add pie chart to context
     })
