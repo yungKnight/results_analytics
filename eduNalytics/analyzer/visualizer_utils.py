@@ -1,4 +1,5 @@
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 import plotly.colors as pc
 
 def extract_total_units(gpa_data):
@@ -211,3 +212,72 @@ def generate_scatter_plot(courses, scores):
 
     return scatter_fig.to_html(full_html=False)
 
+
+
+def generate_branch_course_frequency_charts(cleaned_results_by_semester):
+    """
+    Generates pie charts showing course frequency per branch for each semester.
+    
+    Args:
+        cleaned_results_by_semester (dict): Data containing branch, grade, and course details by semester.
+    
+    Returns:
+        dict: A dictionary with Plotly figure objects for the charts.
+    """
+    figs = {}
+
+    # Loop through each semester to create course frequency pie charts
+    for semester, courses in cleaned_results_by_semester.items():
+        # Calculate data for course frequency per branch
+        branch_counts = {}
+        for course in courses:
+            branch = course.get('branch')
+            branch_counts[branch] = branch_counts.get(branch, 0) + 1
+        
+        # Generate course frequency pie chart for this semester
+        fig = go.Figure()
+        fig.add_trace(
+            go.Pie(
+                labels=list(branch_counts.keys()),
+                values=list(branch_counts.values()),
+                name=f"Course Frequency for {semester}",
+                textinfo="label+percent"
+            )
+        )
+        fig.update_layout(title_text=f"Course Frequency for {semester}")
+        
+        # Store the figure in the dictionary
+        figs[semester] = fig
+
+    return figs
+
+def generate_overall_course_frequency_chart(cleaned_results_by_semester):
+    """
+    Generates a single pie chart that shows the overall course frequency across all semesters.
+    
+    Args:
+        cleaned_results_by_semester (dict): Data containing branch, grade, and course details by semester.
+    
+    Returns:
+        str: HTML string for the overall course frequency pie chart.
+    """
+    overall_branch_counts = {}
+
+    # Aggregate data for course frequency across all semesters
+    for courses in cleaned_results_by_semester.values():
+        for course in courses:
+            branch = course.get('branch')
+            overall_branch_counts[branch] = overall_branch_counts.get(branch, 0) + 1
+    
+    # Generate the overall course frequency pie chart
+    fig = go.Figure()
+    fig.add_trace(
+        go.Pie(
+            labels=list(overall_branch_counts.keys()),
+            values=list(overall_branch_counts.values()),
+            textinfo="label+percent"
+        )
+    )
+    fig.update_layout(title_text="Overall Course Frequency Across Semesters")
+    
+    return fig.to_html(full_html=False)

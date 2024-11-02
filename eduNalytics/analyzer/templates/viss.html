@@ -37,6 +37,20 @@
       <h2 style="text-align: center;" class="text-4xl">Overall Boxplot</h2>
       {{ all_scores_boxplot_html|safe }}
     </div>
+
+    <!--<div style="height: 450px; width: 100vw; padding-bottom: 1rem; padding-top: 6.7rem;">
+        {% for semester, chart in branch_course_charts.items %}
+          <div class="chart-container">
+            <h3>Course Frequency for {{ semester }}</h3>
+            {{ chart|safe }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chart-container">
+        <h3>Overall Course Frequency Across Semesters</h3>
+        {{ overall_course_freq_chart_html|safe }}
+    </div>-->
   </div>
 </div>
 
