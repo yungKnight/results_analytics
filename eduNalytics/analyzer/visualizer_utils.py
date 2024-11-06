@@ -98,6 +98,16 @@ def generate_branch_gpa_chart(branch_gpa_data):
         ))
 
     fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         xaxis_title="Semester",
         yaxis_title="GPA",
         template="plotly_white"
@@ -125,6 +135,16 @@ def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
     ))
 
     fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         xaxis_title="Semester",
         yaxis_title="Value",
         template="plotly_white",
@@ -158,6 +178,16 @@ def generate_boxplot_charts(course_data):
         ))
 
     semester_fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         yaxis_title="Scores",
         template="plotly_white"
     )
@@ -177,6 +207,16 @@ def generate_boxplot_charts(course_data):
         ))
 
     level_fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         yaxis_title="Scores",
         template="plotly_white"
     )
@@ -196,6 +236,16 @@ def generate_boxplot_charts(course_data):
     ))
     
     all_scores_fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         yaxis_title="Scores",
         xaxis=dict(
             showticklabels=False,
@@ -232,6 +282,16 @@ def generate_scatter_plot(courses, scores):
     ))
 
     scatter_fig.update_layout(
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
         xaxis_title="Courses",
         yaxis_title="Scores",
         template="plotly_white",
@@ -298,121 +358,203 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
 
     return pie_chart_html_list
 
-def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
+def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester):
     """
-    Generate a stacked bar chart to show the branch distribution per semester.
+    Generate a grouped bar chart that combines total courses per branch and passed courses per branch
+    to show the pass rate for each branch in a semester.
 
     Args:
         cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
 
     Returns:
-        str: HTML string for the stacked bar chart.
+        str: HTML string for the grouped bar chart.
     """
-    # Define a set of 6 predefined colors
-    predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
-    branch_colors = {}  # Map branches to predefined colors
 
-    # Collect data for each semester and branch
-    branch_course_count_per_semester = {}
+    branch_data = {}
     all_branches = set()
 
     for semester, courses in cleaned_results_by_semester.items():
-        branch_course_count_per_semester[semester] = {}
+        total_courses_per_branch = {}
+        passed_courses_per_branch = {}
+
         for course in courses:
             branch = course['branch']
             all_branches.add(branch)
-            if branch not in branch_course_count_per_semester[semester]:
-                branch_course_count_per_semester[semester][branch] = 0
-            branch_course_count_per_semester[semester][branch] += 1
+            total_courses_per_branch[branch] = total_courses_per_branch.get(branch, 0) + 1
+            if course['score'] >= 40:
+                passed_courses_per_branch[branch] = passed_courses_per_branch.get(branch, 0) + 1
 
-    # Assign colors to each branch (if not more than 6)
-    for i, branch in enumerate(sorted(all_branches)):
-        branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
+        branch_data[semester] = {
+            'total': total_courses_per_branch,
+            'passed': passed_courses_per_branch
+        }
 
-    # Prepare the stacked bar chart
+    predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
+    branch_colors = {branch: predefined_colors[i % len(predefined_colors)] for i, branch in enumerate(sorted(all_branches))}
+
     fig = go.Figure()
 
     for branch, color in branch_colors.items():
-        # Extract course counts for this branch across all semesters
-        branch_counts = [
-            branch_course_count_per_semester[semester].get(branch, 0) 
-            for semester in branch_course_count_per_semester.keys()
-        ]
-        
+        total_courses = [branch_data.get(semester, {}).get('total', {}).get(branch, 0) for semester in branch_data]
+        passed_courses = [branch_data.get(semester, {}).get('passed', {}).get(branch, 0) for semester in branch_data]
+
         fig.add_trace(go.Bar(
-            name=branch,
-            x=list(branch_course_count_per_semester.keys()),
-            y=branch_counts,
-            marker_color=color
+            name=f"{branch} offered",
+            x=list(branch_data.keys()),
+            y=total_courses,
+            marker_color=color,
+            opacity=1.0 
         ))
 
-    # Update layout for a stacked bar appearance
+        fig.add_trace(go.Bar(
+            name=f"Passed {branch}",
+            x=list(branch_data.keys()),
+            y=passed_courses,
+            marker_color=color,
+            opacity=0.55
+        ))
+
     fig.update_layout(
-        barmode='stack',
+        barmode='group',
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            "plotly-logomark"
+            ]
+        ),
         xaxis_title="Semester",
         yaxis_title="Number of Courses",
         template="plotly_white",
-        title="Branch Distribution per Semester",
+        xaxis=dict(tickangle=45, tickfont=dict(
+            style="italic"
+            )
+        ),
+        plot_bgcolor = "#ffffcc",
+        height=500,
     )
 
     return fig.to_html(full_html=False)
 
-def generate_passed_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
-    """
-    Generate a stacked bar chart showing only the distribution of passed courses per semester by branch.
-
-    Args:
-        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
-
-    Returns:
-        str: HTML string for the stacked bar chart.
-    """
-    # Define a set of 6 predefined colors
-    predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
-    branch_colors = {}  # Map branches to predefined colors
-
-    # Collect data for each semester and branch, filtering only passed courses
-    branch_course_count_per_semester = {}
-    all_branches = set()
-
-    for semester, courses in cleaned_results_by_semester.items():
-        branch_course_count_per_semester[semester] = {}
-        for course in courses:
-            if course['score'] >= 40:  # Only include passed courses
-                branch = course['branch']
-                all_branches.add(branch)
-                if branch not in branch_course_count_per_semester[semester]:
-                    branch_course_count_per_semester[semester][branch] = 0
-                branch_course_count_per_semester[semester][branch] += 1
-
-    # Assign colors to each branch (if not more than 6)
-    for i, branch in enumerate(sorted(all_branches)):
-        branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
-
-    # Prepare the stacked bar chart
-    fig = go.Figure()
-
-    for branch, color in branch_colors.items():
-        # Extract course counts for this branch across all semesters
-        branch_counts = [
-            branch_course_count_per_semester[semester].get(branch, 0) 
-            for semester in branch_course_count_per_semester.keys()
-        ]
-        
-        fig.add_trace(go.Bar(
-            name=branch,
-            x=list(branch_course_count_per_semester.keys()),
-            y=branch_counts,
-            marker_color=color
-        ))
-
-    # Update layout for a stacked bar appearance
-    fig.update_layout(
-        barmode='stack',
-        xaxis_title="Semester",
-        yaxis_title="Number of Passed Courses",
-        template="plotly_white",
-        title="Passed Courses Distribution per Semester by Branch",
-    )
-
-    return fig.to_html(full_html=False)
+#def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
+#    """
+#    Generate a stacked bar chart to show the branch distribution per semester.
+#
+#    Args:
+#        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
+#
+#    Returns:
+#        str: HTML string for the stacked bar chart.
+#    """
+#    # Define a set of 6 predefined colors
+#    predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
+#    branch_colors = {}  # Map branches to predefined colors
+#
+#    # Collect data for each semester and branch
+#    branch_course_count_per_semester = {}
+#    all_branches = set()
+#
+#    for semester, courses in cleaned_results_by_semester.items():
+#        branch_course_count_per_semester[semester] = {}
+#        for course in courses:
+#            branch = course['branch']
+#            all_branches.add(branch)
+#            if branch not in branch_course_count_per_semester[semester]:
+#                branch_course_count_per_semester[semester][branch] = 0
+#            branch_course_count_per_semester[semester][branch] += 1
+#
+#    # Assign colors to each branch (if not more than 6)
+#    for i, branch in enumerate(sorted(all_branches)):
+#        branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
+#
+#    # Prepare the stacked bar chart
+#    fig = go.Figure()
+#
+#    for branch, color in branch_colors.items():
+#        # Extract course counts for this branch across all semesters
+#        branch_counts = [
+#            branch_course_count_per_semester[semester].get(branch, 0) 
+#            for semester in branch_course_count_per_semester.keys()
+#        ]
+#        
+#        fig.add_trace(go.Bar(
+#            name=branch,
+#            x=list(branch_course_count_per_semester.keys()),
+#            y=branch_counts,
+#            marker_color=color
+#        ))
+#
+#    # Update layout for a stacked bar appearance
+#    fig.update_layout(
+#        barmode='stack',
+#        xaxis_title="Semester",
+#        yaxis_title="Number of Courses",
+#        template="plotly_white",
+#        height=500
+#    )
+#
+#    return fig.to_html(full_html=False)
+#
+#def generate_passed_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
+#    """
+#    Generate a stacked bar chart showing only the distribution of passed courses per semester by branch.
+#
+#    Args:
+#        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
+#
+#    Returns:
+#        str: HTML string for the stacked bar chart.
+#    """
+#    # Define a set of 6 predefined colors
+#    predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
+#    branch_colors = {}  # Map branches to predefined colors
+#
+#    # Collect data for each semester and branch, filtering only passed courses
+#    branch_course_count_per_semester = {}
+#    all_branches = set()
+#
+#    for semester, courses in cleaned_results_by_semester.items():
+#        branch_course_count_per_semester[semester] = {}
+#        for course in courses:
+#            if course['score'] >= 40:  # Only include passed courses
+#                branch = course['branch']
+#                all_branches.add(branch)
+#                if branch not in branch_course_count_per_semester[semester]:
+#                    branch_course_count_per_semester[semester][branch] = 0
+#                branch_course_count_per_semester[semester][branch] += 1
+#
+#    # Assign colors to each branch (if not more than 6)
+#    for i, branch in enumerate(sorted(all_branches)):
+#        branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
+#
+#    # Prepare the stacked bar chart
+#    fig = go.Figure()
+#
+#    for branch, color in branch_colors.items():
+#        # Extract course counts for this branch across all semesters
+#        branch_counts = [
+#            branch_course_count_per_semester[semester].get(branch, 0) 
+#            for semester in branch_course_count_per_semester.keys()
+#        ]
+#        
+#        fig.add_trace(go.Bar(
+#            name=branch,
+#            x=list(branch_course_count_per_semester.keys()),
+#            y=branch_counts,
+#            marker_color=color
+#        ))
+#
+#    # Update layout for a stacked bar appearance
+#    fig.update_layout(
+#        barmode='stack',
+#        xaxis_title="Semester",
+#        yaxis_title="Number of Passed Courses",
+#        template="plotly_white",
+#        height=500
+#    )
+#
+#    return fig.to_html(full_html=False)
