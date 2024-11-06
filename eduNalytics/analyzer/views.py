@@ -14,13 +14,15 @@ from .visualizer_utils import (
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
     extract_from_cleaned_semester,
+    extract_passed_courses_from_cleaned_semester,
     generate_branch_gpa_chart,
     generate_combined_gpa_cgpa_chart,
     generate_boxplot_charts,
     generate_scatter_plot,
     generate_overall_branch_representation_pie_chart,
     generate_branch_distribution_pie_charts,
-    generate_branch_distribution_stacked_bar_chart
+    generate_branch_distribution_stacked_bar_chart,
+    generate_passed_branch_distribution_stacked_bar_chart
 )
 
 def detailed_course_result_to_dict(result):
@@ -142,11 +144,13 @@ def plot_view(request):
 
         # Generate the stacked bar chart for branch distribution per semester
         branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
+        passed_branch_distribution_stacked_bar_chart_html = generate_passed_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
     else:
         scatter_plot_html = ''
         overall_branch_pie_chart_html = ''
         semester_distribution_pie_chart_html_list = []
         branch_distribution_stacked_bar_chart_html = ''
+        passed_branch_distribution_stacked_bar_chart_html = ''
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
@@ -160,4 +164,5 @@ def plot_view(request):
         'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
         'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,
         'branch_distribution_stacked_bar_chart_html': branch_distribution_stacked_bar_chart_html,
+        'passed_branch_distribution_stacked_bar_chart_html': passed_branch_distribution_stacked_bar_chart_html,
     })
