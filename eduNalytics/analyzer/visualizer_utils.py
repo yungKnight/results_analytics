@@ -424,7 +424,6 @@ def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_seme
             "zoomOut",           
             "lasso2d",
             "resetScale2d",
-            "plotly-logomark"
             ]
         ),
         xaxis_title="Semester",
@@ -450,11 +449,10 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
     Returns:
         str: HTML string for the stacked bar chart.
     """
-    # Define a set of 6 predefined colors
+    
     predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
-    branch_colors = {}  # Map branches to predefined colors
+    branch_colors = {} 
 
-    # Collect data for each semester and branch
     branch_course_count_per_semester = {}
     all_branches = set()
 
@@ -467,15 +465,12 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
                 branch_course_count_per_semester[semester][branch] = 0
             branch_course_count_per_semester[semester][branch] += 1
 
-    # Assign colors to each branch (if not more than 6)
     for i, branch in enumerate(sorted(all_branches)):
         branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
 
-    # Prepare the stacked bar chart
     fig = go.Figure()
 
     for branch, color in branch_colors.items():
-        # Extract course counts for this branch across all semesters
         branch_counts = [
             branch_course_count_per_semester[semester].get(branch, 0) 
             for semester in branch_course_count_per_semester.keys()
@@ -489,13 +484,23 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
             marker_color=color
         ))
 
-    # Update layout for a stacked bar appearance
     fig.update_layout(
         barmode='stack',
         xaxis_title="Semester",
         yaxis_title="Number of Courses",
         template="plotly_white",
-        height=500
+        height=500,
+        modebar=dict(
+            remove=[
+            "pan",               
+            "zoom",              
+            "zoomIn",            
+            "zoomOut",           
+            "lasso2d",
+            "resetScale2d",
+            ]
+        ),
+        bargap=0.4,
     )
 
     return fig.to_html(full_html=False)
