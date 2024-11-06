@@ -65,6 +65,26 @@ def extract_from_cleaned_semester(cleaned_results_by_semester):
     
     return semesters, courses, units, branches, grades, scores
 
+def extract_passed_courses_from_cleaned_semester(cleaned_results_by_semester):
+    """Extract values for semesters, courses, units, branches, grades, and scores for passed courses (score >= 40)."""
+    
+    if not cleaned_results_by_semester:
+        return [], [], [], [], [], []
+
+    semesters = list(cleaned_results_by_semester.keys())
+    courses, units, branches, grades, scores = [], [], [], [], []
+    
+    for semester in semesters:
+        for course_info in cleaned_results_by_semester[semester]:
+            if course_info.get('score', 0) >= 40:
+                courses.append(course_info.get('course'))
+                units.append(course_info.get('unit'))
+                branches.append(course_info.get('branch'))
+                grades.append(course_info.get('grade'))
+                scores.append(course_info.get('score'))
+    
+    return semesters, courses, units, branches, grades, scores
+
 def generate_branch_gpa_chart(branch_gpa_data):
     """Generate a time series chart for each branch GPA."""
     fig = go.Figure()
@@ -277,7 +297,6 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
         pie_chart_html_list.append(fig.to_html(full_html=False))
 
     return pie_chart_html_list
-
 
 def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
     """
