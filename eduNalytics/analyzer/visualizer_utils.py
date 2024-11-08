@@ -174,7 +174,9 @@ def generate_boxplot_charts(course_data):
         semester_fig.add_trace(go.Box(
             y=scores,
             name=semester,
-            marker=dict(color=colors[i % num_colors])
+            marker=dict(color=colors[i % num_colors]),
+            boxmean=True,
+            median=('blue', 2, 'dot', 0.6)
         ))
 
     semester_fig.update_layout(
@@ -203,7 +205,8 @@ def generate_boxplot_charts(course_data):
         level_fig.add_trace(go.Box(
             y=scores,
             name=level,
-            marker=dict(color=colors[i % num_colors])
+            marker=dict(color=colors[i % num_colors]),
+            boxmean=True,
         ))
 
     level_fig.update_layout(
@@ -232,7 +235,8 @@ def generate_boxplot_charts(course_data):
         jitter=0.7, 
         pointpos=0,
         text=all_courses_text,
-        hoverinfo="text + y" 
+        hoverinfo="text + y",
+        boxmean=True,
     ))
     
     all_scores_fig.update_layout(

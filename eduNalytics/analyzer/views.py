@@ -1,3 +1,4 @@
+import pandas as pd
 from django.shortcuts import render, redirect
 from .models import DetailedCourseResult
 from .results_utils import (
@@ -35,7 +36,8 @@ def detailed_course_result_to_dict(result):
         'score': result.score,
     }
 
-def student_cleaned_results(request):
+def get_student_from_context(request):
+    """Helper function to retrieve student and course details from session context."""
     context = request.session.get('context')
 
     if context:
@@ -43,39 +45,48 @@ def student_cleaned_results(request):
         course_details = context.get('course_details')
 
         if not student_info or not course_details:
-            return redirect('home:home')
+            return None, None
 
         student_name = student_info.get('Name')
         entry_type = 'UTME' if student_info.get('EntryType', '').lower() == 'utme' else 'Diploma'
         student = Student.objects.filter(name=student_name, entry_type=entry_type).first()
 
         if not student:
-            return redirect('home:home')
+            return None, None 
 
-        filter_results_by_semester(student)
+        return student, course_details 
 
-        gpa_data_by_semester = calculate_gpa_for_each_semester()
-        calculate_cgpa(student)
-        calculate_branch_gpa_for_each_semester()
-        calculate_total_units_for_semester()
+    return None, None  
 
-        sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (x.split()[0], x))
+def student_cleaned_results(request):
+    """Displays cleaned results for a student."""
+    student, course_details = get_student_from_context(request)
 
-        serialized_cleaned_results_by_semester = {
-            semester: [detailed_course_result_to_dict(result) for result in cleaned_results_by_semester[semester]]
-            for semester in sorted_keys
-        }
+    if student is None:
+        return redirect('home:welcome')
 
-        request.session['cleaned_results_by_semester'] = serialized_cleaned_results_by_semester
-        request.session['gpa_data_by_semester'] = gpa_data_by_semester
+    filter_results_by_semester(student)
 
-        return render(request, 'cleaned.html', {
-            'student': student,
-            'cleaned_results_by_semester': serialized_cleaned_results_by_semester.items(),
-            'gpa_data_by_semester': gpa_data_by_semester,
-        })
+    gpa_data_by_semester = calculate_gpa_for_each_semester()
+    calculate_cgpa(student)
+    calculate_branch_gpa_for_each_semester()
+    calculate_total_units_for_semester()
 
-    return redirect('home:welcome')
+    sorted_keys = sorted(cleaned_results_by_semester.keys(), key=lambda x: (x.split()[0], x))
+
+    serialized_cleaned_results_by_semester = {
+        semester: [detailed_course_result_to_dict(result) for result in cleaned_results_by_semester[semester]]
+        for semester in sorted_keys
+    }
+
+    request.session['cleaned_results_by_semester'] = serialized_cleaned_results_by_semester
+    request.session['gpa_data_by_semester'] = gpa_data_by_semester
+
+    return render(request, 'cleaned.html', {
+        'student': student,
+        'cleaned_results_by_semester': serialized_cleaned_results_by_semester.items(),
+        'gpa_data_by_semester': gpa_data_by_semester,
+    })
 
 def display_insights(request):
     """Displays insights based on processed GPA data."""
@@ -104,18 +115,10 @@ def gpa_time_series_chart(request):
 def plot_view(request):
     """Displays GPA, CGPA, Branch GPA charts, boxplots, scatter plot, and branch distribution bar chart for the student."""
 
-    if not request.session.get('context') or not request.session['context'].get('student_info'):
+    student, _ = get_student_from_context(request)
+
+    if not student:
         return redirect('home:welcome')
-
-    student_info = request.session['context'].get('student_info')
-    student_name = student_info['Name']
-    department_name = student_info['Department']
-
-    try:
-        department = Department.objects.get(name=department_name)
-        student = Student.objects.get(name=student_name, department=department)
-    except (Department.DoesNotExist, Student.DoesNotExist):
-        return render(request, 'error_template.html', {"error_message": "Student or Department not found"})
 
     gpa_data = request.session.get('gpa_data_by_semester')
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
