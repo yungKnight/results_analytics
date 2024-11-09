@@ -83,15 +83,3 @@ def calculate_branch_semester_avg_scores(df):
     
     branch_semester_avg_scores = df.groupby(['semester', 'branch'])['score'].mean().unstack().to_dict()
     return branch_semester_avg_scores
-
-
-#def extract_combined_df(cleaned_results_by_semester, gpa_data_by_semester):
-#    
-#    cleaned_results_df = extract_cleaned_results_df(cleaned_results_by_semester)
-#    gpa_data_df = extract_gpa_data_df(gpa_data_by_semester)
-#    
-#    combined_df = pd.merge(cleaned_results_df, gpa_data_df, on='semester', how='outer')
-#    
-#    combined_df[['level', 'semester']] = combined_df['semester'].str.rsplit(' ', n=1, expand=True)
-#
-#    return combined_df    
