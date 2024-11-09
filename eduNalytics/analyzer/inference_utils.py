@@ -54,13 +54,44 @@ def extract_gpa_data_df(gpa_data_by_semester):
 
     return gpa_data_df
 
-def extract_combined_df(cleaned_results_by_semester, gpa_data_by_semester):
+def calculate_semester_avg_scores(df):
+    """
+    Calculate the average score for each semester based on all courses in that semester.
     
-    cleaned_results_df = extract_cleaned_results_df(cleaned_results_by_semester)
-    gpa_data_df = extract_gpa_data_df(gpa_data_by_semester)
+    Args:
+        df (pd.DataFrame): DataFrame containing course data with columns for 'semester' and 'score'.
     
-    combined_df = pd.merge(cleaned_results_df, gpa_data_df, on='semester', how='outer')
+    Returns:
+        dict: A dictionary where each semester key maps to the average score of all courses in that semester.
+    """
     
-    combined_df[['level', 'semester']] = combined_df['semester'].str.rsplit(' ', n=1, expand=True)
+    semester_avg_scores = df.groupby('semester')['score'].mean().to_dict()
+    return semester_avg_scores
 
-    return combined_df    
+
+def calculate_branch_semester_avg_scores(df):
+    """
+    Calculate the average score for each branch within each semester.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing course data with columns for 'semester', 'branch', and 'score'.
+    
+    Returns:
+        dict: A dictionary where each semester key maps to another dictionary.
+              Each inner dictionary maps branch names to their average scores.
+    """
+    
+    branch_semester_avg_scores = df.groupby(['semester', 'branch'])['score'].mean().unstack().to_dict()
+    return branch_semester_avg_scores
+
+
+#def extract_combined_df(cleaned_results_by_semester, gpa_data_by_semester):
+#    
+#    cleaned_results_df = extract_cleaned_results_df(cleaned_results_by_semester)
+#    gpa_data_df = extract_gpa_data_df(gpa_data_by_semester)
+#    
+#    combined_df = pd.merge(cleaned_results_df, gpa_data_df, on='semester', how='outer')
+#    
+#    combined_df[['level', 'semester']] = combined_df['semester'].str.rsplit(' ', n=1, expand=True)
+#
+#    return combined_df    
