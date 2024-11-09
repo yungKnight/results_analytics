@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from collections import defaultdict
-from analyzer.inference_utils import extract_cleaned_results_df, extract_gpa_data_df
+from analyzer.inference_utils import extract_cleaned_results_df, extract_gpa_data_df, extract_combined_df
 
 def test_extract_cleaned_results_df():
     cleaned_results_by_semester = {
@@ -140,5 +140,93 @@ def test_extract_gpa_data_df():
     # Test 5: Check if total units are extracted correctly
     total_units_extracted = result_df['total_units'].tolist()
     print("Total units extracted:", total_units_extracted)
+
+    assert total_units_extracted == expected_data['total_units']
+
+def test_extract_combined_df():
+    # Sample data for cleaned_results_by_semester and gpa_data_by_semester
+    cleaned_results_by_semester = {
+        '100 level Harmattan': [
+            {'course': 'ACC101', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 65},
+            {'course': 'BUS101', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 60}
+        ],
+        '100 level Rain': [
+            {'course': 'ACC102', 'unit': 3, 'branch': 'Accessories', 'grade': 'A', 'score': 74},
+            {'course': 'ECO112', 'unit': 2, 'branch': 'Accessories', 'grade': 'A', 'score': 72}
+        ]
+    }
+
+    gpa_data_by_semester = {
+        '100 level Harmattan': {'GPA': 3.9, 'Branch_GPA': 3.78, 'CGPA': 3.9, 'Total_units': 20},
+        '100 level Rain': {'GPA': 3.67, 'Branch_GPA': 4.23, 'CGPA': 3.8, 'Total_units': 15}
+    }
+
+    # Expected data for combined dataframe
+    expected_data = {
+        'level': ['100 level', '100 level', '100 level', '100 level'],
+        'semester': ['Harmattan', 'Harmattan', 'Rain', 'Rain'],
+        'course': ['ACC101', 'BUS101', 'ACC102', 'ECO112'],
+        'unit': [3, 3, 3, 2],
+        'branch': ['Accessories', 'Accessories', 'Accessories', 'Accessories'],
+        'grade': ['B', 'B', 'A', 'A'],
+        'score': [65, 60, 74, 72],
+        'gpa': [3.9, 3.9, 3.67, 3.67],
+        'branch_gpa': [3.78, 3.78, 4.23, 4.23],
+        'cgpa': [3.9, 3.9, 3.8, 3.8],
+        'total_units': [20, 20, 15, 15],
+    }
+    expected_df = pd.DataFrame(expected_data)
+
+    # Generate combined dataframe using function
+    combined_df = extract_combined_df(cleaned_results_by_semester, gpa_data_by_semester)
+
+    # Ensure columns are ordered the same for comparison
+    combined_df = combined_df[expected_df.columns]
+
+    print("\nExpected Combined DataFrame:")
+    print(expected_df)
+    
+    print("\nResulting Combined DataFrame from function:")
+    print(combined_df)
+
+    # Verify if the resulting DataFrame matches the expected DataFrame
+    pd.testing.assert_frame_equal(combined_df.reset_index(drop=True), expected_df, check_dtype=False, check_like=True)
+
+    # Additional Checks
+    # Test 1: Check if `level` and `semester` columns are correctly split
+    levels_extracted = combined_df['level'].unique().tolist()
+    semesters_extracted = combined_df['semester'].unique().tolist()
+
+    print("\nLevels extracted:", levels_extracted)
+    print("Semesters extracted:", semesters_extracted)
+    
+    assert '100 level' in levels_extracted
+    assert 'Harmattan' in semesters_extracted
+    assert 'Rain' in semesters_extracted
+
+    # Test 2: Check if all course codes are included
+    course_codes_extracted = combined_df['course'].tolist()
+    print("Course codes extracted:", course_codes_extracted)
+    
+    expected_courses = expected_data['course']
+    assert set(course_codes_extracted) == set(expected_courses)
+
+    # Test 3: Check if all GPA data is merged correctly
+    gpas_extracted = combined_df['gpa'].tolist()
+    print("GPAs extracted:", gpas_extracted)
+    
+    assert gpas_extracted == expected_data['gpa']
+
+    # Test 4: Verify total units from GPA data
+    total_units_extracted = combined_df['total_units'].tolist()
+    print("Total units extracted:", total_units_extracted)
     
     assert total_units_extracted == expected_data['total_units']
+
+    # Test 5: Verify that no columns are missing
+    expected_columns = ['course', 'unit', 'branch', 'grade', 'score', 'gpa', 'branch_gpa', 'cgpa', 'total_units', 'level', 'semester']
+    print("Combined DataFrame columns:", combined_df.columns.tolist())
+    
+    assert set(combined_df.columns) == set(expected_columns)
+
+    print("\nAll tests passed.")

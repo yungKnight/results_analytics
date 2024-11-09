@@ -1,7 +1,7 @@
 import pandas as pd
 
 def extract_cleaned_results_df(cleaned_results_by_semester):
-    # Create lists to store extracted data
+
     semester_keys = []
     course_codes = []
     units = []
@@ -18,8 +18,7 @@ def extract_cleaned_results_df(cleaned_results_by_semester):
             grades.append(course['grade'])
             scores.append(course['score'])
     
-    # Create DataFrame
-    return pd.DataFrame({
+    cleaned_results_df = pd.DataFrame({
         'semester': semester_keys,
         'course': course_codes,
         'unit': units,
@@ -28,8 +27,10 @@ def extract_cleaned_results_df(cleaned_results_by_semester):
         'score': scores
     })
 
+    return cleaned_results_df
+
 def extract_gpa_data_df(gpa_data_by_semester):
-    # Create lists to store extracted data
+
     semester_keys = []
     gpas = []
     branch_gpas = []
@@ -42,9 +43,8 @@ def extract_gpa_data_df(gpa_data_by_semester):
         branch_gpas.append(data['Branch_GPA'])
         cgpas.append(data['CGPA'])
         total_units.append(data['Total_units'])
-    
-    # Create DataFrame
-    return pd.DataFrame({
+
+    gpa_data_df= pd.DataFrame({
         'semester': semester_keys,
         'gpa': gpas,
         'branch_gpa': branch_gpas,
@@ -52,11 +52,15 @@ def extract_gpa_data_df(gpa_data_by_semester):
         'total_units': total_units
     })
 
-def combine_semester_data(cleaned_results_df, gpa_data_df):
-    # Merge the two DataFrames on 'semester' column
-    combined_df = pd.merge(cleaned_results_df, gpa_data_df, on='semester', how='inner')
+    return gpa_data_df
+
+def extract_combined_df(cleaned_results_by_semester, gpa_data_by_semester):
     
-    # Split 'semester' column into 'level' and 'semester_part' columns
+    cleaned_results_df = extract_cleaned_results_df(cleaned_results_by_semester)
+    gpa_data_df = extract_gpa_data_df(gpa_data_by_semester)
+    
+    combined_df = pd.merge(cleaned_results_df, gpa_data_df, on='semester', how='outer')
+    
     combined_df[['level', 'semester']] = combined_df['semester'].str.rsplit(' ', n=1, expand=True)
-    
-    return combined_df
+
+    return combined_df    
