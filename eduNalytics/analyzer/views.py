@@ -1,4 +1,3 @@
-import pandas as pd
 from django.shortcuts import render, redirect
 from .models import DetailedCourseResult
 from .results_utils import (
@@ -24,6 +23,7 @@ from .visualizer_utils import (
     generate_branch_distribution_pie_charts,
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
+    generate_semester_score_charts,
 )
 
 def detailed_course_result_to_dict(result):
@@ -100,23 +100,10 @@ def display_insights(request):
     
     return redirect('home:welcome')
 
-def gpa_time_series_chart(request):
-    """Generates a GPA time series chart for students."""
-    gpa_data = request.session.get('gpa_data_by_semester')
-
-    if not gpa_data:
-        return redirect('home:home')
-
-    semesters, gpa_values = extract_gpa_data(gpa_data)
-    chart_html = generate_gpa_chart(semesters, gpa_values)
-
-    return render(request, 'gpa_chart.html', {'chart': chart_html})
-
 def plot_view(request):
-    """Displays GPA, CGPA, Branch GPA charts, boxplots, scatter plot, and branch distribution bar chart for the student."""
-
+    """Displays various GPA, CGPA, and branch GPA charts, along with boxplots, scatter plots, and branch distribution charts for the student."""
+    
     student, _ = get_student_from_context(request)
-
     if not student:
         return redirect('home:welcome')
 
@@ -139,21 +126,25 @@ def plot_view(request):
     cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
     if cleaned_results_by_semester:
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
+        
         scatter_plot_html = generate_scatter_plot(courses, scores)
-
         overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
-
         semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
-
-        branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)        
+        branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
         pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
+
+        semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester)
+        
+        semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
+        branch_avg_chart_html = branch_avg_chart.to_html(full_html=False)
     else:
         scatter_plot_html = ''
         overall_branch_pie_chart_html = ''
         semester_distribution_pie_chart_html_list = []
         pass_rate_chart_html = ''
-
         branch_distribution_stacked_bar_chart_html = ''
+        semester_avg_chart_html = ''
+        branch_avg_chart_html = ''
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
@@ -166,6 +157,8 @@ def plot_view(request):
         'scatter_plot_html': scatter_plot_html,
         'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
         'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,
-        'pass_rate_html':pass_rate_chart_html,
+        'pass_rate_html': pass_rate_chart_html,
         'branch_distribution_stacked_bar_chart_html': branch_distribution_stacked_bar_chart_html,
+        'semester_avg_chart_html': semester_avg_chart_html,
+        'branch_avg_chart_html': branch_avg_chart_html,
     })

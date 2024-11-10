@@ -17,6 +17,16 @@
       <h2 style="text-align: center;" class="text-4xl">CGPA & GPA</h2>
       {{ combined_chart_html|safe }}
     </div>
+    
+    <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 4.5rem;">
+      <h2 style="text-align: center;" class="text-4xl">Semester Average Score</h2>
+      {{ semester_avg_chart_html|safe }}
+    </div>
+
+    <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 4.5rem;">
+      <h2 style="text-align: center;" class="text-4xl">Branch Average Score per Semester</h2>
+      {{ branch_avg_chart_html|safe }}
+    </div>
 
     <div style="height: 450px; width: 33vw; padding-bottom: 1rem; padding-top: 4.5rem;">
       <h2 style="text-align: center;" class="text-4xl">Per Level boxplot</h2>

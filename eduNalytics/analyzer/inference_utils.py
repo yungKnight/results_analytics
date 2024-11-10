@@ -80,10 +80,8 @@ def calculate_branch_semester_avg_scores(df):
               Each inner dictionary maps branch names to their average scores.
     """
     
-    # Group by 'semester' and 'branch', calculate the mean, and convert it to a dictionary
     grouped = df.groupby(['semester', 'branch'])['score'].mean().unstack(fill_value=0)
     
-    # Transform to expected dictionary structure with semesters as outer keys and branches nested
     branch_semester_avg_scores = {semester: branch_scores.dropna().to_dict() for semester, branch_scores in grouped.iterrows()}
     
     return branch_semester_avg_scores
