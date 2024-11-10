@@ -2,6 +2,7 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import plotly.colors as pc
 import random
+from analyzer.inference_utils import calculate_semester_avg_scores, calculate_branch_semester_avg_scores
 
 branch_colors = {}
 

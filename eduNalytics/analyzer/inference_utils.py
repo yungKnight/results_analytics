@@ -68,22 +68,6 @@ def calculate_semester_avg_scores(df):
     semester_avg_scores = df.groupby('semester')['score'].mean().to_dict()
     return semester_avg_scores
 
-
-def calculate_branch_semester_avg_scores(df):
-    """
-    Calculate the average score for each branch within each semester.
-    
-    Args:
-        df (pd.DataFrame): DataFrame containing course data with columns for 'semester', 'branch', and 'score'.
-    
-    Returns:
-        dict: A dictionary where each semester key maps to another dictionary.
-              Each inner dictionary maps branch names to their average scores.
-    """
-    
-    branch_semester_avg_scores = df.groupby(['semester', 'branch'])['score'].mean().unstack().to_dict()
-    return branch_semester_avg_scores
-
 def calculate_branch_semester_avg_scores(df):
     """
     Calculate the average score for each branch within each semester.
