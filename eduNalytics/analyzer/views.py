@@ -133,7 +133,6 @@ def plot_view(request):
         
         semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
         
-        # Check if there's only one unique branch
         if len(set(branches)) > 1:
             overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
             semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
