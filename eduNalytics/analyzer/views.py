@@ -128,15 +128,22 @@ def plot_view(request):
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
         
         scatter_plot_html = generate_scatter_plot(courses, scores)
-        overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
-        semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
-        branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
         pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
-
         semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester)
         
         semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
-        branch_avg_chart_html = branch_avg_chart.to_html(full_html=False)
+        
+        # Check if there's only one unique branch
+        if len(set(branches)) > 1:
+            overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
+            semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
+            branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
+            branch_avg_chart_html = branch_avg_chart.to_html(full_html=False)
+        else:
+            overall_branch_pie_chart_html = ''
+            semester_distribution_pie_chart_html_list = []
+            branch_distribution_stacked_bar_chart_html = ''
+            branch_avg_chart_html = ''
     else:
         scatter_plot_html = ''
         overall_branch_pie_chart_html = ''
@@ -149,7 +156,7 @@ def plot_view(request):
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
     return render(request, 'viss.html', {
-        'branch_gpa_chart_html': branch_gpa_chart_html,
+        'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
         'combined_chart_html': combined_chart_html,
         'semester_boxplot_html': semester_boxplot_html,
         'level_boxplot_html': level_boxplot_html,

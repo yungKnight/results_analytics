@@ -18,16 +18,6 @@
       {{ combined_chart_html|safe }}
     </div>
     
-    <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 4.5rem;">
-      <h2 style="text-align: center;" class="text-4xl">Semester Average Score</h2>
-      {{ semester_avg_chart_html|safe }}
-    </div>
-
-    <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 4.5rem;">
-      <h2 style="text-align: center;" class="text-4xl">Branch Average Score per Semester</h2>
-      {{ branch_avg_chart_html|safe }}
-    </div>
-
     <div style="height: 450px; width: 33vw; padding-bottom: 1rem; padding-top: 4.5rem;">
       <h2 style="text-align: center;" class="text-4xl">Per Level boxplot</h2>
       {{ level_boxplot_html|safe }}
@@ -48,14 +38,24 @@
       {{ all_scores_boxplot_html|safe }}
     </div>
 
-    <div style="height: 650px; width: 38vw; padding-bottom: 1rem; padding-top: 9rem;">
+    <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 9rem;">
+      <h2 style="text-align: center;" class="text-4xl">Semester Average Score</h2>
+      {{ semester_avg_chart_html|safe }}
+    </div>
+
+    <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 9rem;">
+      <h2 style="text-align: center;" class="text-4xl">Branch Average Score per Semester</h2>
+      {{ branch_avg_chart_html|safe }}
+    </div>
+
+    <div style="height: 650px; width: 38vw; padding-bottom: 1rem; padding-top: 11rem;">
       <h2 style="text-align: center;" class="text-4xl">Overall Branch Distribution</h2>
        {{ overall_branch_pie_chart_html|safe }}
     </div>
 
-    <div style="height: 650px; width: 62vw; padding-bottom: 1rem; padding-top: 9rem;">
+    <div style="height: 650px; width: 62vw; padding-bottom: 1rem; padding-top: 11rem;">
       <h2 style="text-align: center;" class="text-4xl">Branch Distribution of Courses per Semester</h2>
-      <div style="padding-top: 1rem;">
+      <div style="padding-top: 4rem;">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
             {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
                 <div style="flex: 0 0 calc(25% - 20px);">
@@ -66,12 +66,12 @@
       </div>
     </div>
 
-    <div style="height: 630px; width: 100vw; padding-bottom: 1rem; padding-top: 9rem;">
+    <div style="height: 630px; width: 100vw; padding-bottom: 1rem; padding-top: 15rem;">
       <h2 style="text-align: center;" class="text-4xl">Overall Branch Distribution</h2>
        {{ branch_distribution_stacked_bar_chart_html|safe }}
     </div>
 
-    <div style="height: 650px; width: 100vw; padding-top: 4rem; padding-right: 0.7rem;">
+    <div style="height: 650px; width: 100vw; padding-top: 11rem; padding-right: 0.7rem;">
       <h2 style="text-align: center;" class="text-4xl">Overall Passed Branch Distribution</h2>
       {{ pass_rate_html|safe }}
     </div>

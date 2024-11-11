@@ -296,7 +296,6 @@ def generate_scatter_plot(courses, scores):
             "resetScale2d",
             ]
         ),
-        xaxis_title="Courses",
         yaxis_title="Scores",
         template="plotly_white",
         xaxis=dict(tickangle=60, tickfont=dict(size=11, style="italic"))
@@ -573,7 +572,7 @@ def generate_semester_score_charts(cleaned_results_by_semester):
             mode='lines+markers',
             name=f"{branch}",
             marker=dict(color=color),
-            connectgaps=False
+            connectgaps=True
         )
         branch_avg_traces.append(branch_avg_trace)
     
