@@ -110,7 +110,6 @@ def generate_branch_gpa_chart(branch_gpa_data):
             "resetScale2d",
             ]
         ),
-        xaxis_title="Semester",
         yaxis_title="GPA",
         template="plotly_white"
     )
@@ -147,7 +146,6 @@ def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
             "resetScale2d",
             ]
         ),
-        xaxis_title="Semester",
         yaxis_title="Value",
         template="plotly_white",
     )
@@ -432,7 +430,6 @@ def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_seme
             "resetScale2d",
             ]
         ),
-        xaxis_title="Semester",
         yaxis_title="Number of Courses",
         template="plotly_white",
         xaxis=dict(tickangle=45, tickfont=dict(
@@ -492,7 +489,6 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
 
     fig.update_layout(
         barmode='stack',
-        xaxis_title="Semester",
         yaxis_title="Number of Courses",
         template="plotly_white",
         height=500,
@@ -550,7 +546,6 @@ def generate_semester_score_charts(cleaned_results_by_semester):
     )
     semester_avg_chart = go.Figure(data=[semester_avg_trace])
     semester_avg_chart.update_layout(
-        xaxis_title="Semester",
         yaxis_title="Average Score",
         modebar=dict(
             remove=[
@@ -584,7 +579,6 @@ def generate_semester_score_charts(cleaned_results_by_semester):
     
     branch_avg_chart = go.Figure(data=branch_avg_traces)
     branch_avg_chart.update_layout(
-        xaxis_title="Semester",
         yaxis_title="Average Score",
         legend_title="Branches",
         modebar=dict(
