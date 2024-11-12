@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import pingouin as pg
 from collections import defaultdict
 from analyzer.inference_utils import (
     extract_cleaned_results_df,
@@ -257,3 +258,43 @@ def test_calculate_correlations():
     with pytest.raises(ValueError) as exc_info:
         calculate_correlations(df, [('GPA', 'NonExistentColumn')])
     print(f"Caught expected ValueError: {exc_info.value}")
+
+
+import pandas as pd
+import pingouin as pg
+
+def test_partial_correlation():
+    # Sample data setup
+    data = {
+        'Total_units': [30, 28, 25, 32, 29, 27, 31],
+        'Number_of_courses': [5, 6, 5, 6, 7, 6, 5],
+        'Average_score': [80, 75, 78, 70, 72, 74, 79]
+    }
+    df = pd.DataFrame(data)
+
+    # Calculate partial correlation
+    result = pg.partial_corr(data=df, x='Total_units', y='Average_score', covar='Number_of_courses')
+    
+    # Extract key metrics from the result for verification and understanding
+    r_value = result['r'].values[0]
+    p_value = result['p-val'].values[0]
+    ci_low, ci_high = result['CI95%'].values[0]
+
+    # Print statements for understanding
+    print("Partial Correlation Test")
+    print(f"Data Sample:\n{df}\n")
+    print(f"Partial correlation between Total_units and Average_score controlling for Number_of_courses")
+    print(f"Correlation coefficient (r): {r_value:.2f}")
+    print(f"P-value: {p_value:.4f}")
+    print(f"95% Confidence Interval: ({ci_low:.2f}, {ci_high:.2f})\n")
+
+    # Expectations for assertions based on known values or approximations
+    # Since we're using random data, these should be adjusted based on real data or expected ranges.
+    assert abs(r_value) <= 1, "Correlation coefficient should be within -1 and 1."
+    assert 0 <= p_value <= 1, "P-value should be between 0 and 1."
+
+    # Example of checking if the correlation is statistically significant
+    if p_value < 0.05:
+        print("The partial correlation is statistically significant at the 0.05 level.")
+    else:
+        print("The partial correlation is not statistically significant at the 0.05 level.")

@@ -1,4 +1,5 @@
 import pandas as pd
+import pingouin as pg
 
 def extract_cleaned_results_df(cleaned_results_by_semester):
 
