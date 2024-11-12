@@ -86,7 +86,25 @@ def test_extract_gpa_data_df():
         '200 level Harmattan': {'GPA': 3.18, 'Branch_GPA': {'Microeconomics': 3.0, 'Macroeconomics': 4.0, 'Accessories': 3.6, 'Mathematics For Economists': 1.5}, 'CGPA': 3.56, 'Total_units': 22},
         '200 level Rain': {'GPA': 3.91, 'Branch_GPA': {'Accessories': 4.4, 'Mathematics For Economists': 3.33, 'Microeconomics': 4.0, 'Macroeconomics': 3.0}, 'CGPA': 3.66, 'Total_units': 22},
     })
-    
+
+    cleaned_results_by_semester = {
+        '100 level Harmattan': [
+            {'course': 'ACC101', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 65},
+            {'course': 'BUS101', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 60}
+        ],
+        '100 level Rain': [
+            {'course': 'ACC102', 'unit': 3, 'branch': 'Accessories', 'grade': 'A', 'score': 74},
+            {'course': 'ECO112', 'unit': 2, 'branch': 'Accessories', 'grade': 'A', 'score': 72}
+        ],
+        '200 level Harmattan': [
+            {'course': 'ECO201', 'unit': 2, 'branch': 'Microeconomics', 'grade': 'B', 'score': 65},
+            {'course': 'BUS201', 'unit': 3, 'branch': 'Macroeconomics', 'grade': 'A', 'score': 80}
+        ],
+        '200 level Rain': [
+            {'course': 'ECO202', 'unit': 3, 'branch': 'Microeconomics', 'grade': 'C', 'score': 55}
+        ]
+    }
+
     expected_data = {
         'semester': ['100 level Harmattan', '100 level Rain', '200 level Harmattan', '200 level Rain'],
         'gpa': [3.9, 3.67, 3.18, 3.91],
@@ -97,11 +115,12 @@ def test_extract_gpa_data_df():
             {'Accessories': 4.4, 'Mathematics For Economists': 3.33, 'Microeconomics': 4.0, 'Macroeconomics': 3.0}
         ],
         'cgpa': [3.9, 3.8, 3.56, 3.66],
-        'total_units': [20, 15, 22, 22]
+        'total_units': [20, 15, 22, 22],
+        'semester_course_count': [2, 2, 2, 1] 
     }
     expected_df = pd.DataFrame(expected_data)
 
-    result_df = extract_gpa_data_df(gpa_data_by_semester)
+    result_df = extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester)
 
     print("\n \nInput Data (gpa_data_by_semester):")
     print(gpa_data_by_semester)
@@ -115,7 +134,6 @@ def test_extract_gpa_data_df():
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
     print("\n---- Additional Tests ----")
-    # Test 1: Check if all semesters are extracted correctly
     semesters_extracted = result_df['semester'].unique()
     print("Semesters extracted:", semesters_extracted)
 
@@ -124,29 +142,30 @@ def test_extract_gpa_data_df():
     assert '200 level Harmattan' in semesters_extracted
     assert '200 level Rain' in semesters_extracted
     
-    # Test 2: Check if GPAs are extracted correctly
     gpas_extracted = result_df['gpa'].tolist()
     print("GPAs extracted:", gpas_extracted)
 
     assert gpas_extracted == expected_data['gpa']
     
-    # Test 3: Check if Branch GPAs are extracted correctly (check the entire dictionary for branch GPAs)
     branch_gpas_extracted = result_df['branch_gpa'].tolist()
     print("Branch GPAs extracted:", branch_gpas_extracted)
 
     assert branch_gpas_extracted == expected_data['branch_gpa']
 
-    # Test 4: Check if CGPAs are extracted correctly
     cgpas_extracted = result_df['cgpa'].tolist()
     print("CGPAs extracted:", cgpas_extracted)
 
     assert cgpas_extracted == expected_data['cgpa']
 
-    # Test 5: Check if total units are extracted correctly
     total_units_extracted = result_df['total_units'].tolist()
     print("Total units extracted:", total_units_extracted)
 
     assert total_units_extracted == expected_data['total_units']
+
+    course_counts_extracted = result_df['semester_course_count'].tolist()
+    print("Semester course counts extracted:", course_counts_extracted)
+
+    assert course_counts_extracted == expected_data['semester_course_count']
 
 def test_calculate_semester_avg_scores():
     # Sample data
@@ -161,7 +180,6 @@ def test_calculate_semester_avg_scores():
         ]
     }
 
-    # Create DataFrame using extract_cleaned_results_df function
     df = extract_cleaned_results_df(cleaned_results_by_semester)
     
     # Expected result for semester average scores
@@ -258,10 +276,6 @@ def test_calculate_correlations():
     with pytest.raises(ValueError) as exc_info:
         calculate_correlations(df, [('GPA', 'NonExistentColumn')])
     print(f"Caught expected ValueError: {exc_info.value}")
-
-
-import pandas as pd
-import pingouin as pg
 
 def test_partial_correlation():
     # Sample data setup

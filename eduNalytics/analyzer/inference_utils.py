@@ -30,13 +30,13 @@ def extract_cleaned_results_df(cleaned_results_by_semester):
 
     return cleaned_results_df
 
-def extract_gpa_data_df(gpa_data_by_semester):
-
+def extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester):
     semester_keys = []
     gpas = []
     branch_gpas = []
     cgpas = []
     total_units = []
+    course_counts = []
 
     for semester, data in gpa_data_by_semester.items():
         semester_keys.append(semester)
@@ -44,13 +44,15 @@ def extract_gpa_data_df(gpa_data_by_semester):
         branch_gpas.append(data['Branch_GPA'])
         cgpas.append(data['CGPA'])
         total_units.append(data['Total_units'])
+        course_counts.append(len(cleaned_results_by_semester.get(semester, [])))
 
-    gpa_data_df= pd.DataFrame({
+    gpa_data_df = pd.DataFrame({
         'semester': semester_keys,
         'gpa': gpas,
         'branch_gpa': branch_gpas,
         'cgpa': cgpas,
-        'total_units': total_units
+        'total_units': total_units,
+        'semester_course_count': course_counts 
     })
 
     return gpa_data_df
