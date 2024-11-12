@@ -5,7 +5,8 @@ from analyzer.inference_utils import (
     extract_cleaned_results_df,
     extract_gpa_data_df,
     calculate_semester_avg_scores,
-    calculate_branch_semester_avg_scores
+    calculate_branch_semester_avg_scores,
+    calculate_correlations
 )
 
 def test_extract_cleaned_results_df():
@@ -218,3 +219,31 @@ def test_calculate_branch_semester_avg_scores():
     print("Calculated Branch Semester Average Scores:", result_branch_avg_scores)
     
     assert result_branch_avg_scores == expected_branch_avg_scores
+
+def test_calculate_correlations():
+    # Sample data for testing
+    data = {
+        'GPA': [3.9, 3.7, 3.5, 3.8],
+        'CGPA': [3.8, 3.75, 3.6, 3.85],
+        'Total_units': [20, 22, 24, 18],
+        'Average_score': [70, 72, 68, 74]
+    }
+    df = pd.DataFrame(data)
+
+    # Define column pairs for correlation
+    column_pairs = [('GPA', 'CGPA'), ('GPA', 'Average_score'), ('Total_units', 'Average_score')]
+
+    # Expected results as strings formatted to two decimal places
+    expected_correlations = {
+        ('GPA', 'CGPA'): f"{df['GPA'].corr(df['CGPA']):.2f}",
+        ('GPA', 'Average_score'): f"{df['GPA'].corr(df['Average_score']):.2f}",
+        ('Total_units', 'Average_score'): f"{df['Total_units'].corr(df['Average_score']):.2f}"
+    }
+
+    # Run function and assert results
+    result = calculate_correlations(df, column_pairs)
+    assert result == expected_correlations, f"Expected {expected_correlations} but got {result}"
+
+    # Test exception for invalid columns
+    with pytest.raises(ValueError):
+        calculate_correlations(df, [('GPA', 'NonExistentColumn')])

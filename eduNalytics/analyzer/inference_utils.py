@@ -54,6 +54,27 @@ def extract_gpa_data_df(gpa_data_by_semester):
 
     return gpa_data_df
 
+def calculate_correlations(df: pd.DataFrame, column_pairs: list[tuple[str, str]], method: str = 'pearson') -> dict:
+    """
+    Calculate correlations between specified column pairs in a DataFrame, formatted to two decimal places as strings.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame containing the data.
+    - column_pairs (list of tuples): List of column pairs for which to calculate correlations.
+    - method (str): The correlation method to use ('pearson', 'spearman', or 'kendall').
+
+    Returns:
+    - dict: A dictionary with column pairs as keys and their correlations as values formatted to two decimal places as strings.
+    """
+    correlations = {}
+    for col1, col2 in column_pairs:
+        if col1 in df.columns and col2 in df.columns:
+            correlation = df[[col1, col2]].corr(method=method).iloc[0, 1]
+            correlations[(col1, col2)] = f"{correlation:.2f}"  # Format to two decimal places as a string
+        else:
+            raise ValueError(f"One or both columns '{col1}' and '{col2}' are not in the DataFrame.")
+    return correlations
+
 def calculate_semester_avg_scores(df):
     """
     Calculate the average score for each semester based on all courses in that semester.
@@ -85,3 +106,5 @@ def calculate_branch_semester_avg_scores(df):
     branch_semester_avg_scores = {semester: branch_scores.dropna().to_dict() for semester, branch_scores in grouped.iterrows()}
     
     return branch_semester_avg_scores
+
+
