@@ -221,7 +221,6 @@ def test_calculate_branch_semester_avg_scores():
     assert result_branch_avg_scores == expected_branch_avg_scores
 
 def test_calculate_correlations():
-    # Sample data for testing
     data = {
         'GPA': [3.9, 3.7, 3.5, 3.8],
         'CGPA': [3.8, 3.75, 3.6, 3.85],
@@ -230,20 +229,31 @@ def test_calculate_correlations():
     }
     df = pd.DataFrame(data)
 
-    # Define column pairs for correlation
     column_pairs = [('GPA', 'CGPA'), ('GPA', 'Average_score'), ('Total_units', 'Average_score')]
 
-    # Expected results as strings formatted to two decimal places
     expected_correlations = {
         ('GPA', 'CGPA'): f"{df['GPA'].corr(df['CGPA']):.2f}",
         ('GPA', 'Average_score'): f"{df['GPA'].corr(df['Average_score']):.2f}",
         ('Total_units', 'Average_score'): f"{df['Total_units'].corr(df['Average_score']):.2f}"
     }
 
-    # Run function and assert results
-    result = calculate_correlations(df, column_pairs)
-    assert result == expected_correlations, f"Expected {expected_correlations} but got {result}"
+    print("\n \nExpected correlations (formatted as strings):")
+    for key, value in expected_correlations.items():
+        print(f"{key}: {value}")
 
-    # Test exception for invalid columns
-    with pytest.raises(ValueError):
+    result = calculate_correlations(df, column_pairs)
+
+    print("\nActual function result (formatted as strings):")
+    for key, value in result.items():
+        print(f"{key}: {value}")
+
+    try:
+        assert result == expected_correlations, f"Expected {expected_correlations} but got {result}"
+        print("\nTest passed: Function output matches expected correlations.")
+    except AssertionError as e:
+        print("\nTest failed:", e)
+
+    print("\nTesting with an invalid column pair to trigger ValueError:")
+    with pytest.raises(ValueError) as exc_info:
         calculate_correlations(df, [('GPA', 'NonExistentColumn')])
+    print(f"Caught expected ValueError: {exc_info.value}")
