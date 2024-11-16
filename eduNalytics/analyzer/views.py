@@ -3,7 +3,6 @@ from .models import DetailedCourseResult
 from .results_utils import (
     filter_results_by_semester,
     cleaned_results_by_semester,
-    gpa_data_by_semester,
     calculate_branch_gpa_for_each_semester,
     calculate_gpa_for_each_semester,
     calculate_cgpa,
@@ -11,13 +10,7 @@ from .results_utils import (
 )
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
-from analyzer.inference_utils import (
-    calculate_correlations,
-    extract_cleaned_results_df,
-    extract_gpa_data_df,
-    calculate_semester_avg_scores,
-    calculate_branch_semester_avg_scores,
-)    
+from analyzer.inference_utils import calculate_correlations
 from .visualizer_utils import (
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
@@ -98,34 +91,19 @@ def student_cleaned_results(request):
 
 def display_insights(request):
     """Displays insights based on processed GPA data."""
-    context = request.session.get('context')
-    
-    if context:
-        # Process cleaned and GPA data
-        cleaned_results_df = extract_cleaned_results_df(cleaned_results_by_semester)
-        gpa_data_df = extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester)
-        
-        # Calculate new insights
-        correlations = calculate_correlations(
-            df=cleaned_results_df,
-            column_pairs=[('unit', 'score'), ('branch', 'score')],
-            method='pearson'
-        )
-        semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
-        branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
-        
-        return render(request, 'visual.html', {
-            'processed_semester_data': process_gpa_data(),
-            'cleaned_results_by_semester': cleaned_results_by_semester,
-            'gpa_data_by_semester': gpa_data_by_semester,
-            'cleaned_results_df': cleaned_results_df.to_dict(),
-            'gpa_data_df': gpa_data_df.to_dict(),
-            'correlations': correlations,
-            'semester_avg_scores': semester_avg_scores,
-            'branch_semester_avg_scores': branch_semester_avg_scores,
-        })
-    
-    return redirect('home:welcome')
+    student, _ = get_student_from_context(request)
+    if not student:
+        return redirect('home:welcome')
+
+    gpa_data = request.session.get('gpa_data_by_semester')
+    cleaned_results = request.session.get('cleaned_results_by_semester')
+    processed_semester_data = process_gpa_data()
+
+    return render(request, 'visual.html', {
+        'processed_semester_data': processed_semester_data,
+        'cleaned_results': cleaned_results,
+        'gpa_data': gpa_data
+    })
 
 def plot_view(request):
     """Displays various GPA, CGPA, and branch GPA charts, along with boxplots, scatter plots, and branch distribution charts for the student."""
