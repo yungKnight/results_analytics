@@ -16,7 +16,7 @@
                 <th class="px-4 pt-4 pb-1">GPA</th>
                 <th class="px-4 pt-4 pb-1">CGPA</th>
                 <th class="px-4 pt-4 pb-1">Branch GPA</th>
-                <th class="px-4 pt-4 pb-1">Units offered</th>
+                <th class="px-4 pt-4 pb-1">Units Offered</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +39,31 @@
     </table>
 {% else %}
     <p>No GPA data available for display.</p>
+{% endif %}
+
+<h2 class="px-4 pt-4 pb-2">Additional Insights</h2>
+
+{% if additional_data %}
+    <div class="additional-insights">
+        <h3>Branch GPA Distribution</h3>
+        <ul>
+            {% for branch, distribution in additional_data.branch_distribution.items %}
+            <li>{{ branch }}: {{ distribution }}%</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Course Representation per Semester</h3>
+        {% for semester, course_data in additional_data.course_representation.items %}
+        <h4>{{ semester }}</h4>
+        <ul>
+            {% for course, frequency in course_data.items %}
+            <li>{{ course }}: {{ frequency }}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No additional insights available for display.</p>
 {% endif %}
 
 {% endblock %}
