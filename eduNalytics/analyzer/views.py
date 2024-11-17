@@ -10,7 +10,7 @@ from .results_utils import (
 )
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
-from analyzer.inference_utils import calculate_correlations
+from .inference_utils import calculate_correlations
 from .visualizer_utils import (
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
@@ -102,7 +102,7 @@ def display_insights(request):
     return render(request, 'visual.html', {
         'processed_semester_data': processed_semester_data,
         'cleaned_results': cleaned_results,
-        'gpa_data': gpa_data
+        'gpa_data': gpa_data,
     })
 
 def plot_view(request):
