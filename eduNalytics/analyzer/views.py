@@ -12,6 +12,7 @@ from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
 from .inference_utils import (
     extract_cleaned_results_df,
+    extract_gpa_data_df,
     calculate_branch_semester_avg_scores,
     calculate_semester_avg_scores,
     calculate_correlations
@@ -105,9 +106,17 @@ def display_insights(request):
     gpa_data = request.session.get('gpa_data_by_semester')
 
     cleaned_results_df = extract_cleaned_results_df(cleaned_results)
+    gpa_data_df = extract_gpa_data_df(gpa_data, cleaned_results)
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
+
+    correlations = calculate_correlations(
+        gpa_data_df,
+        column_pairs=[('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa'), ('')]
+    )
+
+    print(correlations)
 
     processed_semester_data = process_gpa_data()
 
@@ -146,6 +155,10 @@ def plot_view(request):
     if cleaned_results_by_semester:
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
         
+        print("Semesters:", semesters)
+        print("Branches:", branches)
+        print("Scores:", scores)
+
         scatter_plot_html = generate_scatter_plot(courses, scores)
         pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
         semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester, branch_colors)
