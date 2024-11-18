@@ -18,6 +18,7 @@ from .inference_utils import (
 )
 from .visualizer_utils import (
     extract_branch_gpa_data,
+    branch_colors,
     extract_combined_gpa_cgpa_data,
     extract_from_cleaned_semester,
     extract_passed_courses_from_cleaned_semester,
@@ -118,7 +119,6 @@ def display_insights(request):
         'branch_semester_avg_scores': branch_semester_avg_scores,
     })
 
-
 def plot_view(request):
     """Displays various GPA, CGPA, and branch GPA charts, along with boxplots, scatter plots, and branch distribution charts for the student."""
     
@@ -148,8 +148,11 @@ def plot_view(request):
         
         scatter_plot_html = generate_scatter_plot(courses, scores)
         pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
-        semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester)
+        semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester, branch_colors)
         
+        print("\n \nBranch Avg Chart:", branch_avg_chart)
+        print("\n \nSemester Avg Chart:", semester_avg_chart)
+
         semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
         
         if len(set(branches)) > 1:

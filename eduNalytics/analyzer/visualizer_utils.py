@@ -304,7 +304,7 @@ def generate_scatter_plot(courses, scores):
     return scatter_fig.to_html(full_html=False)
 
 def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester):
-    """Generate a pie chart showing the overall representation of branches."""
+    global branch_counts
     branch_counts = {}
 
     for semester, courses in cleaned_results_by_semester.items():
@@ -324,11 +324,9 @@ def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester
         margin=dict(l=40, r=40, t=50, b=5),
         height=580
     )
-
     return fig.to_html(full_html=False)
 
 def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
-    """Generate individual pie charts for branch distribution of courses per semester."""
     if not cleaned_results_by_semester:
         return []
 
@@ -356,10 +354,68 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
             height=300,
             showlegend=False
         )
-        
         pie_chart_html_list.append(fig.to_html(full_html=False))
 
     return pie_chart_html_list
+
+def generate_semester_score_charts(cleaned_results_by_semester, branch_colors):
+    data = []
+    for semester, courses in cleaned_results_by_semester.items():
+        for course in courses:
+            data.append({
+                'semester': semester,
+                'branch': course['branch'],
+                'score': course['score']
+            })
+    
+    df = pd.DataFrame(data)
+    
+    semester_avg_scores = calculate_semester_avg_scores(df)
+    branch_semester_avg_scores = calculate_branch_semester_avg_scores(df)
+
+    semester_avg_trace = go.Scatter(
+        x=list(semester_avg_scores.keys()),
+        y=list(semester_avg_scores.values()),
+        mode='lines+markers',
+        name="Average Score per Semester",
+        marker=dict(color='blue')
+    )
+    semester_avg_chart = go.Figure(data=[semester_avg_trace])
+    semester_avg_chart.update_layout(
+        yaxis_title="Average Score",
+        modebar=dict(
+            remove=["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"],
+        ),
+    )
+    
+    branch_avg_traces = []
+    for branch, color in branch_colors.items():
+        branch_scores = [
+            branch_semester_avg_scores.get(semester, {}).get(branch, None) 
+            for semester in semester_avg_scores.keys()
+        ]
+        
+        branch_avg_trace = go.Scatter(
+            x=list(semester_avg_scores.keys()),
+            y=branch_scores,
+            mode='lines+markers',
+            name=f"{branch}",
+            marker=dict(color=color), 
+            connectgaps=True
+        )
+        branch_avg_traces.append(branch_avg_trace)
+    
+    branch_avg_chart = go.Figure(data=branch_avg_traces)
+    branch_avg_chart.update_layout(
+        yaxis_title="Average Score",
+        legend_title="Branches",
+        modebar=dict(
+            remove=["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"],
+        ),
+    )
+    
+    return semester_avg_chart, branch_avg_chart
+
 
 def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester):
     """
@@ -505,91 +561,3 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
     )
 
     return fig.to_html(full_html=False)
-
-def generate_semester_score_charts(cleaned_results_by_semester):
-    """
-    Generate two Plotly line charts:
-    1. Per semester average score line chart.
-    2. Multi-line chart for per semester average score for each branch.
-    
-    Parameters:
-        cleaned_results_by_semester (dict): Dictionary containing course data per semester.
-        branch_colors (dict): Dictionary mapping each branch to a specific color.
-
-    Returns:
-        tuple: (semester_avg_chart, branch_avg_chart)
-            semester_avg_chart: Line chart showing per semester average score.
-            branch_avg_chart: Multi-line chart showing average scores by branch per semester.
-    """
-
-    data = []
-    for semester, courses in cleaned_results_by_semester.items():
-        for course in courses:
-            data.append({
-                'semester': semester,
-                'branch': course['branch'],
-                'score': course['score']
-            })
-    
-    df = pd.DataFrame(data)
-    
-    semester_avg_scores = calculate_semester_avg_scores(df)
-    branch_semester_avg_scores = calculate_branch_semester_avg_scores(df)
-
-    semester_avg_trace = go.Scatter(
-        x=list(semester_avg_scores.keys()),
-        y=list(semester_avg_scores.values()),
-        mode='lines+markers',
-        name="Average Score per Semester",
-        marker=dict(color='blue')
-    )
-    semester_avg_chart = go.Figure(data=[semester_avg_trace])
-    semester_avg_chart.update_layout(
-        yaxis_title="Average Score",
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-    )
-    
-    branch_avg_traces = []
-    for branch, color in branch_colors.items():
-        
-        branch_scores = [
-            branch_semester_avg_scores.get(semester, {}).get(branch, None) 
-            for semester in semester_avg_scores.keys()
-        ]
-        
-        branch_avg_trace = go.Scatter(
-            x=list(semester_avg_scores.keys()),
-            y=branch_scores,
-            mode='lines+markers',
-            name=f"{branch}",
-            marker=dict(color=color),
-            connectgaps=True
-        )
-        branch_avg_traces.append(branch_avg_trace)
-    
-    branch_avg_chart = go.Figure(data=branch_avg_traces)
-    branch_avg_chart.update_layout(
-        yaxis_title="Average Score",
-        legend_title="Branches",
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-    )
-    
-    return semester_avg_chart, branch_avg_chart
