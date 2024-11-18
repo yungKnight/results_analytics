@@ -113,10 +113,8 @@ def display_insights(request):
 
     correlations = calculate_correlations(
         gpa_data_df,
-        column_pairs=[('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa'), ('')]
+        column_pairs=[('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa')]
     )
-
-    print(correlations)
 
     processed_semester_data = process_gpa_data()
 
@@ -126,6 +124,7 @@ def display_insights(request):
         'gpa_data': gpa_data,
         'semester_avg_scores': semester_avg_scores,
         'branch_semester_avg_scores': branch_semester_avg_scores,
+        'correlations': correlations
     })
 
 def plot_view(request):
