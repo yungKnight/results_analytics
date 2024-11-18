@@ -10,7 +10,12 @@ from .results_utils import (
 )
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
-from .inference_utils import calculate_correlations
+from .inference_utils import (
+    extract_cleaned_results_df,
+    calculate_branch_semester_avg_scores,
+    calculate_semester_avg_scores,
+    calculate_correlations
+)
 from .visualizer_utils import (
     extract_branch_gpa_data,
     extract_combined_gpa_cgpa_data,
@@ -95,15 +100,24 @@ def display_insights(request):
     if not student:
         return redirect('home:welcome')
 
-    gpa_data = request.session.get('gpa_data_by_semester')
     cleaned_results = request.session.get('cleaned_results_by_semester')
+    gpa_data = request.session.get('gpa_data_by_semester')
+
+    cleaned_results_df = extract_cleaned_results_df(cleaned_results)
+
+    semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
+    branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
+
     processed_semester_data = process_gpa_data()
 
     return render(request, 'visual.html', {
         'processed_semester_data': processed_semester_data,
         'cleaned_results': cleaned_results,
         'gpa_data': gpa_data,
+        'semester_avg_scores': semester_avg_scores,
+        'branch_semester_avg_scores': branch_semester_avg_scores,
     })
+
 
 def plot_view(request):
     """Displays various GPA, CGPA, and branch GPA charts, along with boxplots, scatter plots, and branch distribution charts for the student."""

@@ -41,4 +41,56 @@
     <p>No GPA data available for display.</p>
 {% endif %}
 
+{% if semester_avg_scores %}
+    <h3 class="px-4 pt-3 pb-1">Semester Average Scores</h3>
+    <table class="mb-4">
+        <thead>
+            <tr>
+                <th class="px-4 pt-4 pb-1">Semester</th>
+                <th class="px-4 pt-4 pb-1">Average Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semester, avg_score in semester_avg_scores.items %}
+            <tr>
+                <td class="px-4 py-1">{{ semester }}</td>
+                <td class="px-4 py-1">{{ avg_score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No semester average scores available.</p>
+{% endif %}
+
+{% if branch_semester_avg_scores %}
+    <h3 class="px-4 pt-3 pb-1">Branch Semester Average Scores</h3>
+    <table>
+        <thead>
+            <tr>
+                <th class="px-4 pt-4 pb-1">Semester</th>
+                <th class="px-4 pt-4 pb-1">Branch Average Scores</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semester, branch_scores in branch_semester_avg_scores.items %}
+            <tr>
+                <td class="px-4 py-1">{{ semester }}</td>
+                <td class="px-4 py-2">
+                    <ul>
+                        {% for branch, avg_score in branch_scores.items %}
+                        <li>{{ branch }}: {{ avg_score }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No branch semester average scores available.</p>
+{% endif %}
+
+<div class="py-3 px-4">{{ cleaned_results }}</div>
+
 {% endblock %}

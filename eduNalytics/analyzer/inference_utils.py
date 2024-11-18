@@ -89,7 +89,7 @@ def calculate_semester_avg_scores(df):
         dict: A dictionary where each semester key maps to the average score of all courses in that semester.
     """
     
-    semester_avg_scores = df.groupby('semester')['score'].mean().to_dict()
+    semester_avg_scores = df.groupby('semester')['score'].mean().round(1).to_dict()
     return semester_avg_scores
 
 def calculate_branch_semester_avg_scores(df):
@@ -104,7 +104,7 @@ def calculate_branch_semester_avg_scores(df):
               Each inner dictionary maps branch names to their average scores.
     """
     
-    grouped = df.groupby(['semester', 'branch'])['score'].mean().unstack(fill_value=0)
+    grouped = df.groupby(['semester', 'branch'])['score'].mean().round(1).unstack(fill_value=0)
     
     branch_semester_avg_scores = {semester: branch_scores.dropna().to_dict() for semester, branch_scores in grouped.iterrows()}
     
