@@ -57,6 +57,29 @@ def extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester):
 
     return gpa_data_df
 
+def extract_branch_gpa_df(gpa_data_by_semester: dict):
+    """
+    Extracts Branch GPA data into a DataFrame for correlation analysis.
+
+    Parameters:
+    - gpa_data_by_semester (dict): Dictionary containing GPA data, including branch-specific GPAs.
+
+    Returns:
+    - pd.DataFrame: A DataFrame where rows are semesters and columns are branches.
+    """
+    data = []
+    semesters = []
+
+    for semester, gpa_data in gpa_data_by_semester.items():
+        branch_gpas = gpa_data.get('Branch_GPA', {})
+        semesters.append(semester)
+        data.append(branch_gpas)
+
+    branch_gpa_df = pd.DataFrame(data, index=semesters).fillna(0)
+    branch_gpa_df.index.name = 'semester'
+    
+    return branch_gpa_df
+
 def calculate_correlations(df: pd.DataFrame, column_pairs: list[tuple[str, str]], method: str = 'pearson') -> dict:
     """
     Calculate correlations between specified column pairs in a DataFrame, formatted to two decimal places as strings.
