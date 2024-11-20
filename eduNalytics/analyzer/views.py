@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+import pandas as pd
 from .models import DetailedCourseResult
 from .results_utils import (
     filter_results_by_semester,
@@ -13,6 +14,7 @@ from collector.models import Student, Department
 from .inference_utils import (
     extract_cleaned_results_df,
     extract_gpa_data_df,
+    extract_branch_gpa_df,
     calculate_branch_semester_avg_scores,
     calculate_semester_avg_scores,
     calculate_correlations
@@ -107,14 +109,30 @@ def display_insights(request):
 
     cleaned_results_df = extract_cleaned_results_df(cleaned_results)
     gpa_data_df = extract_gpa_data_df(gpa_data, cleaned_results)
+    branch_gpa_df = extract_branch_gpa_df(gpa_data)
+
+    robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
+        branch_gpa_df,
+        how='left',
+        left_on='semester',
+        right_index=True
+    )
+
+    branch_columns = branch_gpa_df.columns
+
+    required_cor_pairs = [('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa')]  
+    branch_cor_pairs = [('cgpa', branch) for branch in branch_columns]
+    branch_gpa_pairs = [('gpa', branch) for branch in branch_columns]
+
+    merged_list = required_cor_pairs + branch_cor_pairs + branch_gpa_pairs
+
+    correlations = calculate_correlations(
+        robust_gpa_df,
+        column_pairs = merged_list,
+    )
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
-
-    correlations = calculate_correlations(
-        gpa_data_df,
-        column_pairs=[('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa')]
-    )
 
     processed_semester_data = process_gpa_data()
 
@@ -124,7 +142,7 @@ def display_insights(request):
         'gpa_data': gpa_data,
         'semester_avg_scores': semester_avg_scores,
         'branch_semester_avg_scores': branch_semester_avg_scores,
-        'correlations': correlations
+        'correlations': correlations,
     })
 
 def plot_view(request):
