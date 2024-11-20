@@ -5,6 +5,7 @@ from collections import defaultdict
 from analyzer.inference_utils import (
     extract_cleaned_results_df,
     extract_gpa_data_df,
+    extract_branch_gpa_df,
     calculate_semester_avg_scores,
     calculate_branch_semester_avg_scores,
     calculate_correlations
@@ -45,7 +46,6 @@ def test_extract_cleaned_results_df():
 
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
-    # Additional tests
     print("\n---- Additional Tests ----")
     # Test 1: Check if all semesters are extracted correctly
     semesters_extracted = result_df['semester'].unique()
@@ -166,6 +166,77 @@ def test_extract_gpa_data_df():
     print("Semester course counts extracted:", course_counts_extracted)
 
     assert course_counts_extracted == expected_data['semester_course_count']
+
+def test_extract_branch_gpa_df():
+    """Test the extract_branch_gpa_df function with inline sample data."""
+    # Inline sample data for the test case
+    gpa_data_by_semester = {
+        '100 level Harmattan': {
+            'GPA': 3.9,
+            'Branch_GPA': {'Accessories': 3.78, 'Mathematics For Economists': 5.0},
+            'CGPA': 3.9,
+            'Total_units': 20
+        },
+        '100 level Rain': {
+            'GPA': 3.67,
+            'Branch_GPA': {'Accessories': 4.23, 'Mathematics For Economists': 0.0},
+            'CGPA': 3.8,
+            'Total_units': 15
+        },
+        '200 level Harmattan': {
+            'GPA': 3.18,
+            'Branch_GPA': {'Microeconomics': 3.0, 'Macroeconomics': 4.0, 'Accessories': 3.6, 'Mathematics For Economists': 1.5},
+            'CGPA': 3.56,
+            'Total_units': 22
+        },
+        '200 level Rain': {
+            'GPA': 3.91,
+            'Branch_GPA': {'Accessories': 4.4, 'Mathematics For Economists': 3.33, 'Microeconomics': 4.0, 'Macroeconomics': 3.0},
+            'CGPA': 3.66,
+            'Total_units': 22
+        },
+    }
+
+    print("Extracting branch GPA DataFrame...\n \n")
+    df = extract_branch_gpa_df(gpa_data_by_semester)
+    print(df)
+
+    print("\nExpected Columns:")
+    expected_columns = ['Accessories', 'Mathematics For Economists', 'Microeconomics', 'Macroeconomics']
+    print(expected_columns)
+    
+    print("\nActual DataFrame Columns:")
+    print(list(df.columns))
+    assert list(df.columns) == expected_columns, "Columns do not match expected branch names"
+    
+    print("\nExpected Index (Semesters):")
+    expected_index = ['100 level Harmattan', '100 level Rain', '200 level Harmattan', '200 level Rain']
+    print(expected_index)
+    
+    print("\nActual DataFrame Index:")
+    print(list(df.index))
+    assert list(df.index) == expected_index, "Index does not match expected semester names"
+    
+    print("\nExpected Values:")
+    expected_values = {
+        '100 level Harmattan': {'Accessories': 3.78, 'Mathematics For Economists': 5.0, 'Microeconomics': 0.0, 'Macroeconomics': 0.0},
+        '100 level Rain': {'Accessories': 4.23, 'Mathematics For Economists': 0.0, 'Microeconomics': 0.0, 'Macroeconomics': 0.0},
+        '200 level Harmattan': {'Accessories': 3.6, 'Mathematics For Economists': 1.5, 'Microeconomics': 3.0, 'Macroeconomics': 4.0},
+        '200 level Rain': {'Accessories': 4.4, 'Mathematics For Economists': 3.33, 'Microeconomics': 4.0, 'Macroeconomics': 3.0},
+    }
+    for semester, branches in expected_values.items():
+        print(f"\nExpected values for {semester}:")
+        print(branches)
+        for branch, expected_value in branches.items():
+            actual_value = df.at[semester, branch]
+            print(f"Checking {semester} - {branch}: expected {expected_value}, got {actual_value}")
+            assert actual_value == expected_value, f"Mismatch at {semester}, {branch}"
+
+    print("\nChecking for NaN values in the DataFrame...")
+    print(df.isna().sum()) 
+    assert (df.isna().sum().sum() == 0), "DataFrame contains NaN values"
+    print("\nTest passed! All checks are successful.")
+
 
 def test_calculate_semester_avg_scores():
     # Sample data
