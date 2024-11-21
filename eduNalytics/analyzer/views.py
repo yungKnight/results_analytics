@@ -117,6 +117,14 @@ def display_insights(request):
         left_on='semester',
         right_index=True
     )
+    
+    print("Branch GPA DataFrame:")
+    print(branch_gpa_df)
+    print("\n\nGPA Data DataFrame:")
+    print(gpa_data_df)
+    #print("\n\nRobust GPA DataFrame:")
+    #print(robust_gpa_df)
+    #print("\n \n")
 
     branch_columns = branch_gpa_df.columns
 

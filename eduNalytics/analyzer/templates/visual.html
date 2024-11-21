@@ -90,7 +90,7 @@
 
 {% if correlations %}
     <h2 class="text-center text-2xl font-bold px-4 pt-3">Correlational Analysis</h2>
-    <div class="grid grid-cols-3 gap-2 px-4 py-2">
+    <div class="grid grid-cols-3 gap-2 px-4 py-4">
         {% for metric_pair, correlation in correlations.items %}
         <div class="border border-gray p-4 rounded shadow">
             <p class="font-bold">{{ metric_pair.0 }} and {{ metric_pair.1 }}</p>
