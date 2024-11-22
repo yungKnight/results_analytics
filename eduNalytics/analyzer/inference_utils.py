@@ -30,6 +30,26 @@ def extract_cleaned_results_df(cleaned_results_by_semester):
 
     return cleaned_results_df
 
+def count_courses_per_branch(cleaned_results_by_semester):
+    branch_course_count = {}
+
+    sorted_semesters = sorted(cleaned_results_by_semester.keys(), key=lambda x: int(x.split(' ')[0]))
+
+    print(f"Sorted Semesters: {sorted_semesters}") 
+
+    for semester in sorted_semesters:
+        branch_counts = {}
+        for course in cleaned_results_by_semester[semester]:
+            branch = course['branch']
+            branch_counts[branch] = branch_counts.get(branch, 0) + 1
+        branch_course_count[semester] = branch_counts
+
+    df = pd.DataFrame(branch_course_count).T.fillna(0).astype(int)
+    df.index.name = "semester"
+
+    print(f"Resulting DataFrame:\n{df}")
+    return df
+
 def extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester):
     semester_keys = []
     gpas = []

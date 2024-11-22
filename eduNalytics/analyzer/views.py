@@ -17,7 +17,8 @@ from .inference_utils import (
     extract_branch_gpa_df,
     calculate_branch_semester_avg_scores,
     calculate_semester_avg_scores,
-    calculate_correlations
+    calculate_correlations,
+    count_courses_per_branch
 )
 from .visualizer_utils import (
     extract_branch_gpa_data,
@@ -108,6 +109,7 @@ def display_insights(request):
     gpa_data = request.session.get('gpa_data_by_semester')
 
     cleaned_results_df = extract_cleaned_results_df(cleaned_results)
+    branch_counts = count_courses_per_branch(cleaned_results)
     gpa_data_df = extract_gpa_data_df(gpa_data, cleaned_results)
     branch_gpa_df = extract_branch_gpa_df(gpa_data)
 
@@ -120,8 +122,8 @@ def display_insights(request):
     
     print("Branch GPA DataFrame:")
     print(branch_gpa_df)
-    print("\n\nGPA Data DataFrame:")
-    print(gpa_data_df)
+    print("\n\nCourse count by branch:")
+    print(branch_counts)
     #print("\n\nRobust GPA DataFrame:")
     #print(robust_gpa_df)
     #print("\n \n")

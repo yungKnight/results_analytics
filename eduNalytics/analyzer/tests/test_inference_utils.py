@@ -8,7 +8,8 @@ from analyzer.inference_utils import (
     extract_branch_gpa_df,
     calculate_semester_avg_scores,
     calculate_branch_semester_avg_scores,
-    calculate_correlations
+    calculate_correlations,
+    count_courses_per_branch
 )
 
 def test_extract_cleaned_results_df():
@@ -236,7 +237,6 @@ def test_extract_branch_gpa_df():
     print(df.isna().sum()) 
     assert (df.isna().sum().sum() == 0), "DataFrame contains NaN values"
     print("\nTest passed! All checks are successful.")
-
 
 def test_calculate_semester_avg_scores():
     # Sample data
