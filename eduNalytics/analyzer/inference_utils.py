@@ -33,9 +33,7 @@ def extract_cleaned_results_df(cleaned_results_by_semester):
 def count_courses_per_branch(cleaned_results_by_semester):
     branch_course_count = {}
 
-    sorted_semesters = sorted(cleaned_results_by_semester.keys(), key=lambda x: int(x.split(' ')[0]))
-
-    print(f"Sorted Semesters: {sorted_semesters}") 
+    sorted_semesters = sorted(cleaned_results_by_semester.keys(), key=lambda x: int(x.split(' ')[0])) 
 
     for semester in sorted_semesters:
         branch_counts = {}
