@@ -99,7 +99,7 @@ def display_insights(request):
     gpa_data = request.session.get('gpa_data_by_semester')
 
     cleaned_results_df = extract_cleaned_results_df(cleaned_results)
-    branch_counts = count_courses_per_branch(cleaned_results)
+    branch_counts_df = count_courses_per_branch(cleaned_results)
     gpa_data_df = extract_gpa_data_df(gpa_data, cleaned_results)
     branch_gpa_df = extract_branch_gpa_df(gpa_data)
     branch_total_units_df = calculate_branch_units(cleaned_results)
@@ -110,12 +110,31 @@ def display_insights(request):
         left_on='semester',
         right_index=True
     )
+
+    robust_gpa_df = robust_gpa_df.merge(
+        branch_counts_df,
+        how='left',
+        left_on='semester',
+        right_index=True
+    )
+
+    robust_gpa_df = robust_gpa_df.merge(
+        branch_total_units_df,
+        how='left',
+        left_on='semester',
+        right_index=True
+    )
     
-    print("\n\nBranch units DataFrame:")
+#    print("\n\n Gpa data for all semesters:\n\n")
+#    print(branch_gpa_df)
+    print("\n\n Courses offered per branch in semester:\n\n")
+    print(branch_counts_df)
+    print("\n\n Lecture hours registered overall for branch in semester:\n\n")
     print(branch_total_units_df)
-    print("\n\nCourse count by branch:\n\n")
-    print(branch_counts)
+    print("\n\n HMM:\n\n")
+    print(robust_gpa_df)
     print("\n\n")
+    print(robust_gpa_df.columns.tolist())
 
     branch_columns = branch_gpa_df.columns
 
