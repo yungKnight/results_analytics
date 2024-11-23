@@ -9,7 +9,8 @@ from analyzer.inference_utils import (
     calculate_semester_avg_scores,
     calculate_branch_semester_avg_scores,
     calculate_correlations,
-    count_courses_per_branch
+    count_courses_per_branch,
+    calculate_branch_units
 )
 
 def test_extract_cleaned_results_df():
@@ -239,7 +240,7 @@ def test_extract_branch_gpa_df():
     print("\nTest passed! All checks are successful.")
 
 def test_count_courses_per_branch():
-    
+
     cleaned_results_by_semester = {
         "100 Harmattan": [
             {"branch": "Math", "course_code": "MTH101"},
@@ -269,6 +270,39 @@ def test_count_courses_per_branch():
     expected_df.index.name = "semester"
 
     result_df = count_courses_per_branch(cleaned_results_by_semester)
+
+    pd.testing.assert_frame_equal(result_df, expected_df)
+
+def test_calculate_branch_units():
+
+    cleaned_results_by_semester = {
+        '100 level Harmattan': [
+            {'course': 'ACC101', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 65},
+            {'course': 'ACC102', 'unit': 3, 'branch': 'Accessories', 'grade': 'A', 'score': 75},
+            {'course': 'MAT101', 'unit': 3, 'branch': 'Mathematics', 'grade': 'A', 'score': 80},
+            {'course': 'ENG101', 'unit': 3, 'branch': 'Engineering', 'grade': 'B', 'score': 72}
+        ],
+
+        '100 level Rain': [
+            {'course': 'ACC103', 'unit': 3, 'branch': 'Accessories', 'grade': 'A', 'score': 74},
+            {'course': 'ACC104', 'unit': 3, 'branch': 'Accessories', 'grade': 'B', 'score': 78},
+            {'course': 'MAT102', 'unit': 2, 'branch': 'Mathematics', 'grade': 'A', 'score': 70},
+            {'course': 'ENG102', 'unit': 2, 'branch': 'Engineering', 'grade': 'B', 'score': 68},
+            {'course': 'ENG103', 'unit': 2, 'branch': 'Engineering', 'grade': 'A', 'score': 85}
+        ]
+    }
+
+    expected_df = pd.DataFrame({
+        'Accessories_units': [6, 6],
+        'Mathematics_units': [3, 2],
+        'Engineering_units': [3, 4],
+        'Semester': ['100 level Harmattan', '100 level Rain']
+    })
+
+    expected_df = expected_df.set_index('Semester')
+    expected_df.index.name = 'semester'
+
+    result_df = calculate_branch_units(cleaned_results_by_semester)
 
     pd.testing.assert_frame_equal(result_df, expected_df)
 
