@@ -12,29 +12,19 @@ from .results_utils import (
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
 from .inference_utils import (
-    extract_cleaned_results_df,
-    extract_gpa_data_df,
-    extract_branch_gpa_df,
-    calculate_branch_semester_avg_scores,
-    calculate_semester_avg_scores,
-    calculate_correlations,
-    count_courses_per_branch
+    extract_cleaned_results_df, extract_gpa_data_df,
+    extract_branch_gpa_df,  calculate_branch_semester_avg_scores,
+    calculate_semester_avg_scores,  calculate_correlations,
+    count_courses_per_branch,   calculate_branch_units
 )
 from .visualizer_utils import (
-    extract_branch_gpa_data,
-    branch_colors,
-    extract_combined_gpa_cgpa_data,
-    extract_from_cleaned_semester,
-    extract_passed_courses_from_cleaned_semester,
-    generate_branch_gpa_chart,
-    generate_combined_gpa_cgpa_chart,
-    generate_boxplot_charts,
-    generate_scatter_plot,
-    generate_overall_branch_representation_pie_chart,
-    generate_branch_distribution_pie_charts,
+    extract_branch_gpa_data,    branch_colors,  extract_combined_gpa_cgpa_data,
+    extract_from_cleaned_semester,    extract_passed_courses_from_cleaned_semester,
+    generate_branch_gpa_chart,    generate_combined_gpa_cgpa_chart,    generate_boxplot_charts,
+    generate_scatter_plot,  generate_overall_branch_representation_pie_chart,
+    generate_branch_distribution_pie_charts,    generate_semester_score_charts,
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
-    generate_semester_score_charts,
 )
 
 def detailed_course_result_to_dict(result):
@@ -112,6 +102,7 @@ def display_insights(request):
     branch_counts = count_courses_per_branch(cleaned_results)
     gpa_data_df = extract_gpa_data_df(gpa_data, cleaned_results)
     branch_gpa_df = extract_branch_gpa_df(gpa_data)
+    branch_total_units_df = calculate_branch_units(cleaned_results)
 
     robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
@@ -120,13 +111,11 @@ def display_insights(request):
         right_index=True
     )
     
-    print("Branch GPA DataFrame:")
-    print(branch_gpa_df)
-    print("\n\nCourse count by branch:")
+    print("\n\nBranch units DataFrame:")
+    print(branch_total_units_df)
+    print("\n\nCourse count by branch:\n\n")
     print(branch_counts)
-    #print("\n\nRobust GPA DataFrame:")
-    #print(robust_gpa_df)
-    #print("\n \n")
+    print("\n\n")
 
     branch_columns = branch_gpa_df.columns
 

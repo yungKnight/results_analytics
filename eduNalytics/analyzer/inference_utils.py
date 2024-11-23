@@ -43,9 +43,51 @@ def count_courses_per_branch(cleaned_results_by_semester):
         branch_course_count[semester] = branch_counts
 
     df = pd.DataFrame(branch_course_count).T.fillna(0).astype(int)
+    df = df.rename(columns={col: f"{col}_count" for col in df.columns if col != "Semester"})
     df.index.name = "semester"
 
-    print(f"Resulting DataFrame:\n{df}")
+    return df
+
+def calculate_branch_units(cleaned_results):
+    """
+    Calculate the total units for all branches in all semesters and return as a compact DataFrame.
+
+    Parameters:
+    - cleaned_results (dict): The cleaned results dictionary from the session.
+
+    Returns:
+    - pd.DataFrame: A compact DataFrame with columns ['Branch_units'] and 'Semester' as the index.
+    """
+    rows = []
+
+    for semester, courses in cleaned_results.items():
+
+        branch_units = {}
+
+        for course in courses:
+            branch = course['branch']
+            units = course['unit']
+
+            if branch not in branch_units:
+                branch_units[branch] = 0
+            branch_units[branch] += units
+
+        branch_units['Semester'] = semester 
+        rows.append(branch_units)
+
+    df = pd.DataFrame(rows)
+
+    df = df.rename(columns={col: f"{col}_units" for col in df.columns if col != "Semester"})
+
+    df = df.fillna(0)
+
+    for col in df.columns:
+        if col != "Semester":
+            df[col] = df[col].astype(int)
+
+    df = df.set_index('Semester')
+    df.index.name = 'semester'
+
     return df
 
 def extract_gpa_data_df(gpa_data_by_semester, cleaned_results_by_semester):

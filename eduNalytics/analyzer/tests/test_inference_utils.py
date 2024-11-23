@@ -239,7 +239,7 @@ def test_extract_branch_gpa_df():
     print("\nTest passed! All checks are successful.")
 
 def test_count_courses_per_branch():
-    # Test data
+    
     cleaned_results_by_semester = {
         "100 Harmattan": [
             {"branch": "Math", "course_code": "MTH101"},
@@ -259,7 +259,6 @@ def test_count_courses_per_branch():
         ],
     }
 
-    # Expected output
     expected_data = {
         "100 Harmattan": {"Math": 2, "Science": 1, "Engineering": 0, "Humanities": 0},
         "200 Harmattan": {"Math": 1, "Science": 1, "Engineering": 2, "Humanities": 0},
@@ -269,10 +268,8 @@ def test_count_courses_per_branch():
     expected_df = pd.DataFrame(expected_data).T.fillna(0).astype(int)
     expected_df.index.name = "semester"
 
-    # Call the function
     result_df = count_courses_per_branch(cleaned_results_by_semester)
 
-    # Assertions
     pd.testing.assert_frame_equal(result_df, expected_df)
 
 def test_calculate_semester_avg_scores():
