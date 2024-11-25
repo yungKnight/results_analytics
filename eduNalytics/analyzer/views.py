@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 import pandas as pd
+import pingouin as pg
 from .models import DetailedCourseResult
 from .results_utils import (
     filter_results_by_semester,
@@ -127,18 +128,61 @@ def display_insights(request):
     
 #    print("\n\n Gpa data for all semesters:\n\n")
 #    print(branch_gpa_df)
-    print("\n\n Courses offered per branch in semester:\n\n")
-    print(branch_counts_df)
-    print("\n\n Lecture hours registered overall for branch in semester:\n\n")
-    print(branch_total_units_df)
-    print("\n\n HMM:\n\n")
-    print(robust_gpa_df)
+#    print("\n\n Courses offered per branch in semester:\n\n")
+#    print(branch_counts_df)
+#    print("\n\n Lecture hours registered overall for branch in semester:\n\n")
+#    print(branch_total_units_df)
+#    print("\n\n HMM:\n\n")
+#    print(robust_gpa_df)
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
 
-    branch_columns = branch_gpa_df.columns
+    #partial correlation
+    gpa_mathes = pg.partial_corr(robust_gpa_df, x='Mathematics For Economists_units', y='gpa', covar=['Accessories_units', 'Microeconomics_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of GPA and mathes:\n")
+    print(gpa_mathes)
 
-    required_cor_pairs = [('total_units', 'gpa'), ('total_units', 'cgpa'), ('gpa', 'cgpa')]  
+    gpa_micro = pg.partial_corr(robust_gpa_df, x='Microeconomics_units', y='gpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of GPA and micro:\n")
+    print(gpa_micro)
+
+    gpa_macro = pg.partial_corr(robust_gpa_df, x='Macroeconomics_units', y='gpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Microeconomics_units'])
+    print("\nPartial correlation of GPA and macro:\n")
+    print(gpa_macro)
+
+    gpa_accessories = pg.partial_corr(robust_gpa_df, x='Accessories_units', y='gpa', covar=['Microeconomics_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of GPA and Accessories:\n")
+    print(gpa_accessories)
+
+    cgpa_mathes = pg.partial_corr(robust_gpa_df, x='Mathematics For Economists_units', y='cgpa', covar=['Accessories_units', 'Microeconomics_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of CGPA and mathes:\n")
+    print(cgpa_mathes)
+
+    cgpa_micro = pg.partial_corr(robust_gpa_df, x='Microeconomics_units', y='cgpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of CGPA and micro:\n")
+    print(cgpa_micro)
+
+    cgpa_macro = pg.partial_corr(robust_gpa_df, x='Macroeconomics_units', y='cgpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Microeconomics_units'])
+    print("\nPartial correlation of CGPA and macro:\n")
+    print(cgpa_macro)
+
+    cgpa_accessories = pg.partial_corr(robust_gpa_df, x='Accessories_units', y='cgpa', covar=['Microeconomics_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
+    print("\nPartial correlation of CGPA and Accessories:\n")
+    print(cgpa_accessories)
+
+    # correlation
+    branch_columns = branch_gpa_df.columns
+#    print("\n\nBranch columns dataframe:\n")
+#    print(branch_columns)
+
+    required_cor_pairs = [
+        ('total_units', 'gpa'), ('total_units', 'cgpa'), 
+        ('gpa', 'cgpa'), ('gpa', 'Mathematics For Economists_units'),
+        ('gpa', 'Accessories_units'), ('gpa', 'Macroeconomics_units'),
+        ('gpa', 'Microeconomics_units'),('cgpa', 'Mathematics For Economists_units'),
+        ('cgpa', 'Accessories_units'), ('cgpa', 'Macroeconomics_units'),
+        ('cgpa', 'Microeconomics_units')
+    ]  
     branch_cor_pairs = [('cgpa', branch) for branch in branch_columns]
     branch_gpa_pairs = [('gpa', branch) for branch in branch_columns]
 
@@ -148,6 +192,10 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = merged_list,
     )
+
+    print("\n\n My existing correlations:\n\n")
+    print(correlations)
+    print("\n")
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
