@@ -161,6 +161,38 @@ def calculate_correlations(df: pd.DataFrame, column_pairs: list[tuple[str, str]]
             raise ValueError(f"One or both columns '{col1}' and '{col2}' are not in the DataFrame.")
     return correlations
 
+def calculate_partial_correlations(df: pd.DataFrame, args_list: list[dict]):
+    """
+    Calculate partial correlations dynamically using Pingouin.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame containing the data.
+    - args_list (list of dict): List of dictionaries specifying arguments for partial correlation.
+        Each dictionary should have:
+        - 'x' (str): The independent variable.
+        - 'y' (str): The dependent variable.
+        - 'covar' (list of str): List of covariates.
+
+    Returns:
+    - dict: A dictionary with keys as (x, y) tuples and values as the Pingouin correlation result DataFrames.
+    """
+    partial_correlations = {}
+
+    for args in args_list:
+        x = args.get('x')
+        y = args.get('y')
+        covar = args.get('covar', [])
+
+        required_columns = [x, y] + covar
+        if all(col in df.columns for col in required_columns):
+            result = pg.partial_corr(data=df, x=x, y=y, covar=covar)
+            partial_correlations[(x, y)] = result
+        else:
+            missing = [col for col in required_columns if col not in df.columns]
+            raise ValueError(f"Missing required columns in DataFrame: {missing}")
+
+    return partial_correlations
+
 def calculate_semester_avg_scores(df):
     """
     Calculate the average score for each semester based on all courses in that semester.

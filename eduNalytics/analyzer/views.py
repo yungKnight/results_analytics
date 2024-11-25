@@ -8,16 +8,14 @@ from .results_utils import (
     calculate_branch_gpa_for_each_semester,
     calculate_gpa_for_each_semester,
     calculate_cgpa,
-    calculate_total_units_for_semester
-)
+    calculate_total_units_for_semester)
 from .advanced_utils import process_gpa_data
 from collector.models import Student, Department
 from .inference_utils import (
     extract_cleaned_results_df, extract_gpa_data_df,
     extract_branch_gpa_df,  calculate_branch_semester_avg_scores,
     calculate_semester_avg_scores,  calculate_correlations,
-    count_courses_per_branch,   calculate_branch_units
-)
+    count_courses_per_branch,   calculate_branch_units, calculate_partial_correlations)
 from .visualizer_utils import (
     extract_branch_gpa_data,    branch_colors,  extract_combined_gpa_cgpa_data,
     extract_from_cleaned_semester,    extract_passed_courses_from_cleaned_semester,
@@ -126,76 +124,43 @@ def display_insights(request):
         right_index=True
     )
     
-#    print("\n\n Gpa data for all semesters:\n\n")
-#    print(branch_gpa_df)
-#    print("\n\n Courses offered per branch in semester:\n\n")
-#    print(branch_counts_df)
-#    print("\n\n Lecture hours registered overall for branch in semester:\n\n")
-#    print(branch_total_units_df)
-#    print("\n\n HMM:\n\n")
-#    print(robust_gpa_df)
+    #print("\n\n HMM:\n\n")
+    #print(robust_gpa_df)
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
 
     #partial correlation
-    gpa_mathes = pg.partial_corr(robust_gpa_df, x='Mathematics For Economists_units', y='gpa', covar=['Accessories_units', 'Microeconomics_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of GPA and mathes:\n")
-    print(gpa_mathes)
-
-    gpa_micro = pg.partial_corr(robust_gpa_df, x='Microeconomics_units', y='gpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of GPA and micro:\n")
-    print(gpa_micro)
-
-    gpa_macro = pg.partial_corr(robust_gpa_df, x='Macroeconomics_units', y='gpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Microeconomics_units'])
-    print("\nPartial correlation of GPA and macro:\n")
-    print(gpa_macro)
-
-    gpa_accessories = pg.partial_corr(robust_gpa_df, x='Accessories_units', y='gpa', covar=['Microeconomics_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of GPA and Accessories:\n")
-    print(gpa_accessories)
-
-    cgpa_mathes = pg.partial_corr(robust_gpa_df, x='Mathematics For Economists_units', y='cgpa', covar=['Accessories_units', 'Microeconomics_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of CGPA and mathes:\n")
-    print(cgpa_mathes)
-
-    cgpa_micro = pg.partial_corr(robust_gpa_df, x='Microeconomics_units', y='cgpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of CGPA and micro:\n")
-    print(cgpa_micro)
-
-    cgpa_macro = pg.partial_corr(robust_gpa_df, x='Macroeconomics_units', y='cgpa', covar=['Accessories_units', 'Mathematics For Economists_units', 'Microeconomics_units'])
-    print("\nPartial correlation of CGPA and macro:\n")
-    print(cgpa_macro)
-
-    cgpa_accessories = pg.partial_corr(robust_gpa_df, x='Accessories_units', y='cgpa', covar=['Microeconomics_units', 'Mathematics For Economists_units', 'Macroeconomics_units'])
-    print("\nPartial correlation of CGPA and Accessories:\n")
-    print(cgpa_accessories)
-
-    # correlation
     branch_columns = branch_gpa_df.columns
-#    print("\n\nBranch columns dataframe:\n")
-#    print(branch_columns)
+    print(branch_columns)
 
+    partial_corr_list = []
+    for branch in branch_columns:
+        partial_corr_list.append({
+            'x': branch,
+            'y': 'cgpa',
+            'covar': [col for col in branch_columns if col != branch]
+        })
+
+    partial_correlations = calculate_partial_correlations(robust_gpa_df, partial_corr_list)
+    
+    for (x, y), result in partial_correlations.items():
+        print(f"Partial correlation of {x} and {y}:")
+        print(result, "\n")
+    
+    # correlation
     required_cor_pairs = [
         ('total_units', 'gpa'), ('total_units', 'cgpa'), 
-        ('gpa', 'cgpa'), ('gpa', 'Mathematics For Economists_units'),
-        ('gpa', 'Accessories_units'), ('gpa', 'Macroeconomics_units'),
-        ('gpa', 'Microeconomics_units'),('cgpa', 'Mathematics For Economists_units'),
-        ('cgpa', 'Accessories_units'), ('cgpa', 'Macroeconomics_units'),
-        ('cgpa', 'Microeconomics_units')
-    ]  
-    branch_cor_pairs = [('cgpa', branch) for branch in branch_columns]
-    branch_gpa_pairs = [('gpa', branch) for branch in branch_columns]
-
-    merged_list = required_cor_pairs + branch_cor_pairs + branch_gpa_pairs
-
+        ('gpa', 'cgpa')
+    ]
+    
     correlations = calculate_correlations(
         robust_gpa_df,
-        column_pairs = merged_list,
+        column_pairs = required_cor_pairs,
     )
 
-    print("\n\n My existing correlations:\n\n")
+    #print("\n\n My existing correlations:\n\n")
     print(correlations)
-    print("\n")
+    #print("\n")
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
@@ -237,17 +202,10 @@ def plot_view(request):
     cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
     if cleaned_results_by_semester:
         semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
-        
-        print("Semesters:", semesters)
-        print("Branches:", branches)
-        print("Scores:", scores)
 
         scatter_plot_html = generate_scatter_plot(courses, scores)
         pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
         semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester, branch_colors)
-        
-        print("\n \nBranch Avg Chart:", branch_avg_chart)
-        print("\n \nSemester Avg Chart:", semester_avg_chart)
 
         semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
         
