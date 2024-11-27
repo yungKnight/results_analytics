@@ -10,7 +10,8 @@ from analyzer.inference_utils import (
     calculate_branch_semester_avg_scores,
     calculate_correlations,
     count_courses_per_branch,
-    calculate_branch_units
+    calculate_branch_units,
+    calculate_partial_correlations
 )
 
 def test_extract_cleaned_results_df():
@@ -415,3 +416,50 @@ def test_calculate_correlations():
     with pytest.raises(ValueError) as exc_info:
         calculate_correlations(df, [('GPA', 'NonExistentColumn')])
     print(f"Caught expected ValueError: {exc_info.value}")
+
+def test_partial_correlation():
+    """Test the function with valid input."""
+    
+    print("Creating test DataFrame...")
+    df = pd.DataFrame({
+        'gpa': [3.5, 3.7, 3.6, 3.8, 3.9, 3.2, 3.4, 3.3],
+        'cgpa': [3.5, 3.6, 3.55, 3.65, 3.7, 3.4, 3.45, 3.3],
+        'Accessories': [80, 85, 82, 88, 90, 75, 78, 76],
+        'Mathematics For Economists': [70, 72, 68, 74, 76, 65, 66, 64],
+        'Microeconomics': [85, 87, 83, 89, 91, 80, 81, 79],
+        'Macroeconomics': [78, 80, 75, 82, 84, 72, 74, 73],
+    })
+    print("DataFrame created:\n", df)
+
+    print("\nDefining args_list for partial correlations...")
+    args_list = [
+        {
+            'x': 'Accessories',
+            'y': 'cgpa',
+            'covar': ['Mathematics For Economists', 'Microeconomics', 'Macroeconomics']
+        },
+        {
+            'x': 'Mathematics For Economists',
+            'y': 'gpa',
+            'covar': ['Accessories', 'Microeconomics', 'Macroeconomics']
+        },
+    ]
+    print("Args list defined:", args_list)
+
+    print("\nCalling calculate_partial_correlations...")
+    results = calculate_partial_correlations(df, args_list)
+    print("Function returned results:\n", results)
+
+    print("\nValidating results...")
+    assert isinstance(results, dict), "Results should be a dictionary."
+    assert ('Accessories', 'cgpa') in results, "Key ('Accessories', 'cgpa') missing in results."
+    assert ('Mathematics For Economists', 'gpa') in results, "Key ('Mathematics For Economists', 'gpa') missing in results."
+    print("Keys validation passed.")
+
+    for key, result in results.items():
+        print(f"\nValidating result for key: {key}...")
+        assert isinstance(result, pd.DataFrame), f"Result for {key} is not a DataFrame."
+        print(f"Result for {key} is a DataFrame:\n{result}")
+        assert 'r' in result.columns, f"'r' column missing in result for {key}."
+        assert 'p-val' in result.columns, f"'p-val' column missing in result for {key}."
+        print(f"Result for {key} passed validation.")
