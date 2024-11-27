@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
 import pandas as pd
 import pingouin as pg
+import time
+
+from django.shortcuts import render, redirect
 from .models import DetailedCourseResult
 from .results_utils import (
     filter_results_by_semester,
@@ -123,26 +125,62 @@ def display_insights(request):
         left_on='semester',
         right_index=True
     )
-    
-    #print("\n\n HMM:\n\n")
-    #print(robust_gpa_df)
+
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
 
     #partial correlation
     branch_columns = branch_gpa_df.columns
-    print(branch_columns)
 
+    start_time = time.time()
     partial_corr_list = []
-    for branch in branch_columns:
-        partial_corr_list.append({
-            'x': branch,
-            'y': 'cgpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
 
+    for branch in branch_columns:
+        branch_items = [
+            {
+                'x': branch,
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+    
+            {
+                'x': branch,
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+    
+            {
+                'x': f"{branch}_units",
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+    
+            {
+                'x': f"{branch}_units",
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+    
+            {
+                'x': f"{branch}_count",
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+    
+            {
+                'x': f"{branch}_count",
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            },
+        ]
+
+    partial_corr_list.extend(branch_items)
     partial_correlations = calculate_partial_correlations(robust_gpa_df, partial_corr_list)
     
+    end_time = time.time()    
+    execution_time = end_time - start_time
+    print(f"\nExecution time: {execution_time:.2f} seconds")
+
     for (x, y), result in partial_correlations.items():
         print(f"Partial correlation of {x} and {y}:")
         print(result, "\n")
@@ -158,9 +196,8 @@ def display_insights(request):
         column_pairs = required_cor_pairs,
     )
 
-    #print("\n\n My existing correlations:\n\n")
+    print("\n My existing correlations:\n")
     print(correlations)
-    #print("\n")
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
