@@ -126,8 +126,6 @@ def display_insights(request):
         right_index=True
     )
     
-    #print("\n\n HMM:\n\n")
-    #print(robust_gpa_df)
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
 
@@ -135,54 +133,52 @@ def display_insights(request):
     branch_columns = branch_gpa_df.columns
     print(branch_columns)
 
-    start_time = time.time()
-
+    #start_time = time.time()
     partial_corr_list = []
 
-    for branch in branch_columns:
-        partial_corr_list.append({
-            'x': branch,
-            'y': 'gpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
-
-        partial_corr_list.append({
-            'x': branch,
-            'y': 'cgpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
-
-        partial_corr_list.append({
-            'x': f"{branch}_units",
-            'y': 'gpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
-
-        partial_corr_list.append({
-            'x': f"{branch}_units",
-            'y': 'cgpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
-        
-        partial_corr_list.append({
-            'x': f"{branch}_count",
-            'y': 'gpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
-
-        partial_corr_list.append({
-            'x': f"{branch}_count",
-            'y': 'cgpa',
-            'covar': [col for col in branch_columns if col != branch]
-        })
+    if len(branch_columns) > 1:
+        for branch in branch_columns:
+            partial_corr_list.append({
+                'x': branch,
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
+    
+            partial_corr_list.append({
+                'x': branch,
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
+    
+            partial_corr_list.append({
+                'x': f"{branch}_units",
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
+    
+            partial_corr_list.append({
+                'x': f"{branch}_units",
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
+            
+            partial_corr_list.append({
+                'x': f"{branch}_count",
+                'y': 'gpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
+    
+            partial_corr_list.append({
+                'x': f"{branch}_count",
+                'y': 'cgpa',
+                'covar': [col for col in branch_columns if col != branch]
+            })
 
     partial_correlations = calculate_partial_correlations(robust_gpa_df, partial_corr_list)
     
-    end_time = time.time()
-    
-    execution_time = end_time - start_time
-    print(f"\nExecution time: {execution_time:.2f} seconds")
-
+    #end_time = time.time()    
+    #execution_time = end_time - start_time
+    #print(f"\nExecution time: {execution_time:.2f} seconds")
 
     for (x, y), result in partial_correlations.items():
         print(f"Partial correlation of {x} and {y}:")
