@@ -212,6 +212,7 @@ def display_insights(request):
         'semester_avg_scores': semester_avg_scores,
         'branch_semester_avg_scores': branch_semester_avg_scores,
         'correlations': correlations,
+        'partials': partial_correlations,
     })
 
 def plot_view(request):
