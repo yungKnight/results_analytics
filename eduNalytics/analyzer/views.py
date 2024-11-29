@@ -178,14 +178,14 @@ def display_insights(request):
 
     formatted_partials = []
     for (x, y), result in partial_correlations.items():
-        if 'pearson' in result.index:  # Ensure 'pearson' exists
+        if 'pearson' in result.index:
             formatted_partials.append({
                 'x': x,
                 'y': y,
                 'n': result.loc['pearson', 'n'],
-                'r': result.loc['pearson', 'r'],
+                'r': round(result.loc['pearson', 'r'], 6),
                 'ci95': result.loc['pearson', 'CI95%'],
-                'p_val': result.loc['pearson', 'p-val']
+                'p_val': round(result.loc['pearson', 'p-val'], 6)
             })
         else:
             continue
