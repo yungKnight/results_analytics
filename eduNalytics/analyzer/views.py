@@ -175,6 +175,20 @@ def display_insights(request):
             })
 
     partial_correlations = calculate_partial_correlations(robust_gpa_df, partial_corr_list)
+
+    formatted_partials = []
+    for (x, y), result in partial_correlations.items():
+        if 'pearson' in result.index:  # Ensure 'pearson' exists
+            formatted_partials.append({
+                'x': x,
+                'y': y,
+                'n': result.loc['pearson', 'n'],
+                'r': result.loc['pearson', 'r'],
+                'ci95': result.loc['pearson', 'CI95%'],
+                'p_val': result.loc['pearson', 'p-val']
+            })
+        else:
+            continue
     
     #end_time = time.time()    
     #execution_time = end_time - start_time
@@ -212,7 +226,7 @@ def display_insights(request):
         'semester_avg_scores': semester_avg_scores,
         'branch_semester_avg_scores': branch_semester_avg_scores,
         'correlations': correlations,
-        'partials': partial_correlations,
+        'partials': formatted_partials,
     })
 
 def plot_view(request):
