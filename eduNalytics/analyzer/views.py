@@ -128,10 +128,12 @@ def display_insights(request):
     
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
+    print("\n\nMy robust dataframe:\n")
+    print(robust_gpa_df)
 
     #partial correlation
     branch_columns = branch_gpa_df.columns
-    print(branch_columns)
+    #print(branch_columns)
 
     #start_time = time.time()
     partial_corr_list = []
@@ -194,9 +196,9 @@ def display_insights(request):
     #execution_time = end_time - start_time
     #print(f"\nExecution time: {execution_time:.2f} seconds")
 
-    for (x, y), result in partial_correlations.items():
-        print(f"Partial correlation of {x} and {y}:")
-        print(result, "\n")
+#    for (x, y), result in partial_correlations.items():
+#        print(f"Partial correlation of {x} and {y}:")
+#        print(result, "\n")
     
     # correlation
     required_cor_pairs = [
