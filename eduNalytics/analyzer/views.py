@@ -111,6 +111,14 @@ def display_insights(request):
         left_on='semester',
         right_index=True
     )
+    print("\n\n")
+    print(robust_gpa_df.columns.tolist())
+
+    robust_ema_df = robust_gpa_df.drop(columns=[
+            'total_units', 'semester_course_count'
+        ])
+    print("\n\n")
+    print(robust_ema_df.columns.tolist())
 
     robust_gpa_df = robust_gpa_df.merge(
         branch_counts_df,
@@ -128,12 +136,9 @@ def display_insights(request):
     
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
-    print("\n\nMy robust dataframe:\n")
-    print(robust_gpa_df)
 
     #partial correlation
     branch_columns = branch_gpa_df.columns
-    #print(branch_columns)
 
     #start_time = time.time()
     partial_corr_list = []
@@ -196,9 +201,9 @@ def display_insights(request):
     #execution_time = end_time - start_time
     #print(f"\nExecution time: {execution_time:.2f} seconds")
 
-#    for (x, y), result in partial_correlations.items():
-#        print(f"Partial correlation of {x} and {y}:")
-#        print(result, "\n")
+    #    for (x, y), result in partial_correlations.items():
+    #        print(f"Partial correlation of {x} and {y}:")
+    #        print(result, "\n")
     
     # correlation
     required_cor_pairs = [
@@ -211,10 +216,6 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = required_cor_pairs,
     )
-
-    #print("\n\n My existing correlations:\n\n")
-    print(correlations)
-    #print("\n")
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
