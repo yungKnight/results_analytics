@@ -17,7 +17,8 @@ from .inference_utils import (
     extract_cleaned_results_df, extract_gpa_data_df,
     extract_branch_gpa_df,  calculate_branch_semester_avg_scores,
     calculate_semester_avg_scores,  calculate_correlations,
-    count_courses_per_branch,   calculate_branch_units, calculate_partial_correlations)
+    count_courses_per_branch,   calculate_branch_units, calculate_partial_correlations,
+    calculate_ema)
 from .visualizer_utils import (
     extract_branch_gpa_data,    branch_colors,  extract_combined_gpa_cgpa_data,
     extract_from_cleaned_semester,    extract_passed_courses_from_cleaned_semester,
@@ -63,8 +64,7 @@ def get_student_from_context(request):
 def student_cleaned_results(request):
     """Displays cleaned results for a student."""
     student, course_details = get_student_from_context(request)
-
-    if student is None:
+    if not student:
         return redirect('home:welcome')
 
     filter_results_by_semester(student)
@@ -120,7 +120,15 @@ def display_insights(request):
 
     print("\n\n")
     print(robust_ema_df.columns.tolist())
-    print(f"\n\n {robust_ema_df}")
+    print(f"\n {robust_ema_df}")
+
+    parameters = ['gpa', 'cgpa']
+    span = 3
+    
+    robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
+    
+    print("\n\n")
+    print(robust_ema_df)
 
     robust_gpa_df = robust_gpa_df.merge(
         branch_counts_df,
