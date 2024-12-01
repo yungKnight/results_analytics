@@ -193,6 +193,27 @@ def calculate_partial_correlations(df: pd.DataFrame, args_list: list[dict]):
 
     return partial_correlations
 
+def calculate_ema(dataframe, parameters, span=3):
+    """
+    Calculate the Exponential Moving Average (EMA) for specified parameters in the DataFrame.
+
+    Args:
+        dataframe (pd.DataFrame): The DataFrame containing the data.
+        parameters (list): List of column names to calculate EMAs for.
+        span (int): The span for EMA calculation (default is 3).
+
+    Returns:
+        pd.DataFrame: A new DataFrame with original columns and EMA columns appended.
+    """
+    ema_df = dataframe.copy()
+    
+    for param in parameters:
+        ema_column_name = f"{param}_ema"
+        ema_df[ema_column_name] = ema_df[param].ewm(span=span, adjust=False).mean().round(2)
+    
+    return ema_df
+
+
 def calculate_semester_avg_scores(df):
     """
     Calculate the average score for each semester based on all courses in that semester.
