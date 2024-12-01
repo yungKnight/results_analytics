@@ -111,14 +111,16 @@ def display_insights(request):
         left_on='semester',
         right_index=True
     )
-    print("\n\n")
-    print(robust_gpa_df.columns.tolist())
 
-    robust_ema_df = robust_gpa_df.drop(columns=[
-            'total_units', 'semester_course_count'
+    robust_ema_df = gpa_data_df.drop(columns=[
+            'branch_gpa',
+            'total_units',
+            'semester_course_count'
         ])
+
     print("\n\n")
     print(robust_ema_df.columns.tolist())
+    print(f"\n\n {robust_ema_df}")
 
     robust_gpa_df = robust_gpa_df.merge(
         branch_counts_df,
@@ -137,9 +139,9 @@ def display_insights(request):
     print("\n\n")
     print(robust_gpa_df.columns.tolist())
 
-    #partial correlation
     branch_columns = branch_gpa_df.columns
 
+    #partial correlation
     #start_time = time.time()
     partial_corr_list = []
 
