@@ -11,7 +11,8 @@ from analyzer.inference_utils import (
     calculate_correlations,
     count_courses_per_branch,
     calculate_branch_units,
-    calculate_partial_correlations
+    calculate_partial_correlations,
+    calculate_ema
 )
 
 def test_extract_cleaned_results_df():
@@ -419,7 +420,7 @@ def test_calculate_correlations():
 
 def test_partial_correlation():
     """Test the function with valid input."""
-    
+
     print("Creating test DataFrame...")
     df = pd.DataFrame({
         'gpa': [3.5, 3.7, 3.6, 3.8, 3.9, 3.2, 3.4, 3.3],
@@ -463,3 +464,42 @@ def test_partial_correlation():
         assert 'r' in result.columns, f"'r' column missing in result for {key}."
         assert 'p-val' in result.columns, f"'p-val' column missing in result for {key}."
         print(f"Result for {key} passed validation.")
+
+
+def test_calculate_ema():
+    """Test the calculate_ema function with sample data."""
+    data = {
+        "semester": [
+            "100 level Harmattan", "100 level Rain",
+            "200 level Harmattan", "200 level Rain",
+            "300 level Harmattan", "300 level Rain",
+            "400 level Harmattan", "400 level Rain"
+        ],
+        "gpa": [3.90, 3.67, 3.18, 3.91, 1.69, 1.90, 1.82, 3.40],
+        "cgpa": [3.90, 3.80, 3.56, 3.66, 3.17, 2.97, 2.80, 2.83]
+    }
+    sample_data = pd.DataFrame(data)
+    
+    parameters = ['gpa', 'cgpa']
+    span = 3
+    
+    ema_df = calculate_ema(sample_data, parameters, span)
+    
+    print("\nOriginal DataFrame:")
+    print(sample_data)
+    print("\nEMA DataFrame:")
+    print(ema_df)
+    
+    expected_gpa_ema = [3.90, 3.78, 3.48, 3.70, 2.69, 2.30, 2.06, 2.73]
+    expected_cgpa_ema = [3.90, 3.85, 3.70, 3.68, 3.43, 3.20, 3.00, 2.91]
+    
+    pd.testing.assert_series_equal(
+        ema_df['gpa_ema'], 
+        pd.Series(expected_gpa_ema, name='gpa_ema').round(2),
+        check_exact=True
+    )
+    pd.testing.assert_series_equal(
+        ema_df['cgpa_ema'], 
+        pd.Series(expected_cgpa_ema, name='cgpa_ema').round(2),
+        check_exact=True
+    )
