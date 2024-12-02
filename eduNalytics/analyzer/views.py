@@ -126,9 +126,17 @@ def display_insights(request):
     span = 3
     
     robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
+
+    robust_ema_df = robust_ema_df.merge(
+        branch_gpa_df,
+        how = 'left',
+        left_on = 'semester',
+        right_index = True
+    )
     
     print("\n\n")
     print(robust_ema_df)
+    print(f"\n{robust_ema_df.columns.tolist()}")
 
     robust_gpa_df = robust_gpa_df.merge(
         branch_counts_df,
