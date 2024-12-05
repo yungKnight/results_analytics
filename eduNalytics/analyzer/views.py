@@ -105,12 +105,7 @@ def display_insights(request):
     branch_gpa_df = extract_branch_gpa_df(gpa_data)
     branch_total_units_df = calculate_branch_units(cleaned_results)
 
-    robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
-        branch_gpa_df,
-        how='left',
-        left_on='semester',
-        right_index=True
-    )
+    branch_columns = branch_gpa_df.columns
 
     robust_ema_df = gpa_data_df.drop(columns=[
             'branch_gpa',
@@ -118,44 +113,55 @@ def display_insights(request):
             'semester_course_count'
         ])
 
-    print("\n\n")
-    print(robust_ema_df.columns.tolist())
-    print(f"\n {robust_ema_df}")
-
     parameters = ['gpa', 'cgpa']
     span = 3
     
     robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
 
-    robust_ema_df = robust_ema_df.merge(
+    if len(branch_columns) > 1:
+        robust_ema_df = robust_ema_df.merge(
+            branch_gpa_df,
+            how = 'left',
+            left_on = 'semester',
+            right_index = True
+        )
+
+    robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
-        how = 'left',
-        left_on = 'semester',
-        right_index = True
+        how='left',
+        left_on='semester',
+        right_index=True
     )
+
+    print("\nMy Robust gpa df:\n")
+    print(robust_gpa_df.columns.tolist())
+    print(f"\n {robust_gpa_df}")
+
+    if len(branch_columns) > 1:
     
-    print("\n\n")
+        robust_gpa_df = robust_gpa_df.merge(
+            branch_counts_df,
+            how='left',
+            left_on='semester',
+            right_index=True
+        )
+    
+        robust_gpa_df = robust_gpa_df.merge(
+            branch_total_units_df,
+            how='left',
+            left_on='semester',
+            right_index=True
+        )
+
+        print("\nMy Robust gpa df:\n")
+        print(robust_gpa_df.columns.tolist())
+        print(f"\n {robust_gpa_df}")
+    else:
+        print("There is not enough branches to create a robust gba  ")
+
+    print("\nMy Robust ema df:\n")
     print(robust_ema_df)
     print(f"\n{robust_ema_df.columns.tolist()}")
-
-    robust_gpa_df = robust_gpa_df.merge(
-        branch_counts_df,
-        how='left',
-        left_on='semester',
-        right_index=True
-    )
-
-    robust_gpa_df = robust_gpa_df.merge(
-        branch_total_units_df,
-        how='left',
-        left_on='semester',
-        right_index=True
-    )
-    
-    print("\n\n")
-    print(robust_gpa_df.columns.tolist())
-
-    branch_columns = branch_gpa_df.columns
 
     #partial correlation
     #start_time = time.time()
@@ -219,9 +225,9 @@ def display_insights(request):
     #execution_time = end_time - start_time
     #print(f"\nExecution time: {execution_time:.2f} seconds")
 
-    #    for (x, y), result in partial_correlations.items():
-    #        print(f"Partial correlation of {x} and {y}:")
-    #        print(result, "\n")
+    for (x, y), result in partial_correlations.items():
+        print(f"Partial correlation of {x} and {y}:")
+        print(result, "\n")
     
     # correlation
     required_cor_pairs = [
@@ -234,6 +240,8 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = required_cor_pairs,
     )
+
+    print(correlations)
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
