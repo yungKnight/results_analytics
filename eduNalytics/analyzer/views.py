@@ -124,10 +124,6 @@ def display_insights(request):
     
     robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
 
-    print("\nMy Robust ema df:\n")
-    print(robust_ema_df)
-    print(f"\n{robust_ema_df.columns.tolist()}")
-
     if len(branch_columns) > 1:
         robust_ema_df = robust_ema_df.merge(
             branch_gpa_df,
@@ -135,10 +131,6 @@ def display_insights(request):
             left_on = 'semester',
             right_index = True
         )
-
-    print("\nMy Robust ema df:\n")
-    print(robust_ema_df)
-    print(f"\n{robust_ema_df.columns.tolist()}")
 
     robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
@@ -162,13 +154,11 @@ def display_insights(request):
             right_index=True
         )
 
-        print("\nMy Robust gpa df:\n")
-        print(robust_gpa_df.columns.tolist())
-        #print(f"\n {robust_gpa_df}")
     else:
         print("There is not enough branches to create a robust gba  ")
 
-    #partial correlation
+    ##partial correlation
+
     #start_time = time.time()
     partial_corr_list = []
 
@@ -246,7 +236,7 @@ def display_insights(request):
     #    print(f"Partial correlation of {x} and {y}:")
     #    print(result, "\n")
     
-    # correlation
+    ## correlation
     required_cor_pairs = [
         ('total_units', 'gpa'), ('total_units', 'cgpa'), 
         ('gpa', 'cgpa'), ('gpa', 'semester_course_count'),
@@ -257,8 +247,6 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = required_cor_pairs,
     )
-
-    print(correlations)
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
