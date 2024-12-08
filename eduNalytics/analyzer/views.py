@@ -30,6 +30,7 @@ from .visualizer_utils import (
 )
 
 robust_ema_df = None
+partial_correlations = None
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -95,7 +96,8 @@ def student_cleaned_results(request):
 def display_insights(request):
     """Displays insights based on processed GPA data."""
     global robust_ema_df
-    
+    global partial_correlations
+
     student, _ = get_student_from_context(request)
     if not student:
         return redirect('home:welcome')
