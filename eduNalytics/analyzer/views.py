@@ -29,6 +29,8 @@ from .visualizer_utils import (
     generate_branch_distribution_stacked_bar_chart,
 )
 
+robust_ema_df = None
+
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
     return {
@@ -92,6 +94,8 @@ def student_cleaned_results(request):
 
 def display_insights(request):
     """Displays insights based on processed GPA data."""
+    global robust_ema_df
+    
     student, _ = get_student_from_context(request)
     if not student:
         return redirect('home:welcome')
@@ -118,6 +122,10 @@ def display_insights(request):
     
     robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
 
+    print("\nMy Robust ema df:\n")
+    print(robust_ema_df)
+    print(f"\n{robust_ema_df.columns.tolist()}")
+
     if len(branch_columns) > 1:
         robust_ema_df = robust_ema_df.merge(
             branch_gpa_df,
@@ -126,6 +134,10 @@ def display_insights(request):
             right_index = True
         )
 
+    print("\nMy Robust ema df:\n")
+    print(robust_ema_df)
+    print(f"\n{robust_ema_df.columns.tolist()}")
+
     robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
         how='left',
@@ -133,12 +145,7 @@ def display_insights(request):
         right_index=True
     )
 
-    print("\nMy Robust gpa df:\n")
-    print(robust_gpa_df.columns.tolist())
-    print(f"\n {robust_gpa_df}")
-
-    if len(branch_columns) > 1:
-    
+    if len(branch_columns) > 1:    
         robust_gpa_df = robust_gpa_df.merge(
             branch_counts_df,
             how='left',
@@ -155,13 +162,9 @@ def display_insights(request):
 
         print("\nMy Robust gpa df:\n")
         print(robust_gpa_df.columns.tolist())
-        print(f"\n {robust_gpa_df}")
+        #print(f"\n {robust_gpa_df}")
     else:
         print("There is not enough branches to create a robust gba  ")
-
-    print("\nMy Robust ema df:\n")
-    print(robust_ema_df)
-    print(f"\n{robust_ema_df.columns.tolist()}")
 
     #partial correlation
     #start_time = time.time()
@@ -205,6 +208,18 @@ def display_insights(request):
                 'covar': [col for col in branch_columns if col != branch]
             })
 
+            partial_corr_list.append({
+                'x': 'semester_course_count',
+                'y': 'gpa',
+                'covar': ['total_units']
+            })
+
+            partial_corr_list.append({
+                'x': 'semester_course_count',
+                'y': 'cgpa',
+                'covar': ['total_units']
+            })
+
     partial_correlations = calculate_partial_correlations(robust_gpa_df, partial_corr_list)
 
     formatted_partials = []
@@ -225,9 +240,9 @@ def display_insights(request):
     #execution_time = end_time - start_time
     #print(f"\nExecution time: {execution_time:.2f} seconds")
 
-    for (x, y), result in partial_correlations.items():
-        print(f"Partial correlation of {x} and {y}:")
-        print(result, "\n")
+    #for (x, y), result in partial_correlations.items():
+    #    print(f"Partial correlation of {x} and {y}:")
+    #    print(result, "\n")
     
     # correlation
     required_cor_pairs = [
