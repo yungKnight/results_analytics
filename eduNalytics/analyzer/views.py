@@ -1,6 +1,7 @@
 import pandas as pd
 import pingouin as pg
 import time
+import json
 
 from django.shortcuts import render, redirect
 from .models import DetailedCourseResult
@@ -28,9 +29,7 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-
-robust_ema_df = None
-partial_correlations = None
+from .decision_utils import display_parsed
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -95,8 +94,6 @@ def student_cleaned_results(request):
 
 def display_insights(request):
     """Displays insights based on processed GPA data."""
-    global robust_ema_df
-    global partial_correlations
 
     student, _ = get_student_from_context(request)
     if not student:
@@ -120,7 +117,7 @@ def display_insights(request):
         ])
 
     parameters = ['gpa', 'cgpa']
-    span = 3
+    span = 4
     
     robust_ema_df = calculate_ema(robust_ema_df, parameters, span)
 
@@ -131,6 +128,9 @@ def display_insights(request):
             left_on = 'semester',
             right_index = True
         )
+
+    print("\n\nMy robust ema df:\n")
+    print(robust_ema_df)
 
     robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
@@ -153,7 +153,6 @@ def display_insights(request):
             left_on='semester',
             right_index=True
         )
-
     else:
         print("There is not enough branches to create a robust gba  ")
 
@@ -227,14 +226,12 @@ def display_insights(request):
             })
         else:
             continue
+    print("\n\nMy formatted_partials:\n")
+    print(formatted_partials)
     
     #end_time = time.time()    
     #execution_time = end_time - start_time
     #print(f"\nExecution time: {execution_time:.2f} seconds")
-
-    #for (x, y), result in partial_correlations.items():
-    #    print(f"Partial correlation of {x} and {y}:")
-    #    print(result, "\n")
     
     ## correlation
     required_cor_pairs = [
@@ -247,6 +244,12 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = required_cor_pairs,
     )
+
+    print("\n\nMy correlations:\n")
+    print(correlations)
+    
+    cleaned_correlations = {str(k): str(v) for k, v in correlations.items()}
+    request.session['correlations'] = json.dumps(cleaned_correlations)
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
@@ -272,7 +275,8 @@ def plot_view(request):
 
     gpa_data = request.session.get('gpa_data_by_semester')
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
-    
+    correlations = request.session.get('correlations')
+
     branch_gpa_data = {}
     if gpa_data:
         for semester, data in gpa_data.items():
@@ -316,6 +320,8 @@ def plot_view(request):
         branch_avg_chart_html = ''
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
+
+    display_parsed(correlations)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',

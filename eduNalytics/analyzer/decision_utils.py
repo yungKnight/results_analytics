@@ -1,1 +1,3 @@
-from .views import robust_ema_df, partial_correlations
+def display_parsed(correlations): 
+	print("\nMy context correlations:\n")
+	print(correlations)
