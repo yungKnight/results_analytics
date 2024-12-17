@@ -29,7 +29,7 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import display_parsed
+from .decision_utils import display_parsed, display_parsed_part
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -228,6 +228,19 @@ def display_insights(request):
             continue
     print("\n\nMy formatted_partials:\n")
     print(formatted_partials)
+
+    cleaned_partials = [
+        {
+            'x': str(partial['x']),
+            'y': str(partial['y']),
+            'n': int(partial['n']),
+            'r': float(partial['r']),
+            'p_val': float(partial['p_val'])
+        }
+        for partial in formatted_partials
+    ]
+
+    request.session['par_corr'] = json.dumps(cleaned_partials)
     
     #end_time = time.time()    
     #execution_time = end_time - start_time
@@ -276,6 +289,7 @@ def plot_view(request):
     gpa_data = request.session.get('gpa_data_by_semester')
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     correlations = request.session.get('correlations')
+    par_corr = request.session.get('par_corr')
 
     branch_gpa_data = {}
     if gpa_data:
@@ -322,6 +336,7 @@ def plot_view(request):
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
     display_parsed(correlations)
+    display_parsed_part(par_corr)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
