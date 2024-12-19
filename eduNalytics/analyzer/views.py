@@ -288,6 +288,7 @@ def plot_view(request):
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     correlations = request.session.get('correlations')
     par_corr = request.session.get('par_corr')
+    emas = request.session.get('emas')
 
     branch_gpa_data = {}
     if gpa_data:
@@ -335,6 +336,7 @@ def plot_view(request):
 
     display_parsed(correlations)
     display_parsed_part(par_corr)
+    display_parsed_emas(emas)
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
