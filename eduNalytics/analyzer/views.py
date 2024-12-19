@@ -5,6 +5,7 @@ import json
 
 from django.shortcuts import render, redirect
 from .models import DetailedCourseResult
+
 from .results_utils import (
     filter_results_by_semester,
     cleaned_results_by_semester,
@@ -29,7 +30,7 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import display_parsed, display_parsed_part
+from .decision_utils import display_parsed, display_parsed_part, display_parsed_emas
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -132,6 +133,9 @@ def display_insights(request):
     print("\n\nMy robust ema df:\n")
     print(robust_ema_df)
 
+    cleaned_emas = robust_ema_df.to_dict(orient='records')
+    request.session['emas'] = json.dumps(cleaned_emas)
+
     robust_gpa_df = gpa_data_df.drop(columns=['branch_gpa']).merge(
         branch_gpa_df,
         how='left',
@@ -226,21 +230,6 @@ def display_insights(request):
             })
         else:
             continue
-    print("\n\nMy formatted_partials:\n")
-    print(formatted_partials)
-
-    cleaned_partials = [
-        {
-            'x': str(partial['x']),
-            'y': str(partial['y']),
-            'n': int(partial['n']),
-            'r': float(partial['r']),
-            'p_val': float(partial['p_val'])
-        }
-        for partial in formatted_partials
-    ]
-
-    request.session['par_corr'] = json.dumps(cleaned_partials)
     
     #end_time = time.time()    
     #execution_time = end_time - start_time
@@ -257,12 +246,21 @@ def display_insights(request):
         robust_gpa_df,
         column_pairs = required_cor_pairs,
     )
-
-    print("\n\nMy correlations:\n")
-    print(correlations)
     
     cleaned_correlations = {str(k): str(v) for k, v in correlations.items()}
     request.session['correlations'] = json.dumps(cleaned_correlations)
+
+    cleaned_partials = [
+        {
+            'x': str(partial['x']),
+            'y': str(partial['y']),
+            'n': int(partial['n']),
+            'r': float(partial['r']),
+            'p_val': float(partial['p_val'])
+        }
+        for partial in formatted_partials
+    ]
+    request.session['par_corr'] = json.dumps(cleaned_partials)
 
     semester_avg_scores = calculate_semester_avg_scores(cleaned_results_df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(cleaned_results_df)
