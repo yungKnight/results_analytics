@@ -1,3 +1,7 @@
+* {
+    font-size: 16px;
+}
+
 .overlay {
     position: fixed;
     width: 100%;
@@ -6,7 +10,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 105, 0, 0.40);
     z-index: 2;
     display: flex;
     justify-content: center;
@@ -18,4 +22,8 @@
     padding: 20px;
     border-radius: 10px;
     text-align: center;
+}
+
+.welcome {
+    font-size: 1.8rem;
 }
