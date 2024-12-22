@@ -59,3 +59,24 @@ def get_correlation(r):
         strength = "Very Strong"
     
     return correlation_type, strength
+
+
+def extract_partial_corr(par_corr):
+	par_correlation_list = json.loads(par_corr)
+
+	extracted_partials = {}
+	for param in par_correlation_list:
+		x = param['x']
+		y =param['y']
+		n = abs(param['n'])
+		r = float(param['r'])
+		p_val = float(param['p_val'])
+
+		variable_pair = (x, y)
+
+		extracted_partials[variable_pair] = {
+			'partial_corr': r,
+			'prob_val': p_val,
+			'observations': n
+		}
+	return extracted_partials
