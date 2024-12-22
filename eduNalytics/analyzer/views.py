@@ -30,7 +30,7 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import display_parsed, display_parsed_part, display_parsed_emas
+from .decision_utils import (display_parsed_part, display_parsed_emas, extract_correlations)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -130,9 +130,6 @@ def display_insights(request):
             right_index = True
         )
 
-    print("\n\nMy robust ema df:\n")
-    print(robust_ema_df)
-
     cleaned_emas = robust_ema_df.to_dict(orient='records')
     request.session['emas'] = json.dumps(cleaned_emas)
 
@@ -157,8 +154,6 @@ def display_insights(request):
             left_on='semester',
             right_index=True
         )
-    else:
-        print("There is not enough branches to create a robust gba  ")
 
     ##partial correlation
 
@@ -286,6 +281,7 @@ def plot_view(request):
 
     gpa_data = request.session.get('gpa_data_by_semester')
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
+    
     correlations = request.session.get('correlations')
     par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
@@ -334,9 +330,16 @@ def plot_view(request):
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
-    display_parsed(correlations)
-    display_parsed_part(par_corr)
-    display_parsed_emas(emas)
+    #display_parsed_part(par_corr)
+    #display_parsed_emas(emas)
+
+    results = extract_correlations(correlations)
+
+    print(type(results))
+    
+    print(results.keys())  # Prints all the keys
+    print(list(results.keys())[:2])  # Prints the first key
+    print(results.values())
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
