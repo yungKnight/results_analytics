@@ -30,7 +30,7 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import (display_parsed_part, display_parsed_emas, extract_correlations)
+from .decision_utils import (display_parsed_part, display_parsed_emas, extract_correlations, get_correlation)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -288,6 +288,24 @@ def plot_view(request):
 
     results = extract_correlations(correlations)
     print(results)
+
+    correlation_details = {}
+    for param, value in results.items():
+        print(f"Testing correlation: {param} with value {value}")
+
+        correlation_type, correlation_strength = get_correlation(value)
+        
+        print(f"Result for {param}: Type = {correlation_type}, Strength = {correlation_strength}")
+        
+        correlation_details[param] = {
+            'value': value,
+            'type': correlation_type,
+            'strength': correlation_strength
+        }
+
+    print("Final correlation details:")
+    print(correlation_details)
+
 
     branch_gpa_data = {}
     if gpa_data:
