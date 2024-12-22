@@ -286,6 +286,9 @@ def plot_view(request):
     par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
 
+    results = extract_correlations(correlations)
+    print(results)
+
     branch_gpa_data = {}
     if gpa_data:
         for semester, data in gpa_data.items():
@@ -332,14 +335,6 @@ def plot_view(request):
 
     #display_parsed_part(par_corr)
     #display_parsed_emas(emas)
-
-    results = extract_correlations(correlations)
-
-    print(type(results))
-    
-    print(results.keys())  # Prints all the keys
-    print(list(results.keys())[:2])  # Prints the first key
-    print(results.values())
 
     return render(request, 'viss.html', {
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
