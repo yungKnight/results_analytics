@@ -284,11 +284,12 @@ def plot_view(request):
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     
     correlations = request.session.get('correlations')
-    par_corr = request.session.get('par_corr', '{}')
+    par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
 
     context_corr = extract_correlations(correlations)
-    if par_corr != '{}':
+
+    if bool(json.loads(par_corr)):
         context_partials = extract_partial_corr(par_corr)
         print(context_partials)
     else:

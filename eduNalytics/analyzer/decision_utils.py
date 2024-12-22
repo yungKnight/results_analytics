@@ -1,9 +1,5 @@
 import json
 
-def display_parsed_part(par_corr):
-	print("\nMy context partial correlations:\n")
-	print(par_corr)
-
 def display_parsed_emas(emas):
 	print("\nMy context emas:\n")
 	print(emas)
