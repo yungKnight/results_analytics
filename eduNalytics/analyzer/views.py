@@ -30,7 +30,8 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import (display_parsed_part, display_parsed_emas, extract_correlations, get_correlation)
+from .decision_utils import (display_parsed_emas, extract_correlations, get_correlation, 
+    extract_partial_corr)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -283,27 +284,28 @@ def plot_view(request):
     semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
     
     correlations = request.session.get('correlations')
-    par_corr = request.session.get('par_corr')
+    par_corr = request.session.get('par_corr', '{}')
     emas = request.session.get('emas')
 
-    results = extract_correlations(correlations)
-    print(results)
+    context_corr = extract_correlations(correlations)
+    if par_corr != '{}':
+        context_partials = extract_partial_corr(par_corr)
+        print(context_partials)
+    else:
+        print('There is no contextual partial correlations available')
 
     correlation_details = {}
-    for param, value in results.items():
-        print(f"Testing correlation: {param} with value {value}")
+    for param, value in context_corr.items():
 
         correlation_type, correlation_strength = get_correlation(value)
-        
-        print(f"Result for {param}: Type = {correlation_type}, Strength = {correlation_strength}")
-        
+                
         correlation_details[param] = {
             'value': value,
             'type': correlation_type,
             'strength': correlation_strength
         }
 
-    print("Final correlation details:")
+    print("\nFinal correlation details:\n")
     print(correlation_details)
 
 
@@ -351,7 +353,6 @@ def plot_view(request):
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
-    #display_parsed_part(par_corr)
     #display_parsed_emas(emas)
 
     return render(request, 'viss.html', {
