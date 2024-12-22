@@ -20,10 +20,8 @@ def extract_correlations(correlations):
     Returns:
         dict: A dictionary with variable pairs as tuples and their correlation values as floats.
     """
-    # Parse the JSON string into a dictionary
     correlation_dict = json.loads(correlations)
     
-    # Process the key-value pairs into a structured format
     extracted_correlations = {}
     for key, value in correlation_dict.items():
         variable_pair = eval(key)
@@ -31,3 +29,33 @@ def extract_correlations(correlations):
         extracted_correlations[variable_pair] = correlation_value
     
     return extracted_correlations
+
+def get_correlation(r):
+    """
+    Determine the type (Positive, Negative, No Correlation) and 
+    strength (Very Weak, Weak, Moderate, Strong, Very Strong) of the correlation.
+
+    Parameters:
+        r (float): The correlation coefficient.
+
+    Returns:
+        tuple: A tuple containing:
+            - type (str): The type of correlation (Positive, Negative, No Correlation).
+            - strength (str): The strength of the correlation.
+    """
+    r = float(r)
+    correlation_type = "Positive" if r > 0 else "Negative" if r < 0 else "No Correlation"
+    
+    abs_r = abs(r)
+    if abs_r < 0.2:
+        strength = "Very Weak"
+    elif abs_r < 0.4:
+        strength = "Weak"
+    elif abs_r < 0.6:
+        strength = "Moderate"
+    elif abs_r < 0.8:
+        strength = "Strong"
+    else:
+        strength = "Very Strong"
+    
+    return correlation_type, strength
