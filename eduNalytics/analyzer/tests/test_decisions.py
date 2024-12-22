@@ -1,5 +1,6 @@
 import pytest
-from analyzer.decision_utils import extract_correlations, get_correlation
+import json
+from analyzer.decision_utils import extract_correlations, get_correlation, extract_partial_corr
 
 @pytest.fixture
 def correlations():
@@ -51,3 +52,62 @@ def test_extract_correlations(correlations):
         assert correlation_strength == expected_strength, f"Expected {expected_strength}, but got {correlation_strength}"
 
         print(f"Test passed for correlation: {correlation}\n")
+
+@pytest.fixture
+def partial_corr_data():
+    return json.dumps([
+        {"x": "Accessories", "y": "gpa", "n": 8, "r": 0.933129, "p_val": 0.020549},
+        {"x": "Accessories", "y": "cgpa", "n": 8, "r": 0.960561, "p_val": 0.009346},
+        {"x": "Accessories_units", "y": "gpa", "n": 8, "r": -0.241435, "p_val": 0.695608},
+        {"x": "Accessories_units", "y": "cgpa", "n": 8, "r": 0.10403, "p_val": 0.867784},
+        {"x": "Accessories_count", "y": "gpa", "n": 8, "r": 0.242804, "p_val": 0.693918},
+        {"x": "Accessories_count", "y": "cgpa", "n": 8, "r": 0.677484, "p_val": 0.208904}
+    ])
+
+def test_extract_partial_corr(partial_corr_data):
+    # Print input data for debugging
+    print("Input Partial Correlation Data (JSON):")
+    print(partial_corr_data)
+
+    result = extract_partial_corr(partial_corr_data)
+
+    print("Extracted Partial Correlations Result:")
+    print(result)
+
+    expected_result = {
+        ("Accessories", "gpa"): {
+            "partial_corr": 0.933129,
+            "prob_val": 0.020549,
+            "observations": 8,
+        },
+        ("Accessories", "cgpa"): {
+            "partial_corr": 0.960561,
+            "prob_val": 0.009346,
+            "observations": 8,
+        },
+        ("Accessories_units", "gpa"): {
+            "partial_corr": -0.241435,
+            "prob_val": 0.695608,
+            "observations": 8,
+        },
+        ("Accessories_units", "cgpa"): {
+            "partial_corr": 0.10403,
+            "prob_val": 0.867784,
+            "observations": 8,
+        },
+        ("Accessories_count", "gpa"): {
+            "partial_corr": 0.242804,
+            "prob_val": 0.693918,
+            "observations": 8,
+        },
+        ("Accessories_count", "cgpa"): {
+            "partial_corr": 0.677484,
+            "prob_val": 0.208904,
+            "observations": 8,
+        },
+    }
+
+    assert result == expected_result, f"Expected {expected_result}, but got {result}"
+
+    if result == expected_result:
+        print("Test is successful: Extracted data matches expected output!")
