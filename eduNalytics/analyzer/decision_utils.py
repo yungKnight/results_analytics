@@ -56,7 +56,6 @@ def get_correlation(r):
     
     return correlation_type, strength
 
-
 def extract_partial_corr(par_corr):
 	par_correlation_list = json.loads(par_corr)
 
@@ -76,3 +75,31 @@ def extract_partial_corr(par_corr):
 			'observations': n
 		}
 	return extracted_partials
+
+def get_partial_corr_result(r, p_val):
+    r = float(r)
+    p_val = float(p_val)
+
+    correlation_type = "Positive" if r > 0 else "Negative" if r < 0 else "No Correlation"
+    
+    if p_val < 0.05:
+        significance = "Very significant"
+    elif p_val < 0.10:
+        significance = "Significant"
+    else:
+        significance = "Insignificant"
+
+    abs_r = abs(r)
+
+    if abs_r < 0.2:
+        strength = "Very Weak"
+    elif abs_r < 0.4:
+        strength = "Weak"
+    elif abs_r < 0.6:
+        strength = "Moderate"
+    elif abs_r < 0.8:
+        strength = "Strong"
+    else:
+        strength = "Very Strong"
+
+    return significance, strength, correlation_type
