@@ -1,6 +1,6 @@
 import pytest
 import json
-from analyzer.decision_utils import extract_correlations, get_correlation, extract_partial_corr
+from analyzer.decision_utils import extract_correlations, get_correlation, extract_partial_corr, get_partial_corr_result
 
 @pytest.fixture
 def correlations():
@@ -111,3 +111,41 @@ def test_extract_partial_corr(partial_corr_data):
 
     if result == expected_result:
         print("Test is successful: Extracted data matches expected output!")
+
+    # Test the new get_partial_corr_result function
+    for (x, y), data in result.items():
+        r = data["partial_corr"]
+        p_val = data["prob_val"]
+        observations = data["observations"]
+
+        print(f"Testing get_partial_corr_result for ({x}, {y}) with r={r}, p_val={p_val}...")
+
+        significance, strength, correlation_type = get_partial_corr_result(r, p_val)
+
+        print(f"Result: Significance = {significance}, Strength = {strength}, Type = {correlation_type}")
+
+        expected_significance = (
+            "Very significant" if p_val < 0.05 else
+            "Significant" if p_val < 0.10 else
+            "Insignificant"
+        )
+        
+        abs_r = abs(r)
+        if abs_r < 0.2:
+            expected_strength = "Very Weak"
+        elif abs_r < 0.4:
+            expected_strength = "Weak"
+        elif abs_r < 0.6:
+            expected_strength = "Moderate"
+        elif abs_r < 0.8:
+            expected_strength = "Strong"
+        else:
+            expected_strength = "Very Strong"
+
+        expected_type = "Positive" if r > 0 else "Negative" if r < 0 else "No Correlation"
+
+        assert significance == expected_significance, f"Expected {expected_significance}, but got {significance}"
+        assert strength == expected_strength, f"Expected {expected_strength}, but got {strength}"
+        assert correlation_type == expected_type, f"Expected {expected_type}, but got {correlation_type}"
+
+        print(f"Test passed for ({x}, {y})!\n")
