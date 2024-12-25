@@ -1,6 +1,9 @@
 import pytest
 import json
-from analyzer.decision_utils import extract_correlations, get_correlation, extract_partial_corr, get_partial_corr_result
+from analyzer.decision_utils import (
+        extract_correlations, get_correlation, extract_partial_corr, 
+        get_partial_corr_result, extract_emas
+    )
 
 @pytest.fixture
 def correlations():
@@ -149,3 +152,70 @@ def test_extract_partial_corr(partial_corr_data):
         assert correlation_type == expected_type, f"Expected {expected_type}, but got {correlation_type}"
 
         print(f"Test passed for ({x}, {y})!\n")
+
+@pytest.fixture
+def example_emas_data():
+    return json.dumps([
+        {"semester": "100 level Harmattan", "gpa": 3.9, "cgpa": 3.9, "gpa_ema": 3.9, "cgpa_ema": 3.9, 
+         "Accessories": 3.78, "Mathematics For Economists": 5.0, "Microeconomics": 0.0, "Macroeconomics": 0.0},
+        {"semester": "100 level Rain", "gpa": 3.67, "cgpa": 3.8, "gpa_ema": 3.81, "cgpa_ema": 3.86, 
+         "Accessories": 4.23, "Mathematics For Economists": 0.0, "Microeconomics": 0.0, "Macroeconomics": 0.0},
+        {"semester": "200 level Harmattan", "gpa": 3.18, "cgpa": 3.56, "gpa_ema": 3.56, "cgpa_ema": 3.74, 
+         "Accessories": 3.6, "Mathematics For Economists": 1.5, "Microeconomics": 3.0, "Macroeconomics": 4.0},
+        {"semester": "200 level Rain", "gpa": 3.91, "cgpa": 3.66, "gpa_ema": 3.7, "cgpa_ema": 3.71, 
+         "Accessories": 4.4, "Mathematics For Economists": 3.33, "Microeconomics": 4.0, "Macroeconomics": 3.0},
+        {"semester": "300 level Harmattan", "gpa": 1.69, "cgpa": 3.17, "gpa_ema": 2.89, "cgpa_ema": 3.49, 
+         "Accessories": 2.0, "Mathematics For Economists": 1.0, "Microeconomics": 1.0, "Macroeconomics": 2.0},
+        {"semester": "300 level Rain", "gpa": 1.9, "cgpa": 2.97, "gpa_ema": 2.5, "cgpa_ema": 3.28, 
+         "Accessories": 2.5, "Mathematics For Economists": 0.5, "Microeconomics": 2.0, "Macroeconomics": 2.0},
+        {"semester": "400 level Harmattan", "gpa": 1.82, "cgpa": 2.8, "gpa_ema": 2.23, "cgpa_ema": 3.09, 
+         "Accessories": 1.67, "Mathematics For Economists": 2.0, "Microeconomics": 3.0, "Macroeconomics": 1.67},
+        {"semester": "400 level Rain", "gpa": 3.4, "cgpa": 2.83, "gpa_ema": 2.7, "cgpa_ema": 2.99, 
+         "Accessories": 3.0, "Mathematics For Economists": 0.0, "Microeconomics": 4.0, "Macroeconomics": 3.5}
+    ])
+
+def test_extract_emas(example_emas_data):
+    print("\nTesting extract_emas function...")
+
+    result = extract_emas(example_emas_data)
+    print("Function result successfully retrieved.")
+
+    print("Validating extracted data for '100 level Harmattan'...")
+    assert "100 level Harmattan" in result
+    assert result["100 level Harmattan"]["gpa"] == 3.9
+    assert result["100 level Harmattan"]["cgpa"] == 3.9
+    assert result["100 level Harmattan"]["gpa_ema"] == 3.9
+    assert result["100 level Harmattan"]["cgpa_ema"] == 3.9
+    assert result["100 level Harmattan"]["user_specific_params"] == {
+        "Accessories": 3.78,
+        "Mathematics For Economists": 5.0,
+        "Microeconomics": 0.0,
+        "Macroeconomics": 0.0
+    }
+    print("Validation for '100 level Harmattan' passed.")
+
+    print("Validating extracted data for '300 level Harmattan'...")
+    assert "300 level Harmattan" in result
+    assert result["300 level Harmattan"]["gpa"] == 1.69
+    assert result["300 level Harmattan"]["cgpa"] == 3.17
+    assert result["300 level Harmattan"]["gpa_ema"] == 2.89
+    assert result["300 level Harmattan"]["cgpa_ema"] == 3.49
+    assert result["300 level Harmattan"]["user_specific_params"] == {
+        "Accessories": 2.0,
+        "Mathematics For Economists": 1.0,
+        "Microeconomics": 1.0,
+        "Macroeconomics": 2.0
+    }
+    print("Validation for '300 level Harmattan' passed.")
+
+    print("Validating total number of semesters...")
+    assert len(result) == 8  
+    print("Total semesters validation passed.")
+
+    print("Validating dynamically generated parameters for each semester...")
+    for semester, data in result.items():
+        assert "user_specific_params" in data
+        assert isinstance(data["user_specific_params"], dict)
+        print(f"Dynamic parameters for '{semester}' validated successfully.")
+
+    print("All tests for extract_emas passed successfully.")
