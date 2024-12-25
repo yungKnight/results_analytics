@@ -1,9 +1,5 @@
 import json
 
-def display_parsed_emas(emas):
-	print("\nMy context emas:\n")
-	print(emas)
-
 def extract_correlations(correlations):
     """
     Extract correlations from the provided JSON structure and return a dictionary 
@@ -103,3 +99,28 @@ def get_partial_corr_result(r, p_val):
         strength = "Very Strong"
 
     return significance, strength, correlation_type
+
+def extract_emas(emas):
+    emas_list = json.loads(emas)
+
+    extracted_exponentials = {}
+    for param in emas_list:
+        semester = param['semester']
+        gpa = param['gpa']
+        cgpa = param['cgpa']
+        gpa_ema = param['gpa_ema']
+        cgpa_ema = param['cgpa_ema']
+
+        extracted_exponentials[semester] = {
+            "gpa": gpa,
+            "cgpa": cgpa,
+            "gpa_ema": gpa_ema,
+            "cgpa_ema": cgpa_ema,
+            "user_specific_params": {}
+        }
+
+        for key, value in param.items():
+            if key not in ["semester", "gpa", "cgpa", "gpa_ema", "cgpa_ema"]:
+                extracted_exponentials[semester]["user_specific_params"][key] = value
+
+    return extracted_exponentials            
