@@ -30,8 +30,8 @@ from .visualizer_utils import (
     generate_grouped_bar_chart_for_courses_and_pass_rate,
     generate_branch_distribution_stacked_bar_chart,
 )
-from .decision_utils import (display_parsed_emas, extract_correlations, get_correlation, 
-    extract_partial_corr, get_partial_corr_result)
+from .decision_utils import (extract_correlations, get_correlation, 
+    extract_partial_corr, get_partial_corr_result, extract_emas)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -287,6 +287,9 @@ def plot_view(request):
     par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
 
+    print("\nMy original emas:\n")
+    print(emas)
+
     context_corr = extract_correlations(correlations)
 
     correlation_details = {}
@@ -300,13 +303,16 @@ def plot_view(request):
             'strength': correlation_strength
         }
 
-    print("\nFinal correlation details:\n")
-    print(correlation_details)
+    #print("\nFinal correlation details:\n")
+    #print(correlation_details)
+
+    context_exponentials = extract_emas(emas)
+    print("\nMy extracted emas:\n")
+    print(context_exponentials)
 
     partial_corr = {}
     if bool(json.loads(par_corr)):
         context_partials = extract_partial_corr(par_corr)
-        #print(context_partials)
 
         for param, value in context_partials.items():
             corr_value = value["partial_corr"]
@@ -322,8 +328,8 @@ def plot_view(request):
             "type": partials_correlation_type,
             }
     
-        print("Final Processed Partial Correlations:")
-        print(partial_corr)
+        #print("\nFinal Processed Partial Correlations:\n")
+        #print(partial_corr)
     else:
         print('There is no contextual partial correlations available')
 
