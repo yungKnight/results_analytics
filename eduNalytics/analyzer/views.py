@@ -31,7 +31,7 @@ from .visualizer_utils import (
     generate_branch_distribution_stacked_bar_chart,
 )
 from .decision_utils import (extract_correlations, get_correlation, 
-    extract_partial_corr, get_partial_corr_result, extract_emas)
+    extract_partial_corr, get_partial_corr_result, extract_emas, get_results_from_emas)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -287,10 +287,43 @@ def plot_view(request):
     par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
 
-    print("\nMy original emas:\n")
-    print(emas)
-
     context_corr = extract_correlations(correlations)
+    context_exponentials = extract_emas(emas)
+
+    print("\nMy extracted emas:\n")
+    print(context_exponentials)
+    print("\n")
+    print(type(context_exponentials))
+    print("\n")
+
+    # Extract the semesters (keys) into an array
+    semesters = list(context_exponentials.keys())
+    print(semesters)
+    print("\n")
+    print(type(semesters))
+
+    get_results_from_emas(context_exponentials, semesters)
+    
+    ## Print the semesters represented
+    #print("\nSemesters Represented:\n")
+    #for semester in semesters:
+    #    print(f"  - {semester}")
+#
+#
+    #for level, data in context_exponentials.items():
+    #    # Print the level name
+    #    print(f"Level: {level}")
+    #    
+    #    # Separate printing of keys and their respective values
+    #    print("Keys:")
+    #    for key in data.keys():
+    #        print(f"  - {key}")
+    #    
+    #    print("Values:")
+    #    for value in data.values():
+    #        print(f"  - {value}")
+    #    
+    #    print("-" * 50)
 
     correlation_details = {}
     for param, value in context_corr.items():
@@ -305,10 +338,6 @@ def plot_view(request):
 
     #print("\nFinal correlation details:\n")
     #print(correlation_details)
-
-    context_exponentials = extract_emas(emas)
-    print("\nMy extracted emas:\n")
-    print(context_exponentials)
 
     partial_corr = {}
     if bool(json.loads(par_corr)):

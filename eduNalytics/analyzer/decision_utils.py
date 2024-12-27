@@ -124,3 +124,24 @@ def extract_emas(emas):
                 extracted_exponentials[semester]["user_specific_params"][key] = value
 
     return extracted_exponentials            
+
+#from my extracted emas using extract_emas()
+#I'm to check for this conditions
+# 1. It should check for divergence/convergence
+# 2. It would also check if 1 is a positive scenario or not
+# 3. It should also check for crossovers of both ema params
+
+def get_results_from_emas(context_exponentials, semesters):
+    """
+    Analyze the context_exponentials and semesters to dynamically create inner functions
+    for divergence, convergence, or new student observations.
+    """
+    print("\nAnalyzing context_exponentials...\n")
+    print(context_exponentials)
+    print("\nAnalyzing semesters...\n")
+    print(semesters)
+
+    if len(context_exponentials) > 1:
+        print("\nMore than one semester detected. Creating analysis functions...\n")
+    else:
+        print("\nOnly one semester detected. Creating observation function...\n")
