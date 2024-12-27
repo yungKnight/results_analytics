@@ -141,7 +141,19 @@ def get_results_from_emas(context_exponentials, semesters):
     print("\nAnalyzing semesters...\n")
     print(semesters)
 
-    if len(context_exponentials) > 1:
+    if len(semesters) > 1:
         print("\nMore than one semester detected. Creating analysis functions...\n")
+        last_two_semesters = semesters[-2:]
+
+        def divergence_or_convergence_checker():
+            gpa_ema_values = {key: context_exponentials[key]['gpa_ema'] for key in last_two_semesters}
+            cgpa_ema_values = {key: context_exponentials[key]['cgpa_ema'] for key in last_two_semesters}
+            return gpa_ema_values, cgpa_ema_values
+
+        # Call the inner function to execute it
+        gpa_ema_values, cgpa_ema_values = divergence_or_convergence_checker()
+        print("\nReturned gpa_ema values from the inner function:\n", gpa_ema_values)
+        print("\nReturned cgpa_ema values from the inner function:\n", cgpa_ema_values)
+
     else:
         print("\nOnly one semester detected. Creating observation function...\n")

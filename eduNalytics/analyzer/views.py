@@ -290,17 +290,7 @@ def plot_view(request):
     context_corr = extract_correlations(correlations)
     context_exponentials = extract_emas(emas)
 
-    print("\nMy extracted emas:\n")
-    print(context_exponentials)
-    print("\n")
-    print(type(context_exponentials))
-    print("\n")
-
-    # Extract the semesters (keys) into an array
     semesters = list(context_exponentials.keys())
-    print(semesters)
-    print("\n")
-    print(type(semesters))
 
     get_results_from_emas(context_exponentials, semesters)
     
