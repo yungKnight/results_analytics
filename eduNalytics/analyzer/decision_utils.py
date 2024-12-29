@@ -145,22 +145,23 @@ def get_results_from_emas(context_exponentials, semesters):
         print("\nMore than one semester detected. Creating analysis functions...\n")
         last_two_semesters = semesters[-2:]
 
+        prev_semester = last_two_semesters[0]
+        current_semester = last_two_semesters[1]
+        print(f"this- {prev_semester} is my previous semester, current semester is {current_semester}")
+
+        prev_semester_cgpa_ema = context_exponentials[prev_semester]["cgpa_ema"]
+        print(f"\n My previous semester's cgpa ema is {prev_semester_cgpa_ema}")
+
+        prev_semester_gpa_ema = context_exponentials[prev_semester]["gpa_ema"]
+        print(f"\n My previous semester's gpa ema is {prev_semester_gpa_ema}")
+
+        current_semester_cgpa_ema = context_exponentials[current_semester]["cgpa_ema"]
+        print(f"\n My current semester's cgpa ema is {current_semester_cgpa_ema}")
+
+        current_semester_gpa_ema = context_exponentials[current_semester]["gpa_ema"]
+        print(f"\n My current semester's gpa ema is {current_semester_gpa_ema}")
+
         def divergence_or_convergence_checker():
-            prev_semester = last_two_semesters[0]
-            current_semester = last_two_semesters[1]
-            print(f"this- {prev_semester} is my previous semester, current semester is {current_semester}")
-
-            prev_semester_cgpa_ema = context_exponentials[prev_semester]["cgpa_ema"]
-            print(f"\n My previous semester's cgpa ema is {prev_semester_cgpa_ema}")
-
-            prev_semester_gpa_ema = context_exponentials[prev_semester]["gpa_ema"]
-            print(f"\n My previous semester's gpa ema is {prev_semester_gpa_ema}")
-
-            current_semester_cgpa_ema = context_exponentials[current_semester]["cgpa_ema"]
-            print(f"\n My current semester's cgpa ema is {current_semester_cgpa_ema}")
-
-            current_semester_gpa_ema = context_exponentials[current_semester]["gpa_ema"]
-            print(f"\n My current semester's gpa ema is {current_semester_gpa_ema}")
 
             status = "At equilibrium state"
             if ((current_semester_cgpa_ema - current_semester_gpa_ema) > (prev_semester_cgpa_ema - prev_semester_gpa_ema)):
@@ -168,17 +169,24 @@ def get_results_from_emas(context_exponentials, semesters):
             elif ((current_semester_cgpa_ema - current_semester_gpa_ema) < (prev_semester_cgpa_ema - prev_semester_gpa_ema)):
                 status = "convergence"
 
-            gpa_ema_values = {key: context_exponentials[key]['gpa_ema'] for key in last_two_semesters}
-            cgpa_ema_values = {key: context_exponentials[key]['cgpa_ema'] for key in last_two_semesters}
-            
-            return status, gpa_ema_values, cgpa_ema_values
+            return status
 
-        status, gpa_ema_values, cgpa_ema_values = divergence_or_convergence_checker()
+        status = divergence_or_convergence_checker()
         print("\nDivergence/Convergence status:", status)
-        print("\nReturned gpa_ema values from the inner function:\n", gpa_ema_values)
-        print("\nReturned cgpa_ema values from the inner function:\n", cgpa_ema_values)
-        print("\nReturned gpa_ema values from the inner function:\n", gpa_ema_values)
-        print("\nReturned cgpa_ema values from the inner function:\n", cgpa_ema_values)
 
+        if ((status == "divergence") & (current_semester_gpa_ema > current_semester_cgpa_ema)):
+            type = "positive"
+        elif ((status == "divergence") & (current_semester_gpa_ema < current_semester_cgpa_ema)):
+            type = "negative"
+        elif ((status == "convergence") & (current_semester_gpa_ema > prev_semester_gpa_ema) & (current_semester_cgpa_ema > prev_semester_cgpa_ema)):
+            type = "positive"
+        elif ((status == "convergence") & (current_semester_gpa_ema < prev_semester_gpa_ema) & (current_semester_cgpa_ema < prev_semester_cgpa_ema)):
+            type = "negative"
+        elif ((status == "convergence") & (current_semester_gpa_ema > prev_semester_gpa_ema) & (current_semester_cgpa_ema < prev_semester_cgpa_ema)):
+            type = "flattening"
+
+        print(f"\nThis is a {type} {status}\n")
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
+
+#def check_ema_crossovers(param1, param2):
