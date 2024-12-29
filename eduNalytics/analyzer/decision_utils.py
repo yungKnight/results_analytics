@@ -187,15 +187,15 @@ def get_results_from_emas(context_exponentials, semesters):
 
         print(f"\nThis is a {type} {status}\n")
 
-        def check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa):
+        def check_ema_crossover(param1, param2, param3):
             step = 0.01
             
-            gpa_range = [round(prev_semester_gpa + step * value, 2) 
-                         for value in range(int((current_semester_gpa - prev_semester_gpa) / step) + 1)]
-            crossover = current_semester_cgpa_ema in gpa_range
-            return gpa_range, crossover
+            gpa_range = [round(param2 + step * value, 2) 
+                         for value in range(int((param3 - param2) / step) + 1)]
+            crossover = param1 in gpa_range
+            return crossover
 
-        gpa_range, crossover = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa)
-        print(f"\n My gpa range is {gpa_range} and Did a crossover happen? {crossover}")
+        crossover = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa)
+        print(f"Did a crossover happen? {crossover}")
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
