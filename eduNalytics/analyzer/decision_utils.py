@@ -144,17 +144,27 @@ def get_results_from_emas(context_exponentials, semesters):
         current_semester = last_two_semesters[1]
         print(f"this- {prev_semester} is my previous semester, current semester is {current_semester}")
 
-        prev_semester_cgpa_ema = context_exponentials[prev_semester]["cgpa_ema"]
-        prev_semester_gpa_ema = context_exponentials[prev_semester]["gpa_ema"]
-        prev_semester_cgpa = context_exponentials[prev_semester]["cgpa"]
-        prev_semester_gpa = context_exponentials[prev_semester]["gpa"]
-        
-        current_semester_cgpa_ema = context_exponentials[current_semester]["cgpa_ema"]
-        current_semester_gpa_ema = context_exponentials[current_semester]["gpa_ema"]
-        current_semester_cgpa = context_exponentials[current_semester]["cgpa"]
-        current_semester_gpa = context_exponentials[current_semester]["gpa"]
+        prev_semester_data = context_exponentials[prev_semester]
+        current_semester_data = context_exponentials[current_semester]
+
+        prev_semester_cgpa_ema = prev_semester_data["cgpa_ema"]
+        current_semester_cgpa_ema = current_semester_data["cgpa_ema"]
+
+        prev_semester_gpa_ema = prev_semester_data["gpa_ema"]
+        current_semester_gpa_ema = current_semester_data["gpa_ema"]
+
+        prev_semester_gpa = prev_semester_data["gpa"]
+        current_semester_gpa = current_semester_data["gpa"]
+
+        prev_semester_cgpa = prev_semester_data["cgpa"]
+        current_semester_cgpa = current_semester_data["cgpa"]
+
+        user_specific_params_prev = prev_semester_data["user_specific_params"]
+        user_specific_params_current = current_semester_data["user_specific_params"]
 
         print(context_exponentials)
+        print(f"Previous semester: {user_specific_params_prev}")
+        print(f"Current semester: {user_specific_params_current}")
 
         #print(f"\n My previous semester's gpa ema is {prev_semester_gpa_ema} and current one is {current_semester_gpa_ema}")
         #print(f"\n My previous semester's cgpa ema is {prev_semester_cgpa_ema} and current one is {current_semester_cgpa_ema}")
@@ -192,15 +202,13 @@ def get_results_from_emas(context_exponentials, semesters):
                          for value in range(int((param3 - param2) / step) + 1)]
             crossover = param1 in gpa_range
 
+            cross_type = "no crossover"
             if crossover:
+                cross_type = "at equilibrium"
                 if param3 > param1:
                     cross_type = "positive"
                 elif param3 < param1:
                     cross_type = "negative"
-                else:
-                    cross_type = "at equilibrium"
-            else:
-                cross_type = "no crossover"
 
             return crossover, cross_type
 
@@ -215,5 +223,23 @@ def get_results_from_emas(context_exponentials, semesters):
         crossover, cross_type = check_ema_crossover(current_semester_gpa_ema, prev_semester_gpa, current_semester_gpa)
         print(f"\nDid a crossover happen between my gpa ema and gpa? {crossover}")
         print(f"crossover is {cross_type} in nature\n")
+
+        if user_specific_params_prev and user_specific_params_current:
+            print("Analyzing user-specific parameters for EMA crossover...\n")
+            
+            for branch, prev_value in user_specific_params_prev.items():
+                if branch in user_specific_params_current:
+                    current_value = user_specific_params_current[branch]
+
+                    param1 = prev_semester_cgpa_ema
+                    param2 = prev_value
+                    param3 = current_value
+
+                    crossover, cross_type = check_ema_crossover(param1, param2, param3)
+                    print(f"\nDid a crossover happen between my cgpa ema and {branch}? {crossover}")
+                    print(f"crossover is {cross_type} in nature\n")
+        else:
+            print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
+
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
