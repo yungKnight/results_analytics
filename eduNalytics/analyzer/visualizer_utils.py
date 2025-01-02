@@ -487,8 +487,9 @@ def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_seme
         ),
         yaxis_title="Number of Courses",
         template="plotly_white",
-        xaxis=dict(tickangle=45, tickfont=dict(
-            style="italic"
+        xaxis=dict(tickangle=0, tickfont=dict(
+            style="italic",
+            size = 10
             )
         ),
         plot_bgcolor = "#ffffcc",

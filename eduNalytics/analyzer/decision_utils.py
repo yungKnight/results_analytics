@@ -136,9 +136,6 @@ def get_results_from_emas(context_exponentials, semesters):
     Analyze the context_exponentials and semesters to dynamically create inner functions
     for divergence, convergence, or new student observations.
     """
-    print("\nAnalyzing context_exponentials...\n")
-    print(context_exponentials)
-
     if len(semesters) > 1:
         print("\nMore than one semester detected. Creating analysis functions...\n")
         last_two_semesters = semesters[-2:]
