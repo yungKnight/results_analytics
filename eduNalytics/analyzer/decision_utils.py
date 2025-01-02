@@ -148,28 +148,16 @@ def get_results_from_emas(context_exponentials, semesters):
         current_semester_data = context_exponentials[current_semester]
 
         prev_semester_cgpa_ema = prev_semester_data["cgpa_ema"]
-        current_semester_cgpa_ema = current_semester_data["cgpa_ema"]
-
         prev_semester_gpa_ema = prev_semester_data["gpa_ema"]
-        current_semester_gpa_ema = current_semester_data["gpa_ema"]
-
         prev_semester_gpa = prev_semester_data["gpa"]
-        current_semester_gpa = current_semester_data["gpa"]
-
         prev_semester_cgpa = prev_semester_data["cgpa"]
+        prev_user_specific_params = prev_semester_data["user_specific_params"]
+
+        current_semester_cgpa_ema = current_semester_data["cgpa_ema"]
+        current_semester_gpa_ema = current_semester_data["gpa_ema"]
+        current_semester_gpa = current_semester_data["gpa"]
         current_semester_cgpa = current_semester_data["cgpa"]
-
-        user_specific_params_prev = prev_semester_data["user_specific_params"]
-        user_specific_params_current = current_semester_data["user_specific_params"]
-
-        print(context_exponentials)
-        print(f"Previous semester: {user_specific_params_prev}")
-        print(f"Current semester: {user_specific_params_current}")
-
-        #print(f"\n My previous semester's gpa ema is {prev_semester_gpa_ema} and current one is {current_semester_gpa_ema}")
-        #print(f"\n My previous semester's cgpa ema is {prev_semester_cgpa_ema} and current one is {current_semester_cgpa_ema}")
-        #print(f"\n My previous semester's gpa is {prev_semester_gpa} and current one is {current_semester_gpa}")
-        #print(f"\n My previous semester's cgpa is {prev_semester_cgpa} and current one is {current_semester_cgpa}")
+        current_user_specific_params = current_semester_data["user_specific_params"]
 
         def divergence_or_convergence_checker():
             status = "At equilibrium state"
@@ -212,34 +200,25 @@ def get_results_from_emas(context_exponentials, semesters):
 
             return crossover, cross_type
 
-        crossover, cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa)
-        print(f"\nDid a crossover happen between my cgpa and gpa? {crossover}")
-        print(f"crossover is {cross_type} in nature\n")
+        gpa_cgpa_ema_cross, gpa_cgpa_ema_cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa)
+        gpa_cgpa_emas_cross, gpa_cgpa_emas_cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa_ema, current_semester_gpa_ema)
+        gpa_gpa_ema_crossover, gpa_gpa_ema_cross_type = check_ema_crossover(current_semester_gpa_ema, prev_semester_gpa, current_semester_gpa)
 
-        crossover, cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa_ema, current_semester_gpa_ema)
-        print(f"\nDid a crossover happen between my cgpa ema and gpa ema? {crossover}")
-        print(f"crossover is {cross_type} in nature\n")
+        if prev_user_specific_params and current_user_specific_params:
+            for branch, prev_value in prev_user_specific_params.items():
+                if branch in current_user_specific_params:
+                    current_value = current_user_specific_params[branch]
+                    print(f"\nbranch: {branch}")
 
-        crossover, cross_type = check_ema_crossover(current_semester_gpa_ema, prev_semester_gpa, current_semester_gpa)
-        print(f"\nDid a crossover happen between my gpa ema and gpa? {crossover}")
-        print(f"crossover is {cross_type} in nature\n")
-
-        if user_specific_params_prev and user_specific_params_current:
-            print("Analyzing user-specific parameters for EMA crossover...\n")
-            
-            for branch, prev_value in user_specific_params_prev.items():
-                if branch in user_specific_params_current:
-                    current_value = user_specific_params_current[branch]
-
-                    param1 = prev_semester_cgpa_ema
+                    param1 = current_semester_cgpa_ema
                     param2 = prev_value
                     param3 = current_value
+                    print(f"{param1}, {param2}, {param3}")
 
                     crossover, cross_type = check_ema_crossover(param1, param2, param3)
                     print(f"\nDid a crossover happen between my cgpa ema and {branch}? {crossover}")
                     print(f"crossover is {cross_type} in nature\n")
         else:
             print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
-
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
