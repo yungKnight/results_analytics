@@ -216,7 +216,20 @@ def get_results_from_emas(context_exponentials, semesters):
                     print(f"{param1}, {param2}, {param3}")
 
                     crossover, cross_type = check_ema_crossover(param1, param2, param3)
-                    print(f"\nDid a crossover happen between my cgpa ema and {branch}? {crossover}")
+                    print(f"Did a crossover happen between my cgpa ema and {branch}? {crossover}")
+                    print(f"crossover is {cross_type} in nature\n")
+
+                if branch in current_user_specific_params:
+                    current_value = current_user_specific_params[branch]
+                    print(f"\nbranch: {branch}")
+
+                    param1 = current_semester_gpa_ema
+                    param2 = prev_value
+                    param3 = current_value
+                    print(f"{param1}, {param2}, {param3}")
+
+                    crossover, cross_type = check_ema_crossover(param1, param2, param3)
+                    print(f"Did a crossover happen between my gpa ema and {branch}? {crossover}")
                     print(f"crossover is {cross_type} in nature\n")
         else:
             print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
