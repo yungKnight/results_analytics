@@ -232,18 +232,39 @@ def get_results_from_emas(context_exponentials, semesters):
         print("\nOnly one semester detected. Creating observation function...\n")
 
 
-def extracted_needed_data(correlation_details):
+def extracted_needed_data(correlation_details, partial_corr):
     needed_data = {}
-    selected_data = []
-    
+    selected_corr_data = []
+    selected_par_corr_data = []
+
     def extract_needed_corr_params():
         for key, value in correlation_details.items():
             if value['strength'] in ["Moderate", "Strong", "Very Strong"]:
-                selected_data.append({'key': key, 'strength': value['strength']})
+                selected_corr_data.append({'key': key, 'strength': value['strength']})
 
-        needed_data['filtered_corr_data'] = selected_data
+        needed_data['filtered_corr_data'] = selected_corr_data
 
     extract_needed_corr_params()
+
+    if partial_corr != {}:
+        def extract_needed_par_corr_params():
+            for key, value in partial_corr.items():
+                if value['significance'] in ["Significant", "Very significant"]:
+                    selected_par_corr_data.append(
+                        {
+                            'key': key,
+                            'significance': value['significance'],
+                            'strength': value['strength'],
+                            'type': value['type'],
+                        }
+                    )
+
+            needed_data['filtered_par_corr_data'] = selected_par_corr_data
+
+        extract_needed_par_corr_params()
+
+    else:
+        print("there are no items in the partial_corr dictionary") 
 
     return needed_data
 

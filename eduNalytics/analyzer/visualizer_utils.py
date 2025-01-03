@@ -416,7 +416,6 @@ def generate_semester_score_charts(cleaned_results_by_semester, branch_colors):
     
     return semester_avg_chart, branch_avg_chart
 
-
 def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester):
     """
     Generate a grouped bar chart that combines total courses per branch and passed courses per branch

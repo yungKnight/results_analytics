@@ -306,11 +306,8 @@ def plot_view(request):
             'strength': correlation_strength
         }
 
-    print("\nFinal correlation details:\n")
-    print(correlation_details)
-
-    needed_data = extracted_needed_data(correlation_details)
-    print(f"\nNeeded data: {needed_data}")
+    #print("\nFinal correlation details:\n")
+    #print(correlation_details)
 
     partial_corr = {}
     if bool(json.loads(par_corr)):
@@ -329,11 +326,13 @@ def plot_view(request):
             "strength": partials_strength,
             "type": partials_correlation_type,
             }
-    
-        #print("\nFinal Processed Partial Correlations:\n")
-        #print(partial_corr)
     else:
         print('There is no contextual partial correlations available')
+
+    print(f"Partial corr: {partial_corr}")
+
+    needed_data = extracted_needed_data(correlation_details, partial_corr)
+    print(f"\nNeeded data: {needed_data}")
 
     branch_gpa_data = {}
     if gpa_data:
