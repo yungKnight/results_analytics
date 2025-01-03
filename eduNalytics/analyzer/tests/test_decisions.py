@@ -2,7 +2,7 @@ import pytest
 import json
 from analyzer.decision_utils import (
         extract_correlations, get_correlation, extract_partial_corr, 
-        get_partial_corr_result, extract_emas
+        get_partial_corr_result, extract_emas, extracted_needed_data
     )
 
 @pytest.fixture
@@ -219,3 +219,26 @@ def test_extract_emas(example_emas_data):
         print(f"Dynamic parameters for '{semester}' validated successfully.")
 
     print("All tests for extract_emas passed successfully.")
+
+@pytest.fixture
+def correlation_details_example():
+    return {
+        ('total_units', 'gpa'): {'value': -0.46, 'type': 'Negative', 'strength': 'Moderate'},
+        ('total_units', 'cgpa'): {'value': 0.11, 'type': 'Positive', 'strength': 'Very Weak'},
+        ('gpa', 'cgpa'): {'value': 0.73, 'type': 'Positive', 'strength': 'Strong'},
+        ('gpa', 'semester_course_count'): {'value': -0.41, 'type': 'Negative', 'strength': 'Moderate'},
+        ('cgpa', 'semester_course_count'): {'value': 0.15, 'type': 'Positive', 'strength': 'Very Weak'}
+    }
+
+def test_extracted_needed_data(correlation_details_example):
+    needed_data = extracted_needed_data(correlation_details_example)
+
+    expected_output = {
+        'filtered_corr_data': [
+            {'key': ('total_units', 'gpa'), 'strength': 'Moderate'},
+            {'key': ('gpa', 'cgpa'), 'strength': 'Strong'},
+            {'key': ('gpa', 'semester_course_count'), 'strength': 'Moderate'}
+        ]
+    }
+
+    assert needed_data == expected_output, f"Expected {expected_output}, but got {needed_data}"
