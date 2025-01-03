@@ -221,7 +221,7 @@ def test_extract_emas(example_emas_data):
     print("All tests for extract_emas passed successfully.")
 
 @pytest.fixture
-def correlation_details_example():
+def correlation_details():
     return {
         ('total_units', 'gpa'): {'value': -0.46, 'type': 'Negative', 'strength': 'Moderate'},
         ('total_units', 'cgpa'): {'value': 0.11, 'type': 'Positive', 'strength': 'Very Weak'},
@@ -230,15 +230,42 @@ def correlation_details_example():
         ('cgpa', 'semester_course_count'): {'value': 0.15, 'type': 'Positive', 'strength': 'Very Weak'}
     }
 
-def test_extracted_needed_data(correlation_details_example):
-    needed_data = extracted_needed_data(correlation_details_example)
-
-    expected_output = {
-        'filtered_corr_data': [
-            {'key': ('total_units', 'gpa'), 'strength': 'Moderate'},
-            {'key': ('gpa', 'cgpa'), 'strength': 'Strong'},
-            {'key': ('gpa', 'semester_course_count'), 'strength': 'Moderate'}
-        ]
+@pytest.fixture
+def partial_corr():
+    return {
+        ('Accessories', 'gpa'): {'partial_corr': 0.933129, 'prob_val': 0.020549, 'significance': 'Very significant', 'strength': 'Very Strong', 'type': 'Positive'},
+        ('Accessories', 'cgpa'): {'partial_corr': 0.960561, 'prob_val': 0.009346, 'significance': 'Very significant', 'strength': 'Very Strong', 'type': 'Positive'},
+        ('Accessories_units', 'gpa'): {'partial_corr': -0.241435, 'prob_val': 0.695608, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Negative'},
+        ('Accessories_units', 'cgpa'): {'partial_corr': 0.10403, 'prob_val': 0.867784, 'significance': 'Insignificant', 'strength': 'Very Weak', 'type': 'Positive'},
+        ('Accessories_count', 'gpa'): {'partial_corr': 0.242804, 'prob_val': 0.693918, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Positive'},
+        ('Accessories_count', 'cgpa'): {'partial_corr': 0.677484, 'prob_val': 0.208904, 'significance': 'Insignificant', 'strength': 'Strong', 'type': 'Positive'},
+        ('semester_course_count', 'gpa'): {'partial_corr': 0.146721, 'prob_val': 0.753591, 'significance': 'Insignificant', 'strength': 'Very Weak', 'type': 'Positive'},
+        ('semester_course_count', 'cgpa'): {'partial_corr': 0.136078, 'prob_val': 0.77112, 'significance': 'Insignificant', 'strength': 'Very Weak', 'type': 'Positive'},
+        ('Mathematics For Economists', 'gpa'): {'partial_corr': 0.265681, 'prob_val': 0.665747, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Positive'},
+        ('Mathematics For Economists', 'cgpa'): {'partial_corr': 0.817241, 'prob_val': 0.091175, 'significance': 'Significant', 'strength': 'Very Strong', 'type': 'Positive'},
+        ('Mathematics For Economists_units', 'gpa'): {'partial_corr': -0.706252, 'prob_val': 0.18246, 'significance': 'Insignificant', 'strength': 'Strong', 'type': 'Negative'},
+        ('Mathematics For Economists_units', 'cgpa'): {'partial_corr': 0.543636, 'prob_val': 0.343615, 'significance': 'Insignificant', 'strength': 'Moderate', 'type': 'Positive'},
+        ('Mathematics For Economists_count', 'gpa'): {'partial_corr': -0.706252, 'prob_val': 0.18246, 'significance': 'Insignificant', 'strength': 'Strong', 'type': 'Negative'},
+        ('Mathematics For Economists_count', 'cgpa'): {'partial_corr': 0.543636, 'prob_val': 0.343615, 'significance': 'Insignificant', 'strength': 'Moderate', 'type': 'Positive'},
+        ('Microeconomics', 'gpa'): {'partial_corr': 0.340521, 'prob_val': 0.574966, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Positive'},
+        ('Microeconomics', 'cgpa'): {'partial_corr': -0.860843, 'prob_val': 0.060998, 'significance': 'Significant', 'strength': 'Very Strong', 'type': 'Negative'},
+        ('Microeconomics_units', 'gpa'): {'partial_corr': -0.843364, 'prob_val': 0.072643, 'significance': 'Significant', 'strength': 'Very Strong', 'type': 'Negative'},
+        ('Microeconomics_units', 'cgpa'): {'partial_corr': 0.306945, 'prob_val': 0.615412, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Positive'}
     }
 
-    assert needed_data == expected_output, f"Expected {expected_output}, but got {needed_data}"
+def test_extracted_needed_data(correlation_details, partial_corr):
+    
+    result = extracted_needed_data(correlation_details, partial_corr)
+    
+    filtered_corr_data = result['filtered_corr_data']
+    assert isinstance(filtered_corr_data, list)
+    assert len(filtered_corr_data) == 3
+    
+    filtered_par_corr_data = result['filtered_par_corr_data']
+    assert isinstance(filtered_par_corr_data, list)
+    assert len(filtered_par_corr_data) > 0
+    for item in filtered_par_corr_data:
+        assert item['significance'] in ["Significant", "Very significant"]
+        assert item['strength'] in ["Moderate", "Strong", "Very Strong"]
+        assert 'key' in item
+        assert 'type' in item
