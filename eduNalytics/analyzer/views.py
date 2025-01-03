@@ -31,7 +31,8 @@ from .visualizer_utils import (
     generate_branch_distribution_stacked_bar_chart,
 )
 from .decision_utils import (extract_correlations, get_correlation, 
-    extract_partial_corr, get_partial_corr_result, extract_emas, get_results_from_emas)
+    extract_partial_corr, get_partial_corr_result, extract_emas, get_results_from_emas,
+    extracted_needed_data)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -293,27 +294,6 @@ def plot_view(request):
     semesters = list(context_exponentials.keys())
 
     get_results_from_emas(context_exponentials, semesters)
-    
-    ## Print the semesters represented
-    #print("\nSemesters Represented:\n")
-    #for semester in semesters:
-    #    print(f"  - {semester}")
-#
-#
-    #for level, data in context_exponentials.items():
-    #    # Print the level name
-    #    print(f"Level: {level}")
-    #    
-    #    # Separate printing of keys and their respective values
-    #    print("Keys:")
-    #    for key in data.keys():
-    #        print(f"  - {key}")
-    #    
-    #    print("Values:")
-    #    for value in data.values():
-    #        print(f"  - {value}")
-    #    
-    #    print("-" * 50)
 
     correlation_details = {}
     for param, value in context_corr.items():
@@ -326,8 +306,11 @@ def plot_view(request):
             'strength': correlation_strength
         }
 
-    #print("\nFinal correlation details:\n")
-    #print(correlation_details)
+    print("\nFinal correlation details:\n")
+    print(correlation_details)
+
+    needed_data = extracted_needed_data(correlation_details)
+    print(f"\nNeeded data: {needed_data}")
 
     partial_corr = {}
     if bool(json.loads(par_corr)):
