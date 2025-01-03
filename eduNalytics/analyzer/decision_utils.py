@@ -125,16 +125,12 @@ def extract_emas(emas):
 
     return extracted_exponentials            
 
-#from my extracted emas using extract_emas()
-#I'm to check for this conditions
-# 1. It should check for divergence/convergence
-# 2. It would also check if 1 is a positive scenario or not
-# 3. It should also check for crossovers of both ema params
-
 def get_results_from_emas(context_exponentials, semesters):
     """
     Analyze the context_exponentials and semesters to dynamically create inner functions
-    for divergence, convergence, or new student observations.
+    that checks for divergence or convergence of a student's present performance compared
+    to historical performance and what it indicates. It also includes an inner function that
+    checks for crossing of historical bounds and what sort of crossing it is.
     """
     if len(semesters) > 1:
         print("\nMore than one semester detected. Creating analysis functions...\n")
@@ -142,7 +138,6 @@ def get_results_from_emas(context_exponentials, semesters):
 
         prev_semester = last_two_semesters[0]
         current_semester = last_two_semesters[1]
-        print(f"this- {prev_semester} is my previous semester, current semester is {current_semester}")
 
         prev_semester_data = context_exponentials[prev_semester]
         current_semester_data = context_exponentials[current_semester]
@@ -235,3 +230,20 @@ def get_results_from_emas(context_exponentials, semesters):
             print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
+
+
+def extracted_needed_data(correlation_details):
+    needed_data = {}
+    selected_data = []
+    
+    def extract_needed_corr_params():
+        for key, value in correlation_details.items():
+            if value['strength'] in ["Moderate", "Strong", "Very Strong"]:
+                selected_data.append({'key': key, 'strength': value['strength']})
+
+        needed_data['filtered_corr_data'] = selected_data
+
+    extract_needed_corr_params()
+
+    return needed_data
+
