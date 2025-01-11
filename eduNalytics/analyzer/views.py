@@ -32,7 +32,7 @@ from .visualizer_utils import (
 )
 from .decision_utils import (extract_correlations, get_correlation, 
     extract_partial_corr, get_partial_corr_result, extract_emas, get_results_from_emas,
-    extracted_needed_data)
+    extract_needed_data)
 
 def detailed_course_result_to_dict(result):
     """Convert a DetailedCourseResult instance into a dictionary."""
@@ -329,10 +329,10 @@ def plot_view(request):
     else:
         print('There is no contextual partial correlations available')
 
-    print(f"Partial corr: {partial_corr}")
+    #print(f"Partial corr: {partial_corr}")
 
-    needed_data = extracted_needed_data(correlation_details, partial_corr)
-    print(f"\nNeeded data: {needed_data}")
+    needed_data = extract_needed_data(correlation_details, partial_corr)
+    #print(f"\nNeeded data: {needed_data}")
 
     branch_gpa_data = {}
     if gpa_data:

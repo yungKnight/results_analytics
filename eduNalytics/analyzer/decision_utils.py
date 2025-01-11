@@ -156,6 +156,7 @@ def get_results_from_emas(context_exponentials, semesters):
 
         def divergence_or_convergence_checker():
             status = "At equilibrium state"
+
             if ((current_semester_cgpa_ema - current_semester_gpa_ema) > (prev_semester_cgpa_ema - prev_semester_gpa_ema)):
                 status = "divergence"
             elif ((current_semester_cgpa_ema - current_semester_gpa_ema) < (prev_semester_cgpa_ema - prev_semester_gpa_ema)):
@@ -174,9 +175,14 @@ def get_results_from_emas(context_exponentials, semesters):
 
             return status, type
 
-        status, type = divergence_or_convergence_checker()
-        print("\nDivergence/Convergence status:", status)
-        print(f"\nThis is a {type} {status}\n")
+        #divergence_convergence = divergence_or_convergence_checker()
+        #print("\n1. Divergence/Convergence Analysis:")
+        #print(f"   Status: {divergence_convergence[0]}")
+        #print(f"   Type: {divergence_convergence[1]}")
+
+        semester_performance = divergence_or_convergence_checker()
+        print("\nSemester performance Analysis:")
+        print(f"\nSemester performance is a {semester_performance[1]} {semester_performance[0]}")
 
         def check_ema_crossover(param1, param2, param3):
             step = 0.01
@@ -231,8 +237,7 @@ def get_results_from_emas(context_exponentials, semesters):
     else:
         print("\nOnly one semester detected. Creating observation function...\n")
 
-
-def extracted_needed_data(correlation_details, partial_corr):
+def extract_needed_data(correlation_details, partial_corr):
     needed_data = {}
     selected_corr_data = []
     selected_par_corr_data = []
