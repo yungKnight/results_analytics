@@ -173,11 +173,12 @@ def get_results_from_emas(context_exponentials, semesters):
             elif ((status == "convergence") & ((current_semester_gpa_ema > prev_semester_gpa_ema) & (current_semester_cgpa_ema < prev_semester_cgpa_ema))):
                 type = "flattening"
 
-            return status, type
+            return {"status": status, "type": type}
 
         semester_performance = divergence_or_convergence_checker()
+        print(type(semester_performance))
         print("\nSemester performance Analysis:")
-        print(f"\nSemester performance is a {semester_performance[1]} {semester_performance[0]}")
+        print(f"\nSemester performance is a {semester_performance['type']} {semester_performance['status']}")
 
         def check_ema_crossover(param1, param2, param3):
             step = 0.01
@@ -220,12 +221,15 @@ def get_results_from_emas(context_exponentials, semesters):
                     param3 = current_value
                     branch_specific_checks[f"gpa_ema_and_{branch}"] = check_ema_crossover(param1, param2, param3)
 
-            for key, (crossover, cross_type) in branch_specific_checks.items():
-                print(f"{key} crossover check is {crossover} and crossover type is {cross_type}")
-        else:
-            print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
+            #for key, (crossover, cross_type) in branch_specific_checks.items():
+            #    print(f"{key} crossover check is {crossover} and crossover type is {cross_type}")
+      
+        ema_results = [semester_performance, compulsory_emas_check, branch_specific_checks]
+        print(type(ema_results))
+        return ema_results
     else:
-        print("\nOnly one semester detected. Creating observation function...\n")
+        ema_results = [{}, {}, {}]
+        return ema_results
 
 def extract_needed_data(correlation_details, partial_corr):
     needed_data = {}
