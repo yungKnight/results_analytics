@@ -175,11 +175,6 @@ def get_results_from_emas(context_exponentials, semesters):
 
             return status, type
 
-        #divergence_convergence = divergence_or_convergence_checker()
-        #print("\n1. Divergence/Convergence Analysis:")
-        #print(f"   Status: {divergence_convergence[0]}")
-        #print(f"   Type: {divergence_convergence[1]}")
-
         semester_performance = divergence_or_convergence_checker()
         print("\nSemester performance Analysis:")
         print(f"\nSemester performance is a {semester_performance[1]} {semester_performance[0]}")
@@ -201,37 +196,32 @@ def get_results_from_emas(context_exponentials, semesters):
 
             return crossover, cross_type
 
-        gpa_cgpa_ema_cross, gpa_cgpa_ema_cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa)
-        gpa_cgpa_emas_cross, gpa_cgpa_emas_cross_type = check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa_ema, current_semester_gpa_ema)
-        gpa_gpa_ema_crossover, gpa_gpa_ema_cross_type = check_ema_crossover(current_semester_gpa_ema, prev_semester_gpa, current_semester_gpa)
+        compulsory_emas_check = {
+            "gpa_and_cgpa_ema": check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa, current_semester_gpa),
+            "gpa_and_cgpa_emas": check_ema_crossover(current_semester_cgpa_ema, prev_semester_gpa_ema, current_semester_gpa_ema),
+            "gpa_and_gpa_ema": check_ema_crossover(current_semester_gpa_ema, prev_semester_gpa, current_semester_gpa)
+        }
+        #for key, (crossover, cross_type) in compulsory_emas_check.items():
+        #    print(f"\n{key} crossover check is {crossover} and crossover type is {cross_type}")
 
+        branch_specific_checks = {}
         if prev_user_specific_params and current_user_specific_params:
             for branch, prev_value in prev_user_specific_params.items():
                 if branch in current_user_specific_params:
                     current_value = current_user_specific_params[branch]
-                    print(f"\nbranch: {branch}")
-
+                    
                     param1 = current_semester_cgpa_ema
                     param2 = prev_value
                     param3 = current_value
-                    print(f"{param1}, {param2}, {param3}")
-
-                    crossover, cross_type = check_ema_crossover(param1, param2, param3)
-                    print(f"Did a crossover happen between my cgpa ema and {branch}? {crossover}")
-                    print(f"crossover is {cross_type} in nature\n")
-
-                if branch in current_user_specific_params:
-                    current_value = current_user_specific_params[branch]
-                    print(f"\nbranch: {branch}")
-
+                    branch_specific_checks[f"cgpa_ema_and_{branch}"] = check_ema_crossover(param1, param2, param3)
+                    
                     param1 = current_semester_gpa_ema
                     param2 = prev_value
                     param3 = current_value
-                    print(f"{param1}, {param2}, {param3}")
+                    branch_specific_checks[f"gpa_ema_and_{branch}"] = check_ema_crossover(param1, param2, param3)
 
-                    crossover, cross_type = check_ema_crossover(param1, param2, param3)
-                    print(f"Did a crossover happen between my gpa ema and {branch}? {crossover}")
-                    print(f"crossover is {cross_type} in nature\n")
+            for key, (crossover, cross_type) in branch_specific_checks.items():
+                print(f"{key} crossover check is {crossover} and crossover type is {cross_type}")
         else:
             print("\nSkipping EMA crossover analysis as user-specific parameters are empty.\n")
     else:
