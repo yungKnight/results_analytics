@@ -125,13 +125,15 @@ def extract_emas(emas):
 
     return extracted_exponentials            
 
-def get_results_from_emas(context_exponentials, semesters):
+def get_results_from_emas(context_exponentials):
     """
     Analyze the context_exponentials and semesters to dynamically create inner functions
     that checks for divergence or convergence of a student's present performance compared
     to historical performance and what it indicates. It also includes an inner function that
     checks for crossing of historical bounds and what sort of crossing it is.
     """
+    semesters = list(context_exponentials.keys())
+
     if len(semesters) > 1:
         print("\nMore than one semester detected. Creating analysis functions...\n")
         last_two_semesters = semesters[-2:]
@@ -176,9 +178,9 @@ def get_results_from_emas(context_exponentials, semesters):
             return {"status": status, "type": type}
 
         semester_performance = divergence_or_convergence_checker()
-        print(type(semester_performance))
-        print("\nSemester performance Analysis:")
-        print(f"\nSemester performance is a {semester_performance['type']} {semester_performance['status']}")
+        #print(f"semester_performance type is: {type(semester_performance)}")
+        #print("\nSemester performance Analysis:")
+        #print(f"\nSemester performance is a {semester_performance['type']} {semester_performance['status']}")
 
         def check_ema_crossover(param1, param2, param3):
             step = 0.01
@@ -224,14 +226,23 @@ def get_results_from_emas(context_exponentials, semesters):
             #for key, (crossover, cross_type) in branch_specific_checks.items():
             #    print(f"{key} crossover check is {crossover} and crossover type is {cross_type}")
       
-        ema_results = [semester_performance, compulsory_emas_check, branch_specific_checks]
-        print(type(ema_results))
+        ema_results = {
+            "semester performance": semester_performance, 
+            "necessary checks": compulsory_emas_check, 
+            "personal checks": branch_specific_checks
+        }
+    
+        # Assuming ema_results is defined as a dictionary
+        #print(f"using the {'For'} loop:\n  {('-' * 25)}\n\n")
+        #for key, value in ema_results['personal checks'].items():
+        #    print(f"{key}: {value}")
+
         return ema_results
     else:
         ema_results = [{}, {}, {}]
         return ema_results
 
-def extract_needed_data(correlation_details, partial_corr):
+def extract_needed_data(correlation_details, partial_corr, student_emas):
     needed_data = {}
     selected_corr_data = []
     selected_par_corr_data = []
@@ -262,8 +273,13 @@ def extract_needed_data(correlation_details, partial_corr):
 
         extract_needed_par_corr_params()
 
-    else:
-        print("there are no items in the partial_corr dictionary") 
+    def extract_needed_ema_params():
+        print(f"\nstudent_emas is struct as a: {type(student_emas)}")
+        print(
+            f"student's semester performance:\n{student_emas['semester performance']} \n{('-' * 50)} \nstudent-specific checks:\n{student_emas['personal checks']} \n{('-' * 125)} \ncompulsory checks:\n{student_emas['necessary checks']}"
+        )
+
+    extract_needed_ema_params()
 
     return needed_data
 
