@@ -289,12 +289,6 @@ def plot_view(request):
     emas = request.session.get('emas')
 
     context_corr = extract_correlations(correlations)
-    context_exponentials = extract_emas(emas)
-
-    semesters = list(context_exponentials.keys())
-
-    get_results_from_emas(context_exponentials, semesters)
-
     correlation_details = {}
     for param, value in context_corr.items():
 
@@ -329,10 +323,16 @@ def plot_view(request):
     else:
         print('There is no contextual partial correlations available')
 
+    #print("\nFinal partial corr details:\n")
     #print(f"Partial corr: {partial_corr}")
 
-    needed_data = extract_needed_data(correlation_details, partial_corr)
-    #print(f"\nNeeded data: {needed_data}")
+    context_exponentials = extract_emas(emas)
+    print(type(context_exponentials))
+    student_emas = get_results_from_emas(context_exponentials)
+    
+    needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
+    print("\nFinal needed param(s) details:")
+    print(f"\nNeeded data: {needed_data}")
 
     branch_gpa_data = {}
     if gpa_data:
