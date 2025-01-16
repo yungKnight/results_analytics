@@ -2,10 +2,9 @@ from django.core.exceptions import ValidationError
 import re
 
 program_lengths = {
-    'Economics': 4,
     'Medicine': 7,
     'Engineering': 5,
-    # Add more departments as needed
+    # Add more departments that don't offer 4-year courses as needed
 }
 
 def get_program_length_by_department(department):
