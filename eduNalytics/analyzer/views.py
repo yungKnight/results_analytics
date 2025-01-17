@@ -332,7 +332,13 @@ def plot_view(request):
     
     needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
     print("\nFinal needed param(s) details:")
-    print(f"\nNeeded data: {needed_data}")
+    print(f"\n{('-' * 75)}")
+    print(f"\n{('-' * 75)}")
+    print(f"Needed data EMAS data: {needed_data['filtered_emas_data']}")
+    print(f"\n{('-' * 75)}")
+    print(f"\nNeeded data Correlations data: {needed_data['filtered_corr_data']}")
+    print(f"\n{('-' * 75)}")
+    print(f"\nNeeded data Partial Correlation data: {needed_data['filtered_par_corr_data']}")
 
     branch_gpa_data = {}
     if gpa_data:
