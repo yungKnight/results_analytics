@@ -2,7 +2,7 @@ import pytest
 import json
 from analyzer.decision_utils import (
         extract_correlations, get_correlation, extract_partial_corr, 
-        get_partial_corr_result, extract_emas, extracted_needed_data
+        get_partial_corr_result, extract_emas, get_results_from_emas, extract_needed_data
     )
 
 @pytest.fixture
@@ -174,6 +174,7 @@ def example_emas_data():
          "Accessories": 3.0, "Mathematics For Economists": 0.0, "Microeconomics": 4.0, "Macroeconomics": 3.5}
     ])
 
+
 def test_extract_emas(example_emas_data):
     print("\nTesting extract_emas function...")
 
@@ -219,6 +220,23 @@ def test_extract_emas(example_emas_data):
         print(f"Dynamic parameters for '{semester}' validated successfully.")
 
     print("All tests for extract_emas passed successfully.")
+
+    print("\nExtending tests to validate results from get_results_from_emas...")
+    processed_results = get_results_from_emas(result)
+    print("Results processed by get_results_from_emas retrieved successfully.")
+
+    print("Validating processed results for '200 level Rain'...")
+    
+    assert "necessary checks" in processed_results
+    assert "personal checks" in processed_results
+    assert "semester performance" in processed_results
+    print("Processed results structure validated successfully.")
+
+    assert processed_results["semester performance"]["status"] == "convergence"
+    assert processed_results["semester performance"]["type"] == "flattening"
+    
+    print("Processed results for '200 level Rain' validated successfully.")
+    print("All tests for extract_emas and get_results_from_emas passed successfully.")
 
 @pytest.fixture
 def correlation_details():
