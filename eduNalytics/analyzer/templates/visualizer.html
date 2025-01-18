@@ -103,4 +103,9 @@
   <content></content>
 </aside>
 
+<script>
+  const neededData = JSON.parse('{{ needed_data|safe }}');
+  console.log('Needed Data:', neededData);
+</script>
+
 {% endblock %}
