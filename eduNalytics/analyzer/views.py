@@ -387,6 +387,7 @@ def plot_view(request):
     #display_parsed_emas(emas)
 
     return render(request, 'visualizer.html', {
+        'needed_data': json.dumps(needed_data),
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
         'combined_chart_html': combined_chart_html,
         'semester_boxplot_html': semester_boxplot_html,
