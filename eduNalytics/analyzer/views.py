@@ -300,9 +300,6 @@ def plot_view(request):
             'strength': correlation_strength
         }
 
-    #print("\nFinal correlation details:\n")
-    #print(correlation_details)
-
     partial_corr = {}
     if bool(json.loads(par_corr)):
         context_partials = extract_partial_corr(par_corr)
@@ -320,25 +317,12 @@ def plot_view(request):
             "strength": partials_strength,
             "type": partials_correlation_type,
             }
-    else:
-        print('There is no contextual partial correlations available')
-
-    #print("\nFinal partial corr details:\n")
-    #print(f"Partial corr: {partial_corr}")
 
     context_exponentials = extract_emas(emas)
-    print(type(context_exponentials))
     student_emas = get_results_from_emas(context_exponentials)
     
     needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
-    print("\nFinal needed param(s) details:")
-    print(f"\n{('-' * 75)}")
-    print(f"\n{('-' * 75)}")
-    print(f"Needed data EMAS data: {needed_data['filtered_emas_data']}")
-    print(f"\n{('-' * 75)}")
-    print(f"\nNeeded data Correlations data: {needed_data['filtered_corr_data']}")
-    print(f"\n{('-' * 75)}")
-    print(f"\nNeeded data Partial Correlation data: {needed_data['filtered_par_corr_data']}")
+    cleaned_needed_data = json.dumps(needed_data)
 
     branch_gpa_data = {}
     if gpa_data:
@@ -384,10 +368,8 @@ def plot_view(request):
 
     semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
 
-    #display_parsed_emas(emas)
-
     return render(request, 'visualizer.html', {
-        'needed_data': json.dumps(needed_data),
+        'needed_data': cleaned_needed_data,
         'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
         'combined_chart_html': combined_chart_html,
         'semester_boxplot_html': semester_boxplot_html,

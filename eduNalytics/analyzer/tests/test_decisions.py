@@ -271,19 +271,71 @@ def partial_corr():
         ('Microeconomics_units', 'cgpa'): {'partial_corr': 0.306945, 'prob_val': 0.615412, 'significance': 'Insignificant', 'strength': 'Weak', 'type': 'Positive'}
     }
 
-def test_extracted_needed_data(correlation_details, partial_corr):
-    
-    result = extracted_needed_data(correlation_details, partial_corr)
+@pytest.fixture
+def student_emas():
+    return {
+        'semester performance': {
+            'status': 'convergence', 'type': 'flattening'
+        },
+
+        'necessary checks': {
+            'gpa_and_cgpa_ema': (True, 'positive'), 
+            'gpa_and_cgpa_emas': (False, 'no crossover'), 
+            'gpa_and_gpa_ema': (True, 'positive')
+        }, 
+
+        'personal checks': {
+            'cgpa_ema_and_Accessories': (True, 'positive'), 
+            'gpa_ema_and_Accessories': (True, 'positive'), 
+            'cgpa_ema_and_Mathematics For Economists': (False, 'no crossover'), 
+            'gpa_ema_and_Mathematics For Economists': (False, 'no crossover'), 
+            'cgpa_ema_and_Microeconomics': (False, 'no crossover'), 
+            'gpa_ema_and_Microeconomics': (False, 'no crossover'), 
+            'cgpa_ema_and_Macroeconomics': (True, 'positive'), 
+            'gpa_ema_and_Macroeconomics': (True, 'positive')
+        }
+    }
+
+def test_extracted_needed_data(correlation_details, partial_corr, student_emas):
+    result = extract_needed_data(correlation_details, partial_corr, student_emas)
     
     filtered_corr_data = result['filtered_corr_data']
     assert isinstance(filtered_corr_data, list)
     assert len(filtered_corr_data) == 3
+    for item in filtered_corr_data:
+        assert 'key' in item
+        assert 'strength' in item
+        assert item['strength'] in ["Moderate", "Strong", "Very Strong"]
     
     filtered_par_corr_data = result['filtered_par_corr_data']
     assert isinstance(filtered_par_corr_data, list)
     assert len(filtered_par_corr_data) > 0
     for item in filtered_par_corr_data:
+        assert 'key' in item
+        assert 'significance' in item
+        assert 'strength' in item
+        assert 'type' in item
         assert item['significance'] in ["Significant", "Very significant"]
         assert item['strength'] in ["Moderate", "Strong", "Very Strong"]
-        assert 'key' in item
-        assert 'type' in item
+
+    filtered_emas_data = result['filtered_emas_data']
+    assert isinstance(filtered_emas_data, dict)
+    
+    assert "semester performance" in filtered_emas_data
+    assert filtered_emas_data["semester performance"] == student_emas["semester performance"]
+    
+    assert "necessary checks" in filtered_emas_data
+    necessary_checks = filtered_emas_data["necessary checks"]
+    assert isinstance(necessary_checks, dict)
+    for key, value in necessary_checks.items():
+        assert key in student_emas["necessary checks"]
+        assert value["crossover"] == student_emas["necessary checks"][key][0]
+        assert value["cross_type"] == student_emas["necessary checks"][key][1]
+    
+    assert "personal checks" in filtered_emas_data
+    personal_checks = filtered_emas_data["personal checks"]
+    assert isinstance(personal_checks, dict)
+    for key, value in personal_checks.items():
+        assert key in student_emas["personal checks"]
+        assert value["crossover"] == student_emas["personal checks"][key][0]
+        assert value["cross_type"] == student_emas["personal checks"][key][1]
