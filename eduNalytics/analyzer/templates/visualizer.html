@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
    Result Visualizer
 {% endblock %}
 
 {% block content %}
+
+<script>
+  const neededData = JSON.parse('{{ needed_data|safe }}');
+</script>
 
 <div>
   <div style="display: flex; flex-wrap: wrap; width: 100vw; flex-direction: row;">
@@ -100,12 +105,13 @@
 
 <aside>
   <button type="submit" id="view_analysis" class="btn btn-primary py-1 my-2" style="display: inline-block; width: 100vw;">Click here to view detailed analysis of your result</button>
-  <content></content>
+  <content id="advisory">
+    <p id="studentSemesterPerformance"></p>
+    <p id="studentSpecificPerormance"></p>
+    <p id="toDoMoreOrNot"></p>
+  </content>
 </aside>
 
-<script>
-  const neededData = JSON.parse('{{ needed_data|safe }}');
-  console.log('Needed Data:', neededData);
-</script>
+<script src="{% static 'js/visualizer.js' %}" defer></script>
 
 {% endblock %}
