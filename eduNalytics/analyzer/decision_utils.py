@@ -133,6 +133,7 @@ def get_results_from_emas(context_exponentials):
     checks for crossing of historical bounds and what sort of crossing it is.
     """
     semesters = list(context_exponentials.keys())
+    HIGHEST_POSSIBLE_GPA = 5.0
 
     if len(semesters) > 1:
         last_two_semesters = semesters[-2:]
@@ -173,6 +174,15 @@ def get_results_from_emas(context_exponentials):
                 type = "negative"
             elif ((status == "convergence") & ((current_semester_gpa_ema > prev_semester_gpa_ema) & (current_semester_cgpa_ema < prev_semester_cgpa_ema))):
                 type = "flattening"
+            elif((status == "At equilibrium state") & (current_semester_gpa > prev_semester_gpa)):
+                type = "positive"
+            elif((status == "At equilibrium state") & (current_semester_gpa < prev_semester_gpa)):
+                type = "negative"
+            elif ((status == "At equilibrium state") & (current_semester_gpa == prev_semester_gpa)):
+                if current_semester_gpa == HIGHEST_POSSIBLE_GPA:
+                    type = "exemplary"
+                else:
+                    type = "steady"
 
             return {"status": status, "type": type}
 
