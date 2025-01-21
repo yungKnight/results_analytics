@@ -249,7 +249,13 @@ def extract_needed_data(correlation_details, partial_corr, student_emas):
     def extract_needed_corr_params():
         for key, value in correlation_details.items():
             if value['strength'] in ["Moderate", "Strong", "Very Strong"]:
-                selected_corr_data.append({'key': key, 'strength': value['strength']})
+                selected_corr_data.append(
+                    {
+                        'key': key, 
+                        'strength': value['strength'], 
+                        'type': value['type']
+                    }
+                )
 
         needed_data['filtered_corr_data'] = selected_corr_data
 

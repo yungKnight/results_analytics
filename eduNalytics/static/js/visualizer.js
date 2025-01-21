@@ -1,5 +1,5 @@
-console.log('Needed Data:', neededData);
-console.log('-'.repeat(50))
+/*console.log('Needed Data:', neededData);
+console.log('-'.repeat(50))*/
 
 const viewBtn = document.getElementById('view_analysis');
 const minimizeBtn = document.getElementById('minimize_analysis');
@@ -16,7 +16,7 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-console.log(semesterPerformance);
+console.log(neededData["filtered_corr_data"]);
 console.log('-'.repeat(50));
 
 const { status, type} = semesterPerformance;
@@ -39,7 +39,7 @@ const sharedMeanings = {
   }
 };
 
-const extractMeanings = (attribute) => {
+const extractSemesterPerformanceMeanings = (attribute) => {
   return Object.keys(sharedMeanings).reduce((acc, key) => {
     const meaning = sharedMeanings[key][attribute];
     meaning ? acc[key] = meaning : acc;
@@ -47,11 +47,11 @@ const extractMeanings = (attribute) => {
   }, {});
 };
 
-const negativeMeanings = extractMeanings("negative");
-const positiveMeanings = extractMeanings("positive"); 
-const flatteningMeaning = extractMeanings("flattening");
-const steadyMeaning = extractMeanings("steady");
-const exemplaryMeaning = extractMeanings("exemplary");
+const negativeMeanings = extractSemesterPerformanceMeanings("negative");
+const positiveMeanings = extractSemesterPerformanceMeanings("positive"); 
+const flatteningMeaning = extractSemesterPerformanceMeanings("flattening");
+const steadyMeaning = extractSemesterPerformanceMeanings("steady");
+const exemplaryMeaning = extractSemesterPerformanceMeanings("exemplary");
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
