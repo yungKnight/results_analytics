@@ -1,6 +1,3 @@
-/*console.log('Needed Data:', neededData);
-console.log('-'.repeat(50))*/
-
 const viewBtn = document.getElementById('view_analysis');
 const minimizeBtn = document.getElementById('minimize_analysis');
 const advisory= document.getElementById('advisory');
@@ -47,11 +44,37 @@ const extractSemesterPerformanceMeanings = (attribute) => {
   }, {});
 };
 
+/*This set of meanings below will be a part of an object that disseminates final messages
+  to the frontend-
+    This below serves as an overview (for me to recall faster)*/
 const negativeMeanings = extractSemesterPerformanceMeanings("negative");
 const positiveMeanings = extractSemesterPerformanceMeanings("positive"); 
 const flatteningMeaning = extractSemesterPerformanceMeanings("flattening");
 const steadyMeaning = extractSemesterPerformanceMeanings("steady");
 const exemplaryMeaning = extractSemesterPerformanceMeanings("exemplary");
+
+const correlation_data = neededData["filtered_corr_data"];
+console.log(Array.isArray(correlation_data))
+console.log('-'.repeat(50));
+
+const corrMeaning = ({ key, strength, type }) => {
+    if (strength === "Very Strong") {
+        return `The relationship between ${key[0]} and ${key[1]} is ${strength} ${
+            type === "Negative" ? "but" : "and"
+        } ${type}`;
+    }
+    return `The relationship between ${key[0]} and ${key[1]} is ${strength}ly ${type}`;
+};
+
+/*This set of meanings below will be a part of an object that disseminates final messages
+  to the frontend-
+    This would be used to advise overall on impact of the 
+    total units and courses offered per semester with the ones against cgpa the tests
+    for some kind of divergence e.g if any of the key[1] contains 'cgpa' and an inverse value
+                                    might mean a disparity in potential
+    (for me to recall faster)*/
+const correlationMeanings = correlation_data.map(item => corrMeaning(item));
+console.log(Array.isArray(correlationMeanings));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";

@@ -289,6 +289,7 @@ def plot_view(request):
     emas = request.session.get('emas')
 
     context_corr = extract_correlations(correlations)
+    print(context_corr)
     correlation_details = {}
     for param, value in context_corr.items():
 
