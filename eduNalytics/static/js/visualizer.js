@@ -13,7 +13,7 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-console.log(neededData["filtered_corr_data"]);
+console.log(neededData);
 console.log('-'.repeat(50));
 
 const { status, type} = semesterPerformance;
@@ -54,9 +54,6 @@ const steadyMeaning = extractSemesterPerformanceMeanings("steady");
 const exemplaryMeaning = extractSemesterPerformanceMeanings("exemplary");
 
 const correlation_data = neededData["filtered_corr_data"];
-console.log(Array.isArray(correlation_data))
-console.log('-'.repeat(50));
-
 const corrMeaning = ({ key, strength, type }) => {
     if (strength === "Very Strong") {
         return `The relationship between ${key[0]} and ${key[1]} is ${strength} ${
@@ -65,7 +62,6 @@ const corrMeaning = ({ key, strength, type }) => {
     }
     return `The relationship between ${key[0]} and ${key[1]} is ${strength}ly ${type}`;
 };
-
 /*This set of meanings below will be a part of an object that disseminates final messages
   to the frontend-
     This would be used to advise overall on impact of the 
@@ -74,7 +70,54 @@ const corrMeaning = ({ key, strength, type }) => {
                                     might mean a disparity in potential
     (for me to recall faster)*/
 const correlationMeanings = correlation_data.map(item => corrMeaning(item));
-console.log(Array.isArray(correlationMeanings));
+
+const partial_correlation_data = neededData["filtered_par_corr_data"];
+console.log(Array.isArray(partial_correlation_data))
+console.log('-'.repeat(50));
+
+const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
+
+const parCorrMeaning = ({ key, significance, strength, type }) => {
+    const validPredictor = key[0].match(keyRegex);
+    const validKeys = validPredictor && keyRegex.test(key[1]) ? true : false;
+    
+    if (validKeys) {
+      const predictorBranch = validPredictor[1];
+      const predictorSuffix = validPredictor[2] || null;
+      
+      if (!predictorSuffix) {
+        return `The impact of ${key[0]} branch on ${key[1]} is considered ${type}ly ${
+          strength
+        } in nature and also ${significance} statistically`
+      } else if (predictorSuffix === "units") {
+        if (key[1] === 'cgpa') {
+          return type === "Positive" 
+            ? `Student should look to offer more units from ${
+              predictorBranch} as it is beneficial in the long run`
+            : `Student should avoid taking courses from ${
+              predictorBranch} if possible as its long-run negative effect is glaring`
+        }
+        return type === "Positive" 
+          ? `Student should look to offer more units from ${predictorBranch}`
+          : `Student should avoid taking courses from ${predictorBranch} if possible`
+      } else if (predictorSuffix === "count") {
+        if (key[1] === 'cgpa') {
+          return type === "Positive" 
+            ? `Student should look to offer more courses from ${
+              predictorBranch} as it is beneficial in the long run`
+            : `Student should avoid taking courses from ${
+              predictorBranch} if possible as its long-run negative effect is glaring`
+        }
+        return type === "Positive" 
+          ? `Student should look to offer more courses from ${predictorBranch}`
+          : `Student should avoid taking courses from ${predictorBranch} if possible`
+      }
+    }
+}
+
+const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
+console.log(parCorrelationMeanings)
+console.log('-'.repeat(50));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
