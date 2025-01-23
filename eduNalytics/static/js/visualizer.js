@@ -13,10 +13,10 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-console.log(neededData);
+console.log(compulsoryChecks);
 console.log('-'.repeat(50));
 
-const { status, type} = semesterPerformance;
+const { status, type } = semesterPerformance;
 
 const sharedMeanings = {
   "divergence": {
@@ -35,6 +35,15 @@ const sharedMeanings = {
     "exemplary": "Outstanding! You have achieved a perfect GPA! Keep up the great work!"
   }
 };
+
+function processCompulsoryChecksMeaning(checks) {
+  Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
+    console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${
+      cross_type} ${/s$/.test(key) ? "is a long-term occurrence" : ""}`);
+  });
+}
+
+processCompulsoryChecksMeaning(compulsoryChecks);
 
 const extractSemesterPerformanceMeanings = (attribute) => {
   return Object.keys(sharedMeanings).reduce((acc, key) => {
