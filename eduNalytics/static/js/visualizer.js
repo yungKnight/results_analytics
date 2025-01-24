@@ -15,6 +15,8 @@ const {
 
 console.log(compulsoryChecks);
 console.log('-'.repeat(50));
+console.log(studentSpecificChecks);
+console.log('-'.repeat(50));
 
 const { status, type } = semesterPerformance;
 
@@ -38,8 +40,47 @@ const sharedMeanings = {
 
 function processCompulsoryChecksMeaning(checks) {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
-    console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${
-      cross_type} ${/s$/.test(key) ? "is a long-term occurrence" : ""}`);
+    console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${cross_type} ${
+      /s$/.test(key) ? "is a long-term occurrence" : ""}`);
+
+    const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
+    const validCCKey = key.match(compulsoryKeysRegex);
+
+    if (validCCKey) {
+      const comparisonAvg = validCCKey[1];
+      const currAvg = validCCKey[2];
+      const ema = validCCKey[3];
+
+      const multiEmaCheck = ema === 'emas';
+
+      if (!multiEmaCheck) {
+        if (crossover) {
+          cross_type === "Positive" 
+            ? console.log(`The student's most recent performance reflected in ${
+              comparisonAvg} is now better than their ${currAvg} historical adjusted average`)
+            : console.log(`The student's most recent performance reflected in ${
+              comparisonAvg} is now worse than their ${currAvg} historical adjusted average`);
+        } else {
+          console.log("I'm unconcerned with no crossover dataset")
+        }
+      } else {
+        if (crossover) {
+          cross_type === "Positive" 
+            ? console.log(`The student's most recent performance in ${comparisonAvg
+                } adjusted averaging is now better than their ${currAvg} historical adjusted average`)
+            : console.log(`The student's most recent performance in ${comparisonAvg
+                } adjusted averaging is now worse than their ${currAvg} historical adjusted average`);
+        } else {
+          console.log("I'm unconcerned with no crossover dataset")
+        }
+      }
+
+      console.log(comparisonAvg);
+      console.log(currAvg);
+      console.log(ema);
+      console.log('crossover:', crossover);
+      console.log('='.repeat(40));
+    }
   });
 }
 
@@ -125,8 +166,8 @@ const parCorrMeaning = ({ key, significance, strength, type }) => {
 }
 
 const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-console.log(parCorrelationMeanings)
-console.log('-'.repeat(50));
+//console.log(parCorrelationMeanings)
+//console.log('-'.repeat(50));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
