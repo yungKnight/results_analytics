@@ -213,7 +213,6 @@ def calculate_ema(dataframe, parameters, span=3):
     
     return ema_df
 
-
 def calculate_semester_avg_scores(df):
     """
     Calculate the average score for each semester based on all courses in that semester.

@@ -13,7 +13,9 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-console.log(compulsoryChecks);
+console.log(neededData);
+console.log('-'.repeat(50));
+//console.log(compulsoryChecks);
 console.log('-'.repeat(50));
 console.log(studentSpecificChecks);
 console.log('-'.repeat(50));
@@ -38,13 +40,20 @@ const sharedMeanings = {
   }
 };
 
-function processCompulsoryChecksMeaning(checks) {
+const processEmasSemesterChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${cross_type} ${
       /s$/.test(key) ? "is a long-term occurrence" : ""}`);
 
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
+
+    const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
+    const validSSCkey = key.match(personalKeysRegex);
+
+    validSSCkey 
+      ? console.log(`${key} is a valid personal key\n${'='.repeat(44)}`) 
+      : console.log(`${key} is not a valid personal key\n${'='.repeat(44)}`)
 
     if (validCCKey) {
       const comparisonAvg = validCCKey[1];
@@ -75,16 +84,14 @@ function processCompulsoryChecksMeaning(checks) {
         }
       }
 
-      console.log(comparisonAvg);
-      console.log(currAvg);
-      console.log(ema);
       console.log('crossover:', crossover);
       console.log('='.repeat(40));
     }
   });
 }
 
-processCompulsoryChecksMeaning(compulsoryChecks);
+//processEmasSemesterChecks(compulsoryChecks);
+processEmasSemesterChecks(studentSpecificChecks);
 
 const extractSemesterPerformanceMeanings = (attribute) => {
   return Object.keys(sharedMeanings).reduce((acc, key) => {
