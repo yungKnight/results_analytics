@@ -42,8 +42,8 @@ const sharedMeanings = {
 
 const processEmasSemesterChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
-    console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${cross_type} ${
-      /s$/.test(key) ? "is a long-term occurrence" : ""}`);
+    //console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${cross_type} ${
+    //  /s$/.test(key) ? "is a long-term occurrence" : ""}`);
 
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
@@ -51,14 +51,34 @@ const processEmasSemesterChecks = (checks) => {
     const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
     const validSSCkey = key.match(personalKeysRegex);
 
-    validSSCkey 
-      ? console.log(`${key} is a valid personal key\n${'='.repeat(44)}`) 
-      : console.log(`${key} is not a valid personal key\n${'='.repeat(44)}`)
+    if (validSSCkey) {
+      console.log(`${key} is a valid personal key\n${'='.repeat(44)}`);
+      let comparisonAvg = validSSCkey[1];
+      let currAvg = validSSCkey[2];
+
+      console.log(`${validSSCkey[1]}\n${'-'.repeat(44)}`);
+      console.log(`${validSSCkey[2]}\n${'-'.repeat(44)}`);
+      //console.log(`\n${'-'.repeat(44)}`)
+
+      if (crossover) {
+        if (cross_type === "positive") {
+          console.log(`Student is performing better in courses from this branch- ${
+            currAvg} than their ${
+              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+        } else if (cross_type === "negative") {
+          console.log(`Student's performance is getting worse in courses from this branch- ${
+            currAvg} than their ${
+              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+        }
+      }
+    } else {
+      console.log(`${key} is not a valid personal key\n${'='.repeat(44)}`);
+    }
 
     if (validCCKey) {
-      const comparisonAvg = validCCKey[1];
-      const currAvg = validCCKey[2];
-      const ema = validCCKey[3];
+      let comparisonAvg = validCCKey[1];
+      let currAvg = validCCKey[2];
+      let ema = validCCKey[3];
 
       const multiEmaCheck = ema === 'emas';
 
@@ -90,7 +110,7 @@ const processEmasSemesterChecks = (checks) => {
   });
 }
 
-//processEmasSemesterChecks(compulsoryChecks);
+processEmasSemesterChecks(compulsoryChecks);
 processEmasSemesterChecks(studentSpecificChecks);
 
 const extractSemesterPerformanceMeanings = (attribute) => {
