@@ -21,7 +21,6 @@ const {
 console.log('-'.repeat(50));
 
 const { status, type } = semesterPerformance;
-
 const sharedMeanings = {
   "divergence": {
     "positive": "Reinforce that recent performance is improving but advise on sustaining the trend.",
@@ -39,7 +38,6 @@ const sharedMeanings = {
     "exemplary": "Outstanding! You have achieved a perfect GPA! Keep up the great work!"
   }
 };
-
 const semesterPerformanceOverview = ({ status, type }) => {
     if (status === "divergence" &&
      sharedMeanings[status] && 
@@ -58,7 +56,6 @@ const semesterPerformanceOverview = ({ status, type }) => {
           console.log('-'.repeat(45));
     }
 };
-
 semesterPerformanceOverview(semesterPerformance);
 
 const processEmasSemesterChecks = (checks) => {
@@ -70,7 +67,6 @@ const processEmasSemesterChecks = (checks) => {
     const validSSCkey = key.match(personalKeysRegex);
 
     if (validSSCkey) {
-      console.log(`${key} is a valid personal key\n${'='.repeat(44)}`);
       let comparisonAvg = validSSCkey[1];
       let currAvg = validSSCkey[2];
 
@@ -85,8 +81,6 @@ const processEmasSemesterChecks = (checks) => {
               comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
         }
       }
-    } else {
-      console.log(`${key} is not a valid personal key\n${'='.repeat(44)}`);
     }
 
     if (validCCKey) {
@@ -98,34 +92,29 @@ const processEmasSemesterChecks = (checks) => {
 
       if (!multiEmaCheck) {
         if (crossover) {
-          cross_type === "Positive" 
+          cross_type === "positive" 
             ? console.log(`The student's most recent performance reflected in ${
-              comparisonAvg} is now better than their ${currAvg} historical adjusted average`)
+                comparisonAvg} is now better than their ${currAvg} historical adjusted average`)
             : console.log(`The student's most recent performance reflected in ${
-              comparisonAvg} is now worse than their ${currAvg} historical adjusted average`);
-        } else {
-          console.log("I'm unconcerned with no crossover dataset")
+                comparisonAvg} is now worse than their ${currAvg} historical adjusted average`);
         }
+
       } else {
         if (crossover) {
-          cross_type === "Positive" 
+          cross_type === "positive" 
             ? console.log(`The student's most recent performance in ${comparisonAvg
                 } adjusted averaging is now better than their ${currAvg} historical adjusted average`)
             : console.log(`The student's most recent performance in ${comparisonAvg
                 } adjusted averaging is now worse than their ${currAvg} historical adjusted average`);
-        } else {
-          console.log("I'm unconcerned with no crossover dataset")
         }
       }
-
-      console.log('crossover:', crossover);
       console.log('='.repeat(40));
     }
   });
 }
-
 processEmasSemesterChecks(compulsoryChecks);
 processEmasSemesterChecks(studentSpecificChecks);
+
 
 const correlation_data = neededData["filtered_corr_data"];
 const corrMeaning = ({ key, strength, type }) => {
@@ -148,6 +137,7 @@ console.log(`${'=*'.repeat(20)}`);
 console.log(correlationMeanings);
 //console.log(Array.isArray(correlationMeanings))
 //console.log(`${'=*'.repeat(20)}`);
+
 
 const partial_correlation_data = neededData["filtered_par_corr_data"];
 const parCorrMeaning = ({ key, significance, strength, type }) => {
