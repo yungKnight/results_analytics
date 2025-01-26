@@ -13,11 +13,11 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-console.log(neededData);
-console.log('-'.repeat(50));
-//console.log(compulsoryChecks);
-console.log('-'.repeat(50));
-console.log(studentSpecificChecks);
+//console.log(neededData);
+//console.log('-'.repeat(50));
+////console.log(compulsoryChecks);
+//console.log('-'.repeat(50));
+//console.log(studentSpecificChecks);
 console.log('-'.repeat(50));
 
 const { status, type } = semesterPerformance;
@@ -40,11 +40,29 @@ const sharedMeanings = {
   }
 };
 
+const semesterPerformanceOverview = ({ status, type }) => {
+    if (status === "divergence" &&
+     sharedMeanings[status] && 
+     sharedMeanings[status][type]) {
+        console.log(`${sharedMeanings[status][type]}`);
+        console.log('-'.repeat(45));
+    } else if (status === "convergence" &&
+        sharedMeanings[status] && 
+        sharedMeanings[status][type]) {
+          console.log(`${sharedMeanings[status][type]}`);
+          console.log('-'.repeat(45));
+    } else if (status === "At equilibrium state" &&
+        sharedMeanings[status] && 
+        sharedMeanings[status][type]) {
+          console.log(`${sharedMeanings[status][type]}`);
+          console.log('-'.repeat(45));
+    }
+};
+
+semesterPerformanceOverview(semesterPerformance);
+
 const processEmasSemesterChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
-    //console.log(`Key: ${key}, Crossover: ${crossover}, Cross Type: ${cross_type} ${
-    //  /s$/.test(key) ? "is a long-term occurrence" : ""}`);
-
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
 
@@ -55,10 +73,6 @@ const processEmasSemesterChecks = (checks) => {
       console.log(`${key} is a valid personal key\n${'='.repeat(44)}`);
       let comparisonAvg = validSSCkey[1];
       let currAvg = validSSCkey[2];
-
-      console.log(`${validSSCkey[1]}\n${'-'.repeat(44)}`);
-      console.log(`${validSSCkey[2]}\n${'-'.repeat(44)}`);
-      //console.log(`\n${'-'.repeat(44)}`)
 
       if (crossover) {
         if (cross_type === "positive") {
@@ -113,23 +127,6 @@ const processEmasSemesterChecks = (checks) => {
 processEmasSemesterChecks(compulsoryChecks);
 processEmasSemesterChecks(studentSpecificChecks);
 
-const extractSemesterPerformanceMeanings = (attribute) => {
-  return Object.keys(sharedMeanings).reduce((acc, key) => {
-    const meaning = sharedMeanings[key][attribute];
-    meaning ? acc[key] = meaning : acc;
-    return acc;
-  }, {});
-};
-
-/*This set of meanings below will be a part of an object that disseminates final messages
-  to the frontend-
-    This below serves as an overview (for me to recall faster)*/
-const negativeMeanings = extractSemesterPerformanceMeanings("negative");
-const positiveMeanings = extractSemesterPerformanceMeanings("positive"); 
-const flatteningMeaning = extractSemesterPerformanceMeanings("flattening");
-const steadyMeaning = extractSemesterPerformanceMeanings("steady");
-const exemplaryMeaning = extractSemesterPerformanceMeanings("exemplary");
-
 const correlation_data = neededData["filtered_corr_data"];
 const corrMeaning = ({ key, strength, type }) => {
     if (strength === "Very Strong") {
@@ -147,14 +144,15 @@ const corrMeaning = ({ key, strength, type }) => {
                                     might mean a disparity in potential
     (for me to recall faster)*/
 const correlationMeanings = correlation_data.map(item => corrMeaning(item));
+console.log(`${'=*'.repeat(20)}`);
+console.log(correlationMeanings);
+//console.log(Array.isArray(correlationMeanings))
+//console.log(`${'=*'.repeat(20)}`);
 
 const partial_correlation_data = neededData["filtered_par_corr_data"];
-console.log(Array.isArray(partial_correlation_data))
-console.log('-'.repeat(50));
-
-const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
-
 const parCorrMeaning = ({ key, significance, strength, type }) => {
+    const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
+
     const validPredictor = key[0].match(keyRegex);
     const validKeys = validPredictor && keyRegex.test(key[1]) ? true : false;
     
@@ -191,10 +189,10 @@ const parCorrMeaning = ({ key, significance, strength, type }) => {
       }
     }
 }
-
 const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-//console.log(parCorrelationMeanings)
-//console.log('-'.repeat(50));
+console.log(parCorrelationMeanings)
+//console.log(Array.isArray(parCorrelationMeanings))
+console.log('=*'.repeat(20));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
