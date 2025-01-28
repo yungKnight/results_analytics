@@ -13,11 +13,6 @@ const {
   "personal checks": studentSpecificChecks 
 } = neededData["filtered_emas_data"];
 
-//console.log(neededData);
-//console.log('-'.repeat(50));
-////console.log(compulsoryChecks);
-//console.log('-'.repeat(50));
-//console.log(studentSpecificChecks);
 console.log('-'.repeat(50));
 
 const { status, type } = semesterPerformance;
@@ -58,30 +53,10 @@ const semesterPerformanceOverview = ({ status, type }) => {
 };
 semesterPerformanceOverview(semesterPerformance);
 
-const processEmasSemesterChecks = (checks) => {
+const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
-
-    const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
-    const validSSCkey = key.match(personalKeysRegex);
-
-    if (validSSCkey) {
-      let comparisonAvg = validSSCkey[1];
-      let currAvg = validSSCkey[2];
-
-      if (crossover) {
-        if (cross_type === "positive") {
-          console.log(`Student is performing better in courses from this branch- ${
-            currAvg} than their ${
-              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
-        } else if (cross_type === "negative") {
-          console.log(`Student's performance is getting worse in courses from this branch- ${
-            currAvg} than their ${
-              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
-        }
-      }
-    }
 
     if (validCCKey) {
       let comparisonAvg = validCCKey[1];
@@ -93,28 +68,50 @@ const processEmasSemesterChecks = (checks) => {
       if (!multiEmaCheck) {
         if (crossover) {
           cross_type === "positive" 
-            ? console.log(`The student's most recent performance reflected in ${
-                comparisonAvg} is now better than their ${currAvg} historical adjusted average`)
-            : console.log(`The student's most recent performance reflected in ${
-                comparisonAvg} is now worse than their ${currAvg} historical adjusted average`);
+            ? console.log(`Your most recent performance as reflected in ${
+                comparisonAvg} is now better than your ${currAvg === 'cgpa' ? "long-term" : ""} historical adjusted average`)
+            : console.log(`Your most recent performance as reflected in ${
+                comparisonAvg} is now worse than your ${currAvg === 'cgpa' ? "long-term" : ""} historical adjusted average`);
         }
-
       } else {
         if (crossover) {
           cross_type === "positive" 
-            ? console.log(`The student's most recent performance in ${comparisonAvg
-                } adjusted averaging is now better than their ${currAvg} historical adjusted average`)
-            : console.log(`The student's most recent performance in ${comparisonAvg
-                } adjusted averaging is now worse than their ${currAvg} historical adjusted average`);
+            ? console.log(`Your most recent performance in ${comparisonAvg
+                } adjusted averaging is now better than your ${currAvg} historical adjusted average`)
+            : console.log (`Your most recent performance in ${comparisonAvg
+                } adjusted averaging is now worse than your ${currAvg} historical adjusted average`);
         }
       }
       console.log('='.repeat(40));
     }
   });
 }
-processEmasSemesterChecks(compulsoryChecks);
-processEmasSemesterChecks(studentSpecificChecks);
+processCompulsoryChecks(compulsoryChecks);
 
+const processPersonalChecks = (checks) => {
+  Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
+    const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
+    const validSSCkey = key.match(personalKeysRegex);
+
+    if (validSSCkey) {
+      let comparisonAvg = validSSCkey[1];
+      let currAvg = validSSCkey[2];
+
+      if (crossover) {
+        if (cross_type === "positive") {
+          console.log(`You are performing better in courses from this branch- ${
+            currAvg} than your ${
+              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+        } else if (cross_type === "negative") {
+          console.log(`Your performance is getting worse in courses from this branch- ${
+            currAvg} than your ${
+              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+        }
+      }
+    }
+  });
+};
+processPersonalChecks(studentSpecificChecks);
 
 const correlation_data = neededData["filtered_corr_data"];
 const corrMeaning = ({ key, strength, type }) => {
