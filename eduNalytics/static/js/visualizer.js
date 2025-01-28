@@ -150,9 +150,11 @@ const correlationPairMeanings = {
     [expectedVariables[1]]: {
       [expectedVariables[2]]: "Your recent performances have had slightly negative effects on your overall performance, you should be careful not to suffer more loss in performance."
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "You should look to reduce the number of courses being offered to turn drawdown effect around in a short time",
-      [expectedVariables[2]]: "Your recent performances require you to really consider reducing the number of courses being offered to turn long-term negative effect around."
+    [expectedVariables[1]]: {
+      [expectedVariables[3]]: "You should look to reduce the number of courses being offered to turn drawdown effect around in a short time"
+    },
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "Your recent performances require you to really consider reducing the number of courses being offered to turn long-term negative effect around."
     }
   },
   "slightly positive": {
@@ -193,14 +195,23 @@ const correlationPairMeanings = {
   },
 };
 
-const correlation_data = neededData["filtered_corr_data"];
+const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
 const extractCorrMeaning = ({ key, strength, type }) => {
-    if (strength === "Very Strong") {
-        return `The relationship between ${key[0]} and ${key[1]} is ${strength} ${
-            type === "Negative" ? "but" : "and"
-        } ${type}`;
-    }
-    return `The relationship between ${key[0]} and ${key[1]} is ${strength}ly ${type}`;
+  if (!expectedVariables.includes(key[0]) || !expectedVariables.includes(key[1])) {
+    return "Invalid correlation key.";
+  }
+
+  let correlationType;
+
+  if (strength === "Moderate") {
+    correlationType = type === "Negative" ? "slightly negative" : "slightly positive";
+  } else if (strength === "Strong") {
+    correlationType = type === "Negative" ? "negative" : "positive";
+  } else if (strength === "Very Strong") {
+    correlationType = type === "Negative" ? "very negative" : "very positive";
+  }
+
+  return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
 };
 
 /*This set of meanings below will be a part of an object that disseminates final messages
