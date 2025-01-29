@@ -55,9 +55,11 @@ const semesterPerformanceOverview = ({ status, type }) => {
           console.log('-'.repeat(45));
     }
 };
+//const semesterOverview = semesterPerformanceOverview(semesterPerformance);
+//console.log(semesterOverview);
 
 const processCompulsoryChecks = (checks) => {
-  const messages = [];
+  const compulsoryMessages = [];
   
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
@@ -69,7 +71,7 @@ const processCompulsoryChecks = (checks) => {
       const multiEmaCheck = ema === 'emas';
       
       if (!multiEmaCheck && crossover) {
-        messages.push(
+        compulsoryMessages.push(
           cross_type === "positive" 
             ? `Your latest performance in ${comparisonAvg} has improved beyond your ${
                 currAvg === 'cgpa' 
@@ -79,7 +81,7 @@ const processCompulsoryChecks = (checks) => {
                   ? "long-term" : ""} historical average. Consider reviewing your study strategies.`
         );
       } else if (multiEmaCheck && crossover) {
-        messages.push(
+        compulsoryMessages.push(
           cross_type === "positive" 
             ? `Your recent performance in ${comparisonAvg} has surpassed your ${
                 currAvg} historical trend. Keep doing what you have!`
@@ -89,14 +91,15 @@ const processCompulsoryChecks = (checks) => {
       }
     }
   });
-  return messages;
+  return compulsoryMessages;
 };
-
 const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
-console.log(typeof compulsoryChecks);
 console.log(compulsoryChecksMeanings);
 console.log(typeof compulsoryChecksMeanings);
-/*const processPersonalChecks = (checks) => {
+
+const processPersonalChecks = (checks) => {
+  const personalMessages = [];
+
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
     const validSSCkey = key.match(personalKeysRegex);
@@ -107,19 +110,22 @@ console.log(typeof compulsoryChecksMeanings);
 
       if (crossover) {
         if (cross_type === "positive") {
-          console.log(`You are performing better in courses from this branch- ${
-            currAvg} than your ${
-              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+          personalMessages.push(`Great job! Your performance in ${currAvg} courses has surpassed your ${
+            comparisonAvg === "cgpa" 
+              ? "long-term" : ""} average. Keep building on this progress!`);
         } else if (cross_type === "negative") {
-          console.log(`Your performance is getting worse in courses from this branch- ${
-            currAvg} than your ${
-              comparisonAvg === "cgpa" ? "long-term" : ""} adjusted average`);
+          personalMessages.push(`Your performance in ${currAvg} courses has dropped below your ${
+            comparisonAvg === "cgpa" 
+              ? "long-term" : ""} average. Take action to get back on track.`);
         }
       }
     }
   });
+  return personalMessages;
 };
-processPersonalChecks(studentSpecificChecks);*/
+const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
+console.log(personalChecksMeanings)
+console.log(typeof personalChecksMeanings);
 
 const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
 const correlationPairMeanings = {
@@ -203,7 +209,6 @@ const correlationPairMeanings = {
     }
   }
 };
-
 const extractCorrMeaning = ({ key, strength, type }) => {
   if (!expectedVariables.includes(key[0]) || !expectedVariables.includes(key[1])) {
     return;
@@ -221,6 +226,11 @@ const extractCorrMeaning = ({ key, strength, type }) => {
 
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
 };
+//const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
+//console.log(`${'=*'.repeat(20)}`);
+//console.log(correlationMeanings);
+//console.log(`${'+'.repeat(20)}`);
+
 const parCorrMeaning = ({ key, significance, strength, type }) => {
     const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
     const validPredictor = key[0].match(keyRegex);
@@ -272,22 +282,18 @@ const parCorrMeaning = ({ key, significance, strength, type }) => {
       }
     }
 };
-/*This set of meanings below will be a part of an object that disseminates final messages
+//const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
+//console.log(parCorrelationMeanings)
+console.log('=*'.repeat(20));
+
+
+/*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
     This would be used to advise overall on impact of the 
     total units and courses offered per semester with the ones against cgpa the tests
     for some kind of divergence e.g if any of the key[1] contains 'cgpa' and an inverse value
                                     might mean a disparity in potential
     (for me to recall faster)*/
-//const semesterOverview = semesterPerformanceOverview(semesterPerformance);
-//console.log(semesterOverview);
-//const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-//console.log(`${'=*'.repeat(20)}`);
-//console.log(correlationMeanings);
-//console.log(`${'+'.repeat(20)}`);
-//const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-//console.log(parCorrelationMeanings)
-console.log('=*'.repeat(20));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
