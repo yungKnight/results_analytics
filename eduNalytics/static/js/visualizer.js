@@ -7,33 +7,37 @@ const MoreOfOrNo =document.getElementById('toDoMoreOrNot');
 
 advisory.style.display = "none";
 
+const emas_data = neededData ? neededData["filtered_emas_data"] : null;
+const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
+const partial_correlation_data = neededData ? neededData["filtered_par_corr_data"] : null;
+
 const { 
   "semester performance": semesterPerformance, 
   "necessary checks": compulsoryChecks, 
   "personal checks": studentSpecificChecks 
-} = neededData["filtered_emas_data"];
+} = emas_data
 console.log(neededData);
 console.log('-'.repeat(50));
 
 const { status, type } = semesterPerformance;
 const semesterPerformanceMeanings = {
   "divergence": {
-    "positive": "Reinforce that recent performance is improving but advise on sustaining the trend.",
-    "negative": "Warn the student about the risk of misalignment between recent performance and overall trends and suggest corrective measures."
+    "positive": "Your recent performance is improving! Stay consistent and continue reinforcing strong study habits.",
+    "negative": "Your recent performance is deviating from overall trends. Identify weak areas and take corrective action to stay on track."
   },
   "convergence": {
-    "positive": "Encourage the student by highlighting their improving consistency.",
-    "negative": "Alert the student to a potential decline and suggest actionable steps, such as seeking academic support or focusing on specific subjects.",
-    "flattening": "Student's perormance is starting to improve signaling potential to get better in the long run"
+    "positive": "Great progress! Your consistency is improving, maintain focus and keep building on current momentum.",
+    "negative": "Your performance is declining toward a concerning trend. Consider seeking academic support or prioritizing key subjects.",
+    "flattening": "Your performance is beginning to stabilize with signs of improvement. Stay dedicated to see long-term gains."
   },
-  "At equilibrium state": {
-    "positive": "The relationship remains stable, the student's semester GPA is higher than the previous semester.",
-    "negative": "The relationship remains stable, but the student's semester GPA is lower than the previous semester.",
-    "steady": "The student is in a steady state and strategies to help them from dipping should be made.",
-    "exemplary": "Outstanding! You have achieved a perfect GPA! Keep up the great work!"
+  "equilibrium": {
+    "positive": "You're maintaining a stable trend with a higher semester GPA than before. Keep up the good work!",
+    "negative": "Your performance is stable, but your semester GPA has dropped. Reflect on challenges and adjust strategies accordingly.",
+    "steady": "You're in a steady state. Implement strategies to prevent dips and sustain progress.",
+    "exemplary": "Outstanding achievement! You've attained a perfect GPA—continue your excellent efforts!"
   }
 };
-/*const semesterPerformanceOverview = ({ status, type }) => {
+const semesterPerformanceOverview = ({ status, type }) => {
     if (status === "divergence" &&
      semesterPerformanceMeanings[status] && 
      semesterPerformanceMeanings[status][type]) {
@@ -51,7 +55,6 @@ const semesterPerformanceMeanings = {
           console.log('-'.repeat(45));
     }
 };
-semesterPerformanceOverview(semesterPerformance);
 
 const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -86,8 +89,10 @@ const processCompulsoryChecks = (checks) => {
     }
   });
 }
-processCompulsoryChecks(compulsoryChecks);
-const processPersonalChecks = (checks) => {
+const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
+console.log(compulsoryChecks);
+
+/*const processPersonalChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
     const validSSCkey = key.match(personalKeysRegex);
@@ -113,92 +118,91 @@ const processPersonalChecks = (checks) => {
 processPersonalChecks(studentSpecificChecks);*/
 
 const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
-console.log(expectedVariables[0]);
-
 const correlationPairMeanings = {
   "very negative": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You should seriously consider reducing the total units being offered.",
-      [expectedVariables[2]]: "You should seriously consider reducing the total units being offered in the long term."
+      [expectedVariables[1]]: "Strongly consider reducing your course load to prevent further academic strain.",
+      [expectedVariables[2]]: "To avoid long-term setbacks, consider taking fewer units moving forward."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have had devastating effects on your overall performance, you should do better!"
+      [expectedVariables[2]]: "Your recent performance has significantly impacted your overall GPA. Immediate improvement is crucial.",
+      [expectedVariables[3]]: "Reduce your course load now to prevent further performance decline.",
+
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "Your recent performances demand you reduce the number of courses being offered to reduce drawdown immediately.",
-      [expectedVariables[2]]: "Your recent performances demand you reduce the number of courses being offered to reduce long-term damage."
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "Lowering your course load can help mitigate long-term academic risks."
     }
   },
   "negative": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You should look to reduce the total units for courses being offered whenever possible.",
-      [expectedVariables[2]]: "You should look to reduce the total units for courses being offered whenever possible in the long term."
+      [expectedVariables[1]]: "Consider reducing your course load to maintain academic balance.",
+      [expectedVariables[2]]: "Reducing total units may help improve long-term performance."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have had negative effects on your overall performance, you should do better!"
+      [expectedVariables[2]]: "Your recent performance has negatively affected your GPA. Take steps to improve.",
+      [expectedVariables[3]]: "Reducing courses soon may help prevent further GPA decline.",
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "Your recent performances require you to reduce the number of courses being offered to reduce drawdown soon.",
-      [expectedVariables[2]]: "Your recent performances require you to reduce the number of courses being offered to quickly mitigate impact on long-term performance."
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "A lower course load could improve your long-term academic performance."
     }
   },
   "slightly negative": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You should consider reducing the total units for courses being offered.",
-      [expectedVariables[2]]: "You should consider reducing the total units for courses being offered in the long term."
+      [expectedVariables[1]]: "You may benefit from reducing your course load slightly.",
+      [expectedVariables[2]]: "A small reduction in units may support long-term improvement."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have had slightly negative effects on your overall performance, you should be careful not to suffer more loss in performance."
-    },
-    [expectedVariables[1]]: {
-      [expectedVariables[3]]: "You should look to reduce the number of courses being offered to turn drawdown effect around in a short time"
+      [expectedVariables[2]]: "Your performance is slightly declining. Stay cautious and make adjustments as needed.",
+      [expectedVariables[3]]: "Reducing your course load now may help reverse short-term performance dips."  
     },
     [expectedVariables[2]]: {
-      [expectedVariables[3]]: "Your recent performances require you to really consider reducing the number of courses being offered to turn long-term negative effect around."
+      [expectedVariables[3]]: "Consider reducing your courses to counteract long-term negative effects." 
     }
   },
   "slightly positive": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You should consider increasing the total units for courses being offered.",
-      [expectedVariables[2]]: "You should consider increasing the total units for courses being offered in the long term."
+      [expectedVariables[1]]: "Consider increasing your course load slightly to take advantage of your progress.",
+      [expectedVariables[2]]: "If sustained, adding more units could be beneficial in the long run."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have had slightly positive effects on your overall performance, keep it up!"
+      [expectedVariables[2]]: "Your recent performance is slightly improving. Keep building on this progress!",
+      [expectedVariables[3]]: "Increasing your course load now could help maximize your momentum." 
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "You should look to increase the number of courses being offered to capitalize on current slight positive trend you are on",
-      [expectedVariables[2]]: "Your recent performances can increase your overall performance if capitalized on in the short-term if you increase number of courses being offered in the coming semesters."}
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "Sustained performance improvements may allow you to handle more courses next semester."
+    }
   },
   "positive": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You have been performing well recently and could really consider adding more units on if necessary.",
-      [expectedVariables[2]]: "You have been performing well recently and could really consider adding more units on if necessary for long-term benefit."
+      [expectedVariables[1]]: "Your performance is strong, consider adding more courses if feasible.",
+      [expectedVariables[2]]: "With consistent performance, adding more units may benefit your long-term growth."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have had positive effects on your overall performance, well done!"
+      [expectedVariables[2]]: "Great job! Your performance is improving overall, stay on this path.",
+      [expectedVariables[3]]: "Expanding your course load now could help accelerate academic progress." 
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "You should look to increase the number of courses being offered to capitalize on current slight positive trend you are on",
-      [expectedVariables[2]]: "Your recent performances can serve as boost to your overall performance if capitalized on in the short-term by increasing number of courses being offered in the coming semesters."}
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "Sustained success may allow you to take on more challenging courses in the future."    
+    }
   },
   "very positive": {
     [expectedVariables[0]]: {
-      [expectedVariables[1]]: "You have been performing very well recently and could really consider adding more units on if necessary.",
-      [expectedVariables[2]]: "You have been performing very well recently and could really consider adding more units on if necessary for long-term benefit."
+      [expectedVariables[1]]: "You're excelling! If manageable, consider adding more courses to challenge yourself.",
+      [expectedVariables[2]]: "Your strong performance suggests you could take on more courses for long-term benefits."
     },
     [expectedVariables[1]]: {
-      [expectedVariables[2]]: "Your recent performances have being very positive on your overall performance. Keep it going, Thoth roots for you."
+      [expectedVariables[2]]: "Outstanding work! Your performance is consistently improving, keep pushing forward.",
+      [expectedVariables[3]]: "Consider increasing your course load to fully leverage your academic growth."
     },
-    [expectedVariables[3]]: {
-      [expectedVariables[1]]: "You should look to increase the number of courses being offered to capitalize on current strong positive trend you are on",
-      [expectedVariables[2]]: "Your recent outstanding performances can serve as boost to your overall performance if capitalized on in the short-term by increasing number of courses being offered in the coming semesters."}
-  },
+    [expectedVariables[2]]: {
+      [expectedVariables[3]]: "Your exceptional performance could support a more ambitious course load next semester."    
+    }
+  }
 };
 
-const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
 const extractCorrMeaning = ({ key, strength, type }) => {
   if (!expectedVariables.includes(key[0]) || !expectedVariables.includes(key[1])) {
-    return "Invalid correlation key.";
+    return;
   }
 
   let correlationType;
@@ -213,7 +217,57 @@ const extractCorrMeaning = ({ key, strength, type }) => {
 
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
 };
+const parCorrMeaning = ({ key, significance, strength, type }) => {
+    const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
+    const validPredictor = key[0].match(keyRegex);
+    const validKeys = validPredictor && keyRegex.test(key[1]);
 
+    if (validKeys) {
+      const predictorBranch = validPredictor[1];
+      const predictorSuffix = validPredictor[2] || null;
+
+      if (!predictorSuffix) {
+        return {
+          message: `The influence of ${key[0]} on ${key[1]} is ${
+            type.toLowerCase()}ly ${strength} and statistically ${significance}.`,
+          suffix: predictorSuffix
+        }
+      } 
+      
+      if (predictorSuffix === "units") {
+        if (key[1] === 'cgpa') {
+          return {
+            message: type === "Positive" 
+              ? `Taking more units from ${predictorBranch} can benefit your long-term performance.`
+              : `Reducing courses from ${predictorBranch} may help avoid long-term negative effects.`,
+            suffix: predictorSuffix
+          };
+        }
+        return {
+          message: type === "Positive" 
+            ? `Consider taking more units from ${predictorBranch}.`
+            : `It may be beneficial to limit courses from ${predictorBranch}.`,
+          suffix: predictorSuffix
+        };
+      } 
+      if (predictorSuffix === "count") {
+        if (key[1] === 'cgpa') {
+          return {
+            message: type === "Positive" 
+              ? `Adding more courses from ${predictorBranch} could boost your long-term performance.`
+              : `Avoiding courses from ${predictorBranch} may help prevent negative academic impact.`,
+            suffix: predictorSuffix
+          };
+        }
+        return {
+          message: type === "Positive" 
+            ? `Consider taking more courses from ${predictorBranch}.`
+            : `Reducing courses from ${predictorBranch} might be a good strategy.`,
+          suffix: predictorSuffix
+        };
+      }
+    }
+};
 /*This set of meanings below will be a part of an object that disseminates final messages
   to the frontend-
     This would be used to advise overall on impact of the 
@@ -221,54 +275,15 @@ const extractCorrMeaning = ({ key, strength, type }) => {
     for some kind of divergence e.g if any of the key[1] contains 'cgpa' and an inverse value
                                     might mean a disparity in potential
     (for me to recall faster)*/
-const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-console.log(`${'=*'.repeat(20)}`);
-console.log(correlationMeanings);
-console.log(`${'+'.repeat(20)}`);
-
-const partial_correlation_data = neededData["filtered_par_corr_data"];
-const parCorrMeaning = ({ key, significance, strength, type }) => {
-    const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
-
-    const validPredictor = key[0].match(keyRegex);
-    const validKeys = validPredictor && keyRegex.test(key[1]) ? true : false;
-    
-    if (validKeys) {
-      const predictorBranch = validPredictor[1];
-      const predictorSuffix = validPredictor[2] || null;
-      
-      if (!predictorSuffix) {
-        return `The impact of ${key[0]} branch on ${key[1]} is considered ${type}ly ${
-          strength
-        } in nature and also ${significance} statistically`
-      } else if (predictorSuffix === "units") {
-        if (key[1] === 'cgpa') {
-          return type === "Positive" 
-            ? `Student should look to offer more units from ${
-              predictorBranch} as it is beneficial in the long run`
-            : `Student should avoid taking courses from ${
-              predictorBranch} if possible as its long-run negative effect is glaring`
-        }
-        return type === "Positive" 
-          ? `Student should look to offer more units from ${predictorBranch}`
-          : `Student should avoid taking courses from ${predictorBranch} if possible`
-      } else if (predictorSuffix === "count") {
-        if (key[1] === 'cgpa') {
-          return type === "Positive" 
-            ? `Student should look to offer more courses from ${
-              predictorBranch} as it is beneficial in the long run`
-            : `Student should avoid taking courses from ${
-              predictorBranch} if possible as its long-run negative effect is glaring`
-        }
-        return type === "Positive" 
-          ? `Student should look to offer more courses from ${predictorBranch}`
-          : `Student should avoid taking courses from ${predictorBranch} if possible`
-      }
-    }
-}
-const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
+//const semesterOverview = semesterPerformanceOverview(semesterPerformance);
+//console.log(semesterOverview);
+//const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
+//console.log(`${'=*'.repeat(20)}`);
+//console.log(correlationMeanings);
+//console.log(`${'+'.repeat(20)}`);
+//const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
 //console.log(parCorrelationMeanings)
-//console.log('=*'.repeat(20));
+console.log('=*'.repeat(20));
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
