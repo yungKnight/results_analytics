@@ -57,41 +57,45 @@ const semesterPerformanceOverview = ({ status, type }) => {
 };
 
 const processCompulsoryChecks = (checks) => {
+  const messages = [];
+  
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
-
     if (validCCKey) {
       let comparisonAvg = validCCKey[1];
       let currAvg = validCCKey[2];
       let ema = validCCKey[3];
-
       const multiEmaCheck = ema === 'emas';
-
-      if (!multiEmaCheck) {
-        if (crossover) {
+      
+      if (!multiEmaCheck && crossover) {
+        messages.push(
           cross_type === "positive" 
-            ? console.log(`Your most recent performance as reflected in ${
-                comparisonAvg} is now better than your ${currAvg === 'cgpa' ? "long-term" : ""} historical adjusted average`)
-            : console.log(`Your most recent performance as reflected in ${
-                comparisonAvg} is now worse than your ${currAvg === 'cgpa' ? "long-term" : ""} historical adjusted average`);
-        }
-      } else {
-        if (crossover) {
+            ? `Your latest performance in ${comparisonAvg} has improved beyond your ${
+                currAvg === 'cgpa' 
+                  ? "long-term" : ""} historical average. Keep up the progress!`
+            : `Your latest performance in ${comparisonAvg} has dropped below your ${
+                currAvg === 'cgpa' 
+                  ? "long-term" : ""} historical average. Consider reviewing your study strategies.`
+        );
+      } else if (multiEmaCheck && crossover) {
+        messages.push(
           cross_type === "positive" 
-            ? console.log(`Your most recent performance in ${comparisonAvg
-                } adjusted averaging is now better than your ${currAvg} historical adjusted average`)
-            : console.log (`Your most recent performance in ${comparisonAvg
-                } adjusted averaging is now worse than your ${currAvg} historical adjusted average`);
-        }
+            ? `Your recent performance in ${comparisonAvg} has surpassed your ${
+                currAvg} historical trend. Keep doing what you have!`
+            : `Your recent performance in ${comparisonAvg} has fallen below your ${
+                currAvg} historical trend. Take necessary action(s) to improve.`
+        );
       }
-      console.log('='.repeat(40));
     }
   });
-}
-const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
-console.log(compulsoryChecks);
+  return messages;
+};
 
+const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
+console.log(typeof compulsoryChecks);
+console.log(compulsoryChecksMeanings);
+console.log(typeof compulsoryChecksMeanings);
 /*const processPersonalChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
