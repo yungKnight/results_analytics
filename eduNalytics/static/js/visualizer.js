@@ -41,22 +41,24 @@ const semesterPerformanceOverview = ({ status, type }) => {
     if (status === "divergence" &&
      semesterPerformanceMeanings[status] && 
      semesterPerformanceMeanings[status][type]) {
-        console.log(`${semesterPerformanceMeanings[status][type]}`);
+        return `${semesterPerformanceMeanings[status][type]}`;
         console.log('-'.repeat(45));
     } else if (status === "convergence" &&
         semesterPerformanceMeanings[status] && 
         semesterPerformanceMeanings[status][type]) {
-          console.log(`${semesterPerformanceMeanings[status][type]}`);
+          return `${semesterPerformanceMeanings[status][type]}`;
           console.log('-'.repeat(45));
     } else if (status === "At equilibrium state" &&
         semesterPerformanceMeanings[status] && 
         semesterPerformanceMeanings[status][type]) {
-          console.log(`${semesterPerformanceMeanings[status][type]}`);
+          return `${semesterPerformanceMeanings[status][type]}`;
           console.log('-'.repeat(45));
     }
 };
-//const semesterOverview = semesterPerformanceOverview(semesterPerformance);
-//console.log(semesterOverview);
+const semesterOverview = semesterPerformanceOverview(semesterPerformance);
+console.log("semester overview: \n")
+console.log('-'.repeat(15))
+console.log(semesterOverview);
 
 const processCompulsoryChecks = (checks) => {
   const compulsoryMessages = [];
@@ -94,6 +96,8 @@ const processCompulsoryChecks = (checks) => {
   return compulsoryMessages;
 };
 const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
+console.log("semester compulsory checks: \n")
+console.log('-'.repeat(15))
 console.log(compulsoryChecksMeanings);
 console.log(typeof compulsoryChecksMeanings);
 
@@ -112,11 +116,11 @@ const processPersonalChecks = (checks) => {
         if (cross_type === "positive") {
           personalMessages.push(`Great job! Your performance in ${currAvg} courses has surpassed your ${
             comparisonAvg === "cgpa" 
-              ? "long-term" : ""} average. Keep building on this progress!`);
+              ? "long-term " : ""}average. Keep building on this progress!`);
         } else if (cross_type === "negative") {
           personalMessages.push(`Your performance in ${currAvg} courses has dropped below your ${
             comparisonAvg === "cgpa" 
-              ? "long-term" : ""} average. Take action to get back on track.`);
+              ? "long-term " : ""}average. Take action to get back on track.`);
         }
       }
     }
@@ -124,6 +128,8 @@ const processPersonalChecks = (checks) => {
   return personalMessages;
 };
 const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
+console.log("student specific checks: \n")
+console.log('-'.repeat(15))
 console.log(personalChecksMeanings)
 console.log(typeof personalChecksMeanings);
 
@@ -226,10 +232,12 @@ const extractCorrMeaning = ({ key, strength, type }) => {
 
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
 };
-//const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-//console.log(`${'=*'.repeat(20)}`);
-//console.log(correlationMeanings);
-//console.log(`${'+'.repeat(20)}`);
+const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
+console.log(`${'=*'.repeat(20)}`);
+console.log("Correlation inference:")
+console.log('-'.repeat(15))
+console.log(correlationMeanings);
+console.log(`${'+'.repeat(20)}`);
 
 const parCorrMeaning = ({ key, significance, strength, type }) => {
     const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
@@ -282,8 +290,10 @@ const parCorrMeaning = ({ key, significance, strength, type }) => {
       }
     }
 };
-//const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-//console.log(parCorrelationMeanings)
+const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
+console.log("Partial Correlation inference:")
+console.log('-'.repeat(15))
+console.log(parCorrelationMeanings)
 console.log('=*'.repeat(20));
 
 
