@@ -19,8 +19,9 @@ const {
 console.log(neededData);
 console.log('-'.repeat(50));
 
-const { status, type } = semesterPerformance;
-const semesterPerformanceMeanings = {
+if (!semesterPerformance) {
+  const { status, type } = semesterPerformance;
+  const semesterPerformanceMeanings = {
   "divergence": {
     "positive": "Your recent performance is improving! Stay consistent and continue reinforcing strong study habits.",
     "negative": "Your recent performance is deviating from overall trends. Identify weak areas and take corrective action to stay on track."
@@ -36,8 +37,8 @@ const semesterPerformanceMeanings = {
     "steady": "You're in a steady state. Implement strategies to prevent dips and sustain progress.",
     "exemplary": "Outstanding achievement! You've attained a perfect GPA—continue your excellent efforts!"
   }
-};
-const semesterPerformanceOverview = ({ status, type }) => {
+  };
+  const semesterPerformanceOverview = ({ status, type }) => {
     if (status === "divergence" &&
      semesterPerformanceMeanings[status] && 
      semesterPerformanceMeanings[status][type]) {
@@ -54,13 +55,15 @@ const semesterPerformanceOverview = ({ status, type }) => {
           return `${semesterPerformanceMeanings[status][type]}`;
           console.log('-'.repeat(45));
     }
-};
-const semesterOverview = semesterPerformanceOverview(semesterPerformance);
-console.log("semester overview: \n")
-console.log('-'.repeat(15))
-console.log(semesterOverview);
+  };
+  const semesterOverview = semesterPerformanceOverview(semesterPerformance);
+  console.log("semester overview: \n")
+  console.log('-'.repeat(15))
+  console.log(semesterOverview);
+}
 
-const processCompulsoryChecks = (checks) => {
+if (!compulsoryChecks) {
+  const processCompulsoryChecks = (checks) => {
   const compulsoryMessages = [];
   
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -94,14 +97,16 @@ const processCompulsoryChecks = (checks) => {
     }
   });
   return compulsoryMessages;
-};
-const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
-console.log("semester compulsory checks: \n")
-console.log('-'.repeat(15))
-console.log(compulsoryChecksMeanings);
-console.log(typeof compulsoryChecksMeanings);
+  };
+  const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
+  console.log("semester compulsory checks: \n")
+  console.log('-'.repeat(15))
+  console.log(compulsoryChecksMeanings);
+  console.log(typeof compulsoryChecksMeanings);
+}
 
-const processPersonalChecks = (checks) => {
+if (!studentSpecificChecks) {
+  const processPersonalChecks = (checks) => {
   const personalMessages = [];
 
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -126,15 +131,17 @@ const processPersonalChecks = (checks) => {
     }
   });
   return personalMessages;
-};
-const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
-console.log("student specific checks: \n")
-console.log('-'.repeat(15))
-console.log(personalChecksMeanings)
-console.log(typeof personalChecksMeanings);
+  };
+  const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
+  console.log("student specific checks: \n")
+  console.log('-'.repeat(15))
+  console.log(personalChecksMeanings)
+  console.log(typeof personalChecksMeanings);
+}
 
-const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
-const correlationPairMeanings = {
+if (correlation_data != []) {
+  const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
+  const correlationPairMeanings = {
   "very negative": {
     [expectedVariables[0]]: {
       [expectedVariables[1]]: "Strongly consider reducing your course load to prevent further academic strain.",
@@ -214,8 +221,8 @@ const correlationPairMeanings = {
       [expectedVariables[3]]: "Your exceptional performance could support a more ambitious course load next semester."    
     }
   }
-};
-const extractCorrMeaning = ({ key, strength, type }) => {
+  };
+  const extractCorrMeaning = ({ key, strength, type }) => {
   if (!expectedVariables.includes(key[0]) || !expectedVariables.includes(key[1])) {
     return;
   }
@@ -231,15 +238,17 @@ const extractCorrMeaning = ({ key, strength, type }) => {
   }
 
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
-};
-const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-console.log(`${'=*'.repeat(20)}`);
-console.log("Correlation inference:")
-console.log('-'.repeat(15))
-console.log(correlationMeanings);
-console.log(`${'+'.repeat(20)}`);
+  };
+  const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
+  console.log(`${'=*'.repeat(20)}`);
+  console.log("Correlation inference:")
+  console.log('-'.repeat(15))
+  console.log(correlationMeanings);
+  console.log(`${'+'.repeat(20)}`);
+}
 
-const parCorrMeaning = ({ key, significance, strength, type }) => {
+if (partial_correlation_data) {
+  const parCorrMeaning = ({ key, significance, strength, type }) => {
     const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
     const validPredictor = key[0].match(keyRegex);
     const validKeys = validPredictor && keyRegex.test(key[1]);
@@ -289,12 +298,13 @@ const parCorrMeaning = ({ key, significance, strength, type }) => {
         };
       }
     }
-};
-const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-console.log("Partial Correlation inference:")
-console.log('-'.repeat(15))
-console.log(parCorrelationMeanings)
-console.log('=*'.repeat(20));
+  };
+  const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
+  console.log("Partial Correlation inference:")
+  console.log('-'.repeat(15))
+  console.log(parCorrelationMeanings)
+  console.log('=*'.repeat(20));
+}
 
 
 /*This set of meanings above will be a part of an object that disseminates final messages
@@ -305,9 +315,17 @@ console.log('=*'.repeat(20));
                                     might mean a disparity in potential
     (for me to recall faster)*/
 
+/* The function below is would be responsible for sending the inferences and in what manner to
+  the frontend */
+
+const parseToView = () => {
+
+}
+
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display= "none";
   advisory.style.display = "block";
+  parseToView
 });
 
 minimizeBtn.addEventListener('click', () => {
