@@ -5,6 +5,7 @@ const studentSpecificPerformance = document.getElementById('studentSpecificPerfo
 const studentSemesterPerformance = document.getElementById('studentSemesterPerformance');
 const MoreOfOrNo =document.getElementById('toDoMoreOrNot');
 
+let semesterOverview;
 advisory.style.display = "none";
 
 const emas_data = neededData ? neededData["filtered_emas_data"] : null;
@@ -19,7 +20,7 @@ const {
 console.log(neededData);
 console.log('-'.repeat(50));
 
-if (!semesterPerformance) {
+if (semesterPerformance) {
   const { status, type } = semesterPerformance;
   const semesterPerformanceMeanings = {
   "divergence": {
@@ -29,9 +30,9 @@ if (!semesterPerformance) {
   "convergence": {
     "positive": "Great progress! Your consistency is improving, maintain focus and keep building on current momentum.",
     "negative": "Your performance is declining toward a concerning trend. Consider seeking academic support or prioritizing key subjects.",
-    "flattening": "Your performance is beginning to stabilize with signs of improvement. Stay dedicated to see long-term gains."
+    "flattening": "Your performance is beginning to stabilize with potential to get better. Stay dedicated to see long-term gains."
   },
-  "equilibrium": {
+  "At equilibrium state": {
     "positive": "You're maintaining a stable trend with a higher semester GPA than before. Keep up the good work!",
     "negative": "Your performance is stable, but your semester GPA has dropped. Reflect on challenges and adjust strategies accordingly.",
     "steady": "You're in a steady state. Implement strategies to prevent dips and sustain progress.",
@@ -43,24 +44,23 @@ if (!semesterPerformance) {
      semesterPerformanceMeanings[status] && 
      semesterPerformanceMeanings[status][type]) {
         return `${semesterPerformanceMeanings[status][type]}`;
-        console.log('-'.repeat(45));
     } else if (status === "convergence" &&
         semesterPerformanceMeanings[status] && 
         semesterPerformanceMeanings[status][type]) {
           return `${semesterPerformanceMeanings[status][type]}`;
-          console.log('-'.repeat(45));
     } else if (status === "At equilibrium state" &&
         semesterPerformanceMeanings[status] && 
         semesterPerformanceMeanings[status][type]) {
           return `${semesterPerformanceMeanings[status][type]}`;
-          console.log('-'.repeat(45));
     }
   };
-  const semesterOverview = semesterPerformanceOverview(semesterPerformance);
-  console.log("semester overview: \n")
-  console.log('-'.repeat(15))
-  console.log(semesterOverview);
+  semesterOverview = semesterPerformanceOverview(semesterPerformance);
 }
+console.log("semester overview: \n")
+console.log('-'.repeat(15))
+console.log(semesterOverview);
+console.log(typeof semesterOverview);
+console.log('-'.repeat(45))
 
 if (!compulsoryChecks) {
   const processCompulsoryChecks = (checks) => {
@@ -99,10 +99,10 @@ if (!compulsoryChecks) {
   return compulsoryMessages;
   };
   const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
-  console.log("semester compulsory checks: \n")
-  console.log('-'.repeat(15))
-  console.log(compulsoryChecksMeanings);
-  console.log(typeof compulsoryChecksMeanings);
+  //console.log("semester compulsory checks: \n")
+  //console.log('-'.repeat(15))
+  //console.log(compulsoryChecksMeanings);
+  //console.log(typeof compulsoryChecksMeanings);
 }
 
 if (!studentSpecificChecks) {
@@ -133,10 +133,10 @@ if (!studentSpecificChecks) {
   return personalMessages;
   };
   const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
-  console.log("student specific checks: \n")
-  console.log('-'.repeat(15))
-  console.log(personalChecksMeanings)
-  console.log(typeof personalChecksMeanings);
+  //console.log("student specific checks: \n")
+  //console.log('-'.repeat(15))
+  //console.log(personalChecksMeanings)
+  //console.log(typeof personalChecksMeanings);
 }
 
 if (correlation_data != []) {
@@ -240,11 +240,11 @@ if (correlation_data != []) {
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
   };
   const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-  console.log(`${'=*'.repeat(20)}`);
-  console.log("Correlation inference:")
-  console.log('-'.repeat(15))
-  console.log(correlationMeanings);
-  console.log(`${'+'.repeat(20)}`);
+  //console.log(`${'=*'.repeat(20)}`);
+  //console.log("Correlation inference:")
+  //console.log('-'.repeat(15))
+  //console.log(correlationMeanings);
+  //console.log(`${'+'.repeat(20)}`);
 }
 
 if (partial_correlation_data) {
@@ -300,12 +300,11 @@ if (partial_correlation_data) {
     }
   };
   const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-  console.log("Partial Correlation inference:")
-  console.log('-'.repeat(15))
-  console.log(parCorrelationMeanings)
-  console.log('=*'.repeat(20));
+  //console.log("Partial Correlation inference:")
+  //console.log('-'.repeat(15))
+  //console.log(parCorrelationMeanings)
+  //console.log('=*'.repeat(20));
 }
-
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
@@ -318,14 +317,19 @@ if (partial_correlation_data) {
 /* The function below is would be responsible for sending the inferences and in what manner to
   the frontend */
 
-const parseToView = () => {
-
+const parseToView = (semesterOverview) => {
+  return studentSemesterPerformance.textContent = String(semesterOverview);
 }
 
 viewBtn.addEventListener('click', () => {
-  viewBtn.style.display= "none";
+  viewBtn.style.display = "none";
   advisory.style.display = "block";
-  parseToView
+
+  if (semesterOverview) {
+    parseToView(semesterOverview);
+  } else {
+    console.error("semesterOverview is not defined yet.");
+  }
 });
 
 minimizeBtn.addEventListener('click', () => {
