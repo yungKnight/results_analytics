@@ -6,13 +6,15 @@ const studentSemesterPerformance = document.getElementById('studentSemesterPerfo
 const MoreOfOrNo =document.getElementById('toDoMoreOrNot');
 
 let semesterOverview;
+const compulsoryMessages = [];
+const personalMessages = [];
+
 advisory.style.display = "none";
 
 const emas_data = neededData ? neededData["filtered_emas_data"] : null;
 const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
 const partial_correlation_data = neededData ? neededData["filtered_par_corr_data"] : null;
 
-const compulsoryMessages = [];
 
 const { 
   "semester performance": semesterPerformance, 
@@ -61,11 +63,11 @@ if (semesterPerformance) {
   semesterOverview = semesterPerformanceOverview(semesterPerformance);
 }
 
-console.log("semester overview: \n")
-console.log('-'.repeat(15))
-console.log(semesterOverview);
-console.log(typeof semesterOverview);
-console.log('-'.repeat(45))
+//console.log("semester overview: \n")
+//console.log('-'.repeat(15))
+//console.log(semesterOverview);
+//console.log(typeof semesterOverview);
+//console.log('-'.repeat(45))
 
 const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -105,16 +107,13 @@ if (compulsoryChecks) {
   processCompulsoryChecks(compulsoryChecks);
 };
 
-console.log("semester compulsory checks: \n")
-console.log('-'.repeat(15))
-console.log(compulsoryMessages);
-console.log(typeof compulsoryMessages);
-console.log('-'.repeat(45))
+//console.log("semester compulsory checks: \n")
+//console.log('-'.repeat(15))
+//console.log(compulsoryMessages);
+//console.log(typeof compulsoryMessages);
+//console.log('-'.repeat(45))
 
-if (!studentSpecificChecks) {
-  const processPersonalChecks = (checks) => {
-  const personalMessages = [];
-
+const processPersonalChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const personalKeysRegex = /^([A-Za-z]+)_[A-Za-z]+_and_(.+)$/;
     const validSSCkey = key.match(personalKeysRegex);
@@ -137,13 +136,17 @@ if (!studentSpecificChecks) {
     }
   });
   return personalMessages;
-  };
-  const personalChecksMeanings = processPersonalChecks(studentSpecificChecks);
-  //console.log("student specific checks: \n")
-  //console.log('-'.repeat(15))
-  //console.log(personalChecksMeanings)
-  //console.log(typeof personalChecksMeanings);
+};
+
+if (studentSpecificChecks) {
+  processPersonalChecks(studentSpecificChecks);
 }
+
+console.log("student specific checks: \n")
+console.log('-'.repeat(15))
+console.log(personalMessages)
+console.log(typeof personalMessages);
+console.log('-'.repeat(45))
 
 if (correlation_data != []) {
   const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
@@ -323,7 +326,7 @@ if (partial_correlation_data) {
 /* The function below is would be responsible for sending the inferences and in what manner to
   the frontend */
 
-const parseToView = (semesterOverview, compulsoryMessages) => {
+const parseToView = (semesterOverview, compulsoryMessages, personalMessages) => {
   if (semesterPerformance) {
     studentSemesterPerformance.textContent = String(semesterOverview);    
   }
@@ -334,17 +337,15 @@ const parseToView = (semesterOverview, compulsoryMessages) => {
     }
   }
 
-  //if () {}
+  if (studentSpecificChecks) {
+    studentSpecificPerformance.textContent = personalMessages.map(msg => String(
+        msg)).join(" ");
+  }
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display = "none";
   advisory.style.display = "block";
-
-  if (semesterOverview) {
-    parseToView(semesterOverview, compulsoryMessages);
-  } else {
-    console.error("semesterOverview is not defined yet.");
-  }
+  parseToView(semesterOverview, compulsoryMessages, personalMessages);
 });
 
 minimizeBtn.addEventListener('click', () => {
