@@ -12,6 +12,8 @@ const emas_data = neededData ? neededData["filtered_emas_data"] : null;
 const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
 const partial_correlation_data = neededData ? neededData["filtered_par_corr_data"] : null;
 
+const compulsoryMessages = [];
+
 const { 
   "semester performance": semesterPerformance, 
   "necessary checks": compulsoryChecks, 
@@ -20,9 +22,7 @@ const {
 console.log(neededData);
 console.log('-'.repeat(50));
 
-if (semesterPerformance) {
-  const { status, type } = semesterPerformance;
-  const semesterPerformanceMeanings = {
+const semesterPerformanceMeanings = {
   "divergence": {
     "positive": "Your recent performance is improving! Stay consistent and continue reinforcing strong study habits.",
     "negative": "Your recent performance is deviating from overall trends. Identify weak areas and take corrective action to stay on track."
@@ -38,34 +38,36 @@ if (semesterPerformance) {
     "steady": "You're in a steady state. Implement strategies to prevent dips and sustain progress.",
     "exemplary": "Outstanding achievement! You've attained a perfect GPA—continue your excellent efforts!"
   }
-  };
-  const semesterPerformanceOverview = ({ status, type }) => {
-    if (status === "divergence" &&
-     semesterPerformanceMeanings[status] && 
-     semesterPerformanceMeanings[status][type]) {
+};
+
+const { status, type } = semesterPerformance;
+const semesterPerformanceOverview = ({ status, type }) => {
+  if (status === "divergence" &&
+   semesterPerformanceMeanings[status] && 
+   semesterPerformanceMeanings[status][type]) {
+      return `${semesterPerformanceMeanings[status][type]}`;
+  } else if (status === "convergence" &&
+      semesterPerformanceMeanings[status] && 
+      semesterPerformanceMeanings[status][type]) {
         return `${semesterPerformanceMeanings[status][type]}`;
-    } else if (status === "convergence" &&
-        semesterPerformanceMeanings[status] && 
-        semesterPerformanceMeanings[status][type]) {
-          return `${semesterPerformanceMeanings[status][type]}`;
-    } else if (status === "At equilibrium state" &&
-        semesterPerformanceMeanings[status] && 
-        semesterPerformanceMeanings[status][type]) {
-          return `${semesterPerformanceMeanings[status][type]}`;
-    }
-  };
+  } else if (status === "At equilibrium state" &&
+      semesterPerformanceMeanings[status] && 
+      semesterPerformanceMeanings[status][type]) {
+        return `${semesterPerformanceMeanings[status][type]}`;
+  }
+};
+
+if (semesterPerformance) {
   semesterOverview = semesterPerformanceOverview(semesterPerformance);
 }
+
 console.log("semester overview: \n")
 console.log('-'.repeat(15))
 console.log(semesterOverview);
 console.log(typeof semesterOverview);
 console.log('-'.repeat(45))
 
-if (!compulsoryChecks) {
-  const processCompulsoryChecks = (checks) => {
-  const compulsoryMessages = [];
-  
+const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
     const compulsoryKeysRegex = /^([A-Za-z]+)_and_([A-Za-z]+)_(\w+)$/;
     const validCCKey = key.match(compulsoryKeysRegex);
@@ -97,13 +99,17 @@ if (!compulsoryChecks) {
     }
   });
   return compulsoryMessages;
-  };
-  const compulsoryChecksMeanings = processCompulsoryChecks(compulsoryChecks);
-  //console.log("semester compulsory checks: \n")
-  //console.log('-'.repeat(15))
-  //console.log(compulsoryChecksMeanings);
-  //console.log(typeof compulsoryChecksMeanings);
-}
+};
+
+if (compulsoryChecks) {
+  processCompulsoryChecks(compulsoryChecks);
+};
+
+console.log("semester compulsory checks: \n")
+console.log('-'.repeat(15))
+console.log(compulsoryMessages);
+console.log(typeof compulsoryMessages);
+console.log('-'.repeat(45))
 
 if (!studentSpecificChecks) {
   const processPersonalChecks = (checks) => {
@@ -317,16 +323,25 @@ if (partial_correlation_data) {
 /* The function below is would be responsible for sending the inferences and in what manner to
   the frontend */
 
-const parseToView = (semesterOverview) => {
-  return studentSemesterPerformance.textContent = String(semesterOverview);
-}
+const parseToView = (semesterOverview, compulsoryMessages) => {
+  if (semesterPerformance) {
+    studentSemesterPerformance.textContent = String(semesterOverview);    
+  }
+
+  if (compulsoryChecks) {
+    studentSemesterPerformance.textContent += ` ${compulsoryMessages.map(msg => String(
+        msg)).join(" ")}`;
+    }
+  }
+
+  //if () {}
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display = "none";
   advisory.style.display = "block";
 
   if (semesterOverview) {
-    parseToView(semesterOverview);
+    parseToView(semesterOverview, compulsoryMessages);
   } else {
     console.error("semesterOverview is not defined yet.");
   }
