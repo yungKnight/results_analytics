@@ -3,18 +3,18 @@ const minimizeBtn = document.getElementById('minimize_analysis');
 const advisory= document.getElementById('advisory');
 const studentSpecificPerformance = document.getElementById('studentSpecificPerformance');
 const studentSemesterPerformance = document.getElementById('studentSemesterPerformance');
-const MoreOfOrNo =document.getElementById('toDoMoreOrNot');
+const moreOfOrNo =document.getElementById('toDoMoreOrNot');
 
 let semesterOverview;
 const compulsoryMessages = [];
 const personalMessages = [];
+let correlationMeanings = []; 
 
 advisory.style.display = "none";
 
 const emas_data = neededData ? neededData["filtered_emas_data"] : null;
 const correlation_data = neededData ? neededData["filtered_corr_data"] : null;
 const partial_correlation_data = neededData ? neededData["filtered_par_corr_data"] : null;
-
 
 const { 
   "semester performance": semesterPerformance, 
@@ -142,15 +142,14 @@ if (studentSpecificChecks) {
   processPersonalChecks(studentSpecificChecks);
 }
 
-console.log("student specific checks: \n")
-console.log('-'.repeat(15))
-console.log(personalMessages)
-console.log(typeof personalMessages);
-console.log('-'.repeat(45))
+//console.log("student specific checks: \n")
+//console.log('-'.repeat(15))
+//console.log(personalMessages)
+//console.log(typeof personalMessages);
+//console.log('-'.repeat(45))
 
-if (correlation_data != []) {
-  const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
-  const correlationPairMeanings = {
+const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
+const correlationPairMeanings = {
   "very negative": {
     [expectedVariables[0]]: {
       [expectedVariables[1]]: "Strongly consider reducing your course load to prevent further academic strain.",
@@ -230,9 +229,10 @@ if (correlation_data != []) {
       [expectedVariables[3]]: "Your exceptional performance could support a more ambitious course load next semester."    
     }
   }
-  };
-  const extractCorrMeaning = ({ key, strength, type }) => {
+};
+const extractCorrMeaning = ({ key, strength, type }) => {
   if (!expectedVariables.includes(key[0]) || !expectedVariables.includes(key[1])) {
+    console.warn("Unexpected keys:", key);
     return;
   }
 
@@ -247,14 +247,18 @@ if (correlation_data != []) {
   }
 
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
-  };
-  const correlationMeanings = correlation_data.map(item => extractCorrMeaning(item));
-  //console.log(`${'=*'.repeat(20)}`);
-  //console.log("Correlation inference:")
-  //console.log('-'.repeat(15))
-  //console.log(correlationMeanings);
-  //console.log(`${'+'.repeat(20)}`);
-}
+};
+
+correlation_data.forEach(item => {
+  const meaning = extractCorrMeaning(item);
+  if (meaning) correlationMeanings.push(meaning);
+});
+
+console.log("Correlation inference:")
+console.log('-'.repeat(15))
+console.log(correlationMeanings);
+console.log(typeof correlationMeanings);
+console.log('-'.repeat(50));
 
 if (partial_correlation_data) {
   const parCorrMeaning = ({ key, significance, strength, type }) => {
@@ -340,6 +344,13 @@ const parseToView = (semesterOverview, compulsoryMessages, personalMessages) => 
   if (studentSpecificChecks) {
     studentSpecificPerformance.textContent = personalMessages.map(msg => String(
         msg)).join(" ");
+    //to-do: check if a branch crosses both the historical and long-term historical to
+    //  display dynamic sentence capturing the fact.
+  }
+
+  if (correlation_data.length > 0) {
+    moreOfOrNo.innerHTML += `<span class="next-semester-overview">
+      </span><span class="next-semester-courses-overview"></span>`
   }
 
 viewBtn.addEventListener('click', () => {
