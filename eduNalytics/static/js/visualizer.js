@@ -5,10 +5,11 @@ const studentSpecificPerformance = document.getElementById('studentSpecificPerfo
 const studentSemesterPerformance = document.getElementById('studentSemesterPerformance');
 const moreOfOrNo =document.getElementById('toDoMoreOrNot');
 
-let semesterOverview;
 const compulsoryMessages = [];
 const personalMessages = [];
-let correlationMeanings = []; 
+let semesterOverview;
+let correlationMeanings = [];
+let parCorrelationMeanings = []; 
 
 advisory.style.display = "none";
 
@@ -253,32 +254,29 @@ correlation_data.forEach(item => {
   const meaning = extractCorrMeaning(item);
   if (meaning) correlationMeanings.push(meaning);
 });
+//console.log("Correlation inference:")
+//console.log('-'.repeat(15))
+//console.log(correlationMeanings);
+//console.log(typeof correlationMeanings);
+//console.log('-'.repeat(50));
 
-console.log("Correlation inference:")
-console.log('-'.repeat(15))
-console.log(correlationMeanings);
-console.log(typeof correlationMeanings);
-console.log('-'.repeat(50));
+const extractParCorrMeaning = ({ key, significance, strength, type }) => {
+  const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
+  const validPredictor = key[0].match(keyRegex);
+  const validKeys = validPredictor && keyRegex.test(key[1]);
 
-if (partial_correlation_data) {
-  const parCorrMeaning = ({ key, significance, strength, type }) => {
-    const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
-    const validPredictor = key[0].match(keyRegex);
-    const validKeys = validPredictor && keyRegex.test(key[1]);
-
-    if (validKeys) {
-      const predictorBranch = validPredictor[1];
-      const predictorSuffix = validPredictor[2] || null;
-
-      if (!predictorSuffix) {
+  if (validKeys) {
+    const predictorBranch = validPredictor[1];
+    const predictorSuffix = validPredictor[2] || null;
+    if (!predictorSuffix) {
         return {
           message: `The influence of ${key[0]} on ${key[1]} is ${
             type.toLowerCase()}ly ${strength} and statistically ${significance}.`,
           suffix: predictorSuffix
         }
-      } 
-      
-      if (predictorSuffix === "units") {
+    } 
+    
+    if (predictorSuffix === "units") {
         if (key[1] === 'cgpa') {
           return {
             message: type === "Positive" 
@@ -293,8 +291,9 @@ if (partial_correlation_data) {
             : `It may be beneficial to limit courses from ${predictorBranch}.`,
           suffix: predictorSuffix
         };
-      } 
-      if (predictorSuffix === "count") {
+    } 
+
+    if (predictorSuffix === "count") {
         if (key[1] === 'cgpa') {
           return {
             message: type === "Positive" 
@@ -309,15 +308,19 @@ if (partial_correlation_data) {
             : `Reducing courses from ${predictorBranch} might be a good strategy.`,
           suffix: predictorSuffix
         };
-      }
     }
-  };
-  const parCorrelationMeanings = partial_correlation_data.map(item => parCorrMeaning(item));
-  //console.log("Partial Correlation inference:")
-  //console.log('-'.repeat(15))
-  //console.log(parCorrelationMeanings)
-  //console.log('=*'.repeat(20));
-}
+  }
+};
+
+partial_correlation_data.forEach(item => {
+  const meaning = extractParCorrMeaning(item);
+  if (meaning) parCorrelationMeanings.push(meaning);
+})
+console.log("Partial Correlation inference:")
+console.log('-'.repeat(15))
+console.log(parCorrelationMeanings)
+console.log(typeof parCorrelationMeanings)
+console.log('=*'.repeat(20));
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
@@ -330,7 +333,7 @@ if (partial_correlation_data) {
 /* The function below is would be responsible for sending the inferences and in what manner to
   the frontend */
 
-const parseToView = (semesterOverview, compulsoryMessages, personalMessages) => {
+const parseToView = () => {
   if (semesterPerformance) {
     studentSemesterPerformance.textContent = String(semesterOverview);    
   }
@@ -357,7 +360,7 @@ const parseToView = (semesterOverview, compulsoryMessages, personalMessages) => 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display = "none";
   advisory.style.display = "block";
-  parseToView(semesterOverview, compulsoryMessages, personalMessages);
+  parseToView();
 });
 
 minimizeBtn.addEventListener('click', () => {
