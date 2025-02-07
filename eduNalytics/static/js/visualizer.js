@@ -250,10 +250,12 @@ const extractCorrMeaning = ({ key, strength, type }) => {
   return correlationPairMeanings[correlationType]?.[key[0]]?.[key[1]];
 };
 
-correlation_data.forEach(item => {
-  const meaning = extractCorrMeaning(item);
-  if (meaning) correlationMeanings.push(meaning);
-});
+if (correlation_data) {
+  correlation_data.forEach(item => {
+    const meaning = extractCorrMeaning(item);
+    if (meaning) correlationMeanings.push(meaning);
+  });
+}
 //console.log("Correlation inference:")
 //console.log('-'.repeat(15))
 //console.log(correlationMeanings);
@@ -312,10 +314,12 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
   }
 };
 
-partial_correlation_data.forEach(item => {
-  const meaning = extractParCorrMeaning(item);
-  if (meaning) parCorrelationMeanings.push(meaning);
-})
+if (partial_correlation_data) {
+  partial_correlation_data.forEach(item => {
+    const meaning = extractParCorrMeaning(item);
+    if (meaning) parCorrelationMeanings.push(meaning["message"]);
+  })
+}
 console.log("Partial Correlation inference:")
 console.log('-'.repeat(15))
 console.log(parCorrelationMeanings)
@@ -351,11 +355,19 @@ const parseToView = () => {
     //  display dynamic sentence capturing the fact.
   }
 
-  if (correlation_data.length > 0) {
+  if (correlation_data) {
     moreOfOrNo.innerHTML += `<span class="next-semester-overview">${
       correlationMeanings.map(msg => String(msg)).join(" ")
-    }</span><span class="next-semester-courses-overview"></span>`
+    }</span>${
+      partial_correlation_data
+        ? `<span class="next-semester-courses-overview">${
+            parCorrelationMeanings.map(msg => String(msg)).join("<br>")
+          }</span>`
+        : `<h1 class="next-semester-courses-overview">Available dataset isn't sufficient enough
+            to suggest specific targets for you, sorry you'll have to rawdog this mate.</h1>`
+    }`;
   }
+
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display = "none";
