@@ -349,8 +349,9 @@ const parseToView = (semesterOverview, compulsoryMessages, personalMessages) => 
   }
 
   if (correlation_data.length > 0) {
-    moreOfOrNo.innerHTML += `<span class="next-semester-overview">
-      </span><span class="next-semester-courses-overview"></span>`
+    moreOfOrNo.innerHTML += `<span class="next-semester-overview">${
+      correlationMeanings.map(msg => String(msg)).join(" ")
+    }</span><span class="next-semester-courses-overview"></span>`
   }
 
 viewBtn.addEventListener('click', () => {
