@@ -337,7 +337,27 @@ console.log('=*'.repeat(20));
 /* The function below is would be responsible for sending the inferences and in what manner to
   the frontend */
 
+const newbieAdvices = [
+  "Engage with material through active techniques like summarizing key points in your own words, creating mind maps, teaching concepts to others, and using practice questions. This approach enhances comprehension and retention.", 
+  "Familiarize yourself with academic support services like tutoring centers, writing labs, study skills workshops, and peer mentoring programs. These free resources can provide targeted assistance and help you develop stronger academic skills.", 
+  "Form study groups with motivated, focused peers who complement your learning style. Choose collaborators who are committed to mutual learning.", 
+  "Communicate promptly with professors about challenges, seek clarification early, and take responsibility for your learning.", 
+  "Embrace a Growth Mindset, view challenges as opportunities for learning, not insurmountable obstacles. Understand that intelligence and abilities can be developed through dedication and hard work. Celebrate progress, learn from setbacks, and maintain a positive, resilient attitude toward academic challenges."
+]
+
 const parseToView = () => {
+  if (!emas_data || !correlation_data) {
+    if (!emas_data && !correlation_data && !partial_correlation_data) {
+      advisory.innerHTML += `
+        <h2 class="advisory-section-title">Tips for achieving academic success as a newbie</h2>
+        <ul id="new-student-advice">
+          ${newbieAdvices.map(advice => `<li class="adviceOfAdvices">${advice}</li>`).join('')}
+        </ul>
+      `;
+      return;
+    }
+  }  
+
   if (semesterPerformance) {
     studentSemesterPerformance.textContent = String(semesterOverview);    
   }
@@ -345,9 +365,8 @@ const parseToView = () => {
   if (compulsoryChecks) {
     studentSemesterPerformance.textContent += ` ${compulsoryMessages.map(msg => String(
         msg)).join(" ")}`;
-    }
   }
-
+  
   if (studentSpecificChecks) {
     studentSpecificPerformance.textContent = personalMessages.map(msg => String(
         msg)).join(" ");
@@ -367,6 +386,8 @@ const parseToView = () => {
             to suggest specific targets for you, sorry you'll have to rawdog this mate.</h1>`
     }`;
   }
+  return;
+}
 
 
 viewBtn.addEventListener('click', () => {
