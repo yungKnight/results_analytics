@@ -348,14 +348,14 @@ const newbieAdvices = [
 const parseToView = () => {
   if (!emas_data || !correlation_data) {
     if (!emas_data && !correlation_data && !partial_correlation_data) {
-      advisory.innerHTML += `
+      advisory.innerHTML = `
         <h2 class="advisory-section-title">Tips for achieving academic success as a newbie</h2>
         <ul id="new-student-advice">
           ${newbieAdvices.map(advice => `<li class="adviceOfAdvices">${advice}</li>`).join('')}
         </ul>
       `;
-      return;
     }
+    return;
   }  
 
   if (semesterPerformance) {
@@ -372,6 +372,7 @@ const parseToView = () => {
         msg)).join(" ");
     //to-do: check if a branch crosses both the historical and long-term historical to
     //  display dynamic sentence capturing the fact.
+    const multipleCrossesRegex = /[A-Za-z\s]+of([A-Za-z])+\son[(c)?gpa]+\sis\s([A-Za-z]+)/ig;
   }
 
   if (correlation_data) {
