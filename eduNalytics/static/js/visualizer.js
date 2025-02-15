@@ -5,6 +5,17 @@ const studentSpecificPerformance = document.getElementById('studentSpecificPerfo
 const studentSemesterPerformance = document.getElementById('studentSemesterPerformance');
 const moreOfOrNo =document.getElementById('toDoMoreOrNot');
 
+const advisoryTitles = document.getElementsByClassName('advisory-section-title');
+
+const secondTitle = advisoryTitles[1];
+const thirdTitle = advisoryTitles[2];
+
+secondTitle.style.display = "none";
+thirdTitle.style.display = "none"
+
+console.log("Second title is: ", secondTitle.textContent);
+console.log("Third title is: ", thirdTitle.textContent);
+
 const compulsoryMessages = [];
 const personalMessages = [];
 let semesterOverview;
@@ -315,6 +326,8 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
 };
 
 if (partial_correlation_data) {
+  secondTitle.style.display = "block";
+
   partial_correlation_data.forEach(item => {
     const meaning = extractParCorrMeaning(item);
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
@@ -368,14 +381,16 @@ const parseToView = () => {
   }
   
   if (studentSpecificChecks) {
+    
     studentSpecificPerformance.textContent = personalMessages.map(msg => String(
         msg)).join(" ");
     //to-do: check if a branch crosses both the historical and long-term historical to
     //  display dynamic sentence capturing the fact.
-    const multipleCrossesRegex = /[A-Za-z\s]+of([A-Za-z])+\son[(c)?gpa]+\sis\s([A-Za-z]+)/ig;
+    const multipleCrossesRegex = /[A-Za-z\s]+of([A-Za-z]+)\son[(c)?gpa]+\sis\s((?:positively|negatively))/ig;
   }
 
   if (correlation_data) {
+    thirdTitle.style.display = "block";
     moreOfOrNo.innerHTML += `<span class="next-semester-overview">${
       correlationMeanings.map(msg => String(msg)).join(" ")
     }</span>${
