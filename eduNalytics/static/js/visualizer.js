@@ -13,8 +13,8 @@ const thirdTitle = advisoryTitles[2];
 secondTitle.style.display = "none";
 thirdTitle.style.display = "none"
 
-console.log("Second title is: ", secondTitle.textContent);
-console.log("Third title is: ", thirdTitle.textContent);
+////console.log("Second title is: ", secondTitle.textContent);
+//console.log("Third title is: ", thirdTitle.textContent);
 
 const compulsoryMessages = [];
 const personalMessages = [];
@@ -33,8 +33,8 @@ const {
   "necessary checks": compulsoryChecks, 
   "personal checks": studentSpecificChecks 
 } = emas_data
-console.log(neededData);
-console.log('-'.repeat(50));
+//console.log(neededData);
+//console.log('-'.repeat(50));
 
 const semesterPerformanceMeanings = {
   "divergence": {
@@ -75,11 +75,11 @@ if (semesterPerformance) {
   semesterOverview = semesterPerformanceOverview(semesterPerformance);
 }
 
-//console.log("semester overview: \n")
-//console.log('-'.repeat(15))
-//console.log(semesterOverview);
-//console.log(typeof semesterOverview);
-//console.log('-'.repeat(45))
+////console.log("semester overview: \n")
+////console.log('-'.repeat(15))
+////console.log(semesterOverview);
+////console.log(typeof semesterOverview);
+////console.log('-'.repeat(45))
 
 const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -94,12 +94,12 @@ const processCompulsoryChecks = (checks) => {
       if (!multiEmaCheck && crossover) {
         compulsoryMessages.push(
           cross_type === "positive" 
-            ? `Your latest performance in ${comparisonAvg} has improved beyond your ${
+            ? `Your latest performance in ${comparisonAvg} has improved beyond your${
                 currAvg === 'cgpa' 
-                  ? "long-term" : ""} historical average. Keep up the progress!`
-            : `Your latest performance in ${comparisonAvg} has dropped below your ${
+                  ? " long-term" : ""} historical average. Keep up the progress!`
+            : `Your latest performance in ${comparisonAvg} has dropped below your${
                 currAvg === 'cgpa' 
-                  ? "long-term" : ""} historical average. Consider reviewing your study strategies.`
+                  ? " long-term" : ""} historical average. Consider reviewing your study strategies.`
         );
       } else if (multiEmaCheck && crossover) {
         compulsoryMessages.push(
@@ -115,15 +115,29 @@ const processCompulsoryChecks = (checks) => {
   return compulsoryMessages;
 };
 
+console.log(compulsoryMessages)
+const compulsoryMessagesCleaner = (compulsoryMessages) => {
+  /*const multiPositiveCrossCheckRegex = /Your latest performance in ([A-Za-z]+) has improved beyond your (long-term )?historical/g;
+  const multiNegativeCrossCheckRegex = /Your latest performance in ([A-Za-z]+) has dropped below your (long-term )?historical/g;*/
+  const multiCrossCheckRegex = /Your (latest|recent) performance in ([A-Za-z]+) has (improved|dropped) (?:beyond|below) your (long-term )?historical average\./i;
+  const allMessagesValid = compulsoryMessages.every(msg => multiCrossCheckRegex.test(msg));
+  
+  console.log("Are all messages valid?", allMessagesValid);
+  
+  const invalidMessages = compulsoryMessages.filter(msg => !multiCrossCheckRegex.test(msg));
+  console.log("Invalid messages:", invalidMessages);
+
+}
+
 if (compulsoryChecks) {
   processCompulsoryChecks(compulsoryChecks);
 };
 
-//console.log("semester compulsory checks: \n")
-//console.log('-'.repeat(15))
-//console.log(compulsoryMessages);
-//console.log(typeof compulsoryMessages);
-//console.log('-'.repeat(45))
+////console.log("semester compulsory checks: \n")
+////console.log('-'.repeat(15))
+////console.log(compulsoryMessages);
+////console.log(typeof compulsoryMessages);
+////console.log('-'.repeat(45))
 
 const processPersonalChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -154,11 +168,11 @@ if (studentSpecificChecks) {
   processPersonalChecks(studentSpecificChecks);
 }
 
-//console.log("student specific checks: \n")
-//console.log('-'.repeat(15))
-//console.log(personalMessages)
-//console.log(typeof personalMessages);
-//console.log('-'.repeat(45))
+////console.log("student specific checks: \n")
+////console.log('-'.repeat(15))
+////console.log(personalMessages)
+////console.log(typeof personalMessages);
+////console.log('-'.repeat(45))
 
 const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
 const correlationPairMeanings = {
@@ -267,11 +281,11 @@ if (correlation_data) {
     if (meaning) correlationMeanings.push(meaning);
   });
 }
-//console.log("Correlation inference:")
-//console.log('-'.repeat(15))
-//console.log(correlationMeanings);
-//console.log(typeof correlationMeanings);
-//console.log('-'.repeat(50));
+////console.log("Correlation inference:")
+////console.log('-'.repeat(15))
+////console.log(correlationMeanings);
+////console.log(typeof correlationMeanings);
+////console.log('-'.repeat(50));
 
 const extractParCorrMeaning = ({ key, significance, strength, type }) => {
   const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
@@ -333,11 +347,11 @@ if (partial_correlation_data) {
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
   })
 }
-console.log("Partial Correlation inference:")
-console.log('-'.repeat(15))
-console.log(parCorrelationMeanings)
-console.log(typeof parCorrelationMeanings)
-console.log('=*'.repeat(20));
+//console.log("Partial Correlation inference:")
+//console.log('-'.repeat(15))
+//console.log(parCorrelationMeanings)
+//console.log(typeof parCorrelationMeanings)
+//console.log('=*'.repeat(20));
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
@@ -381,7 +395,6 @@ const parseToView = () => {
   }
   
   if (studentSpecificChecks) {
-    
     studentSpecificPerformance.textContent = personalMessages.map(msg => String(
         msg)).join(" ");
     //to-do: check if a branch crosses both the historical and long-term historical to
@@ -396,7 +409,7 @@ const parseToView = () => {
     }</span>${
       partial_correlation_data
         ? `<span class="next-semester-courses-overview">${
-            parCorrelationMeanings.map(msg => String(msg)).join("<br>")
+            parCorrelationMeanings.map(msg => String(msg)).join(" ")
           }</span>`
         : `<h1 class="next-semester-courses-overview">Available dataset isn't sufficient enough
             to suggest specific targets for you, sorry you'll have to rawdog this mate.</h1>`
