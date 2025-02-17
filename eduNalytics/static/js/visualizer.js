@@ -13,11 +13,8 @@ const thirdTitle = advisoryTitles[2];
 secondTitle.style.display = "none";
 thirdTitle.style.display = "none"
 
-////console.log("Second title is: ", secondTitle.textContent);
-//console.log("Third title is: ", thirdTitle.textContent);
-
-const compulsoryMessages = [];
-const personalMessages = [];
+let compulsoryMessages = [];
+let personalMessages = [];
 let semesterOverview;
 let correlationMeanings = [];
 let parCorrelationMeanings = []; 
@@ -115,29 +112,75 @@ const processCompulsoryChecks = (checks) => {
   return compulsoryMessages;
 };
 
-console.log(compulsoryMessages)
 const compulsoryMessagesCleaner = (compulsoryMessages) => {
-  /*const multiPositiveCrossCheckRegex = /Your latest performance in ([A-Za-z]+) has improved beyond your (long-term )?historical/g;
-  const multiNegativeCrossCheckRegex = /Your latest performance in ([A-Za-z]+) has dropped below your (long-term )?historical/g;*/
-  const multiCrossCheckRegex = /Your (latest|recent) performance in ([A-Za-z]+) has (improved|dropped) (?:beyond|below) your (long-term )?historical average\./i;
-  const allMessagesValid = compulsoryMessages.every(msg => multiCrossCheckRegex.test(msg));
+  const multiCrossCheckRegex = /Your (?:latest|recent) performance in ([A-Za-z]+) has (improved|dropped) (?:beyond|below) your (long-term )?historical average\./i;
   
-  console.log("Are all messages valid?", allMessagesValid);
-  
-  const invalidMessages = compulsoryMessages.filter(msg => !multiCrossCheckRegex.test(msg));
-  console.log("Invalid messages:", invalidMessages);
+  const toPop = {};
+  const mergedMessages = [];
 
-}
+  console.log(compulsoryMessages);
+
+  const neededStatements = compulsoryMessages
+    .map((msg, index) => ({ match: msg.match(multiCrossCheckRegex), index, fullMsg: msg }))
+    .filter(entry => entry.match);
+
+  console.log("Matched Statements:", neededStatements);
+
+  neededStatements.forEach(({ match, index, fullMsg }) => {
+    if (match) {
+      const neededKey = match[1];
+      const keyStatus = match[2];
+      const longTermOrNo = !!match[3];
+
+      if (!toPop[neededKey]) {
+        toPop[neededKey] = [];
+      }
+
+      toPop[neededKey].push({ keyStatus, longTermOrNo, index, fullMsg });
+    }
+  });
+
+  console.log("toPop Dictionary:", toPop);
+
+  const indicesToRemove = new Set();
+
+  Object.entries(toPop).forEach(([key, values]) => {
+    const longTermEntries = values.filter(v => v.longTermOrNo);
+    const shortTermEntries = values.filter(v => !v.longTermOrNo);
+
+    if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
+      const keyStatus = longTermEntries[0].keyStatus; 
+
+      const originalMessages = [...longTermEntries, ...shortTermEntries];
+
+      originalMessages.forEach(v => indicesToRemove.add(v.index));
+
+      // Push a new merged message
+      mergedMessages.push(
+        `Your most recent performance in ${key} has ${keyStatus} across both your short-term and long-term trends. Keep it going!`
+      );
+    }
+  });
+
+  for (let i = compulsoryMessages.length - 1; i >= 0; i--) {
+    if (indicesToRemove.has(i)) {
+      compulsoryMessages.splice(i, 1);
+    }
+  }
+
+  compulsoryMessages.push(...mergedMessages);
+
+  console.log("Final Cleaned Messages:", compulsoryMessages);
+};
 
 if (compulsoryChecks) {
   processCompulsoryChecks(compulsoryChecks);
+  console.log("initial compulsoryMessages: ", compulsoryMessages)
+  console.log('-'.repeat(15));
+  compulsoryMessagesCleaner(compulsoryMessages);
+  console.log("Final compulsoryMessages: ", compulsoryMessages)
+  console.log('-'.repeat(15))
 };
-
-////console.log("semester compulsory checks: \n")
-////console.log('-'.repeat(15))
-////console.log(compulsoryMessages);
-////console.log(typeof compulsoryMessages);
-////console.log('-'.repeat(45))
 
 const processPersonalChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
