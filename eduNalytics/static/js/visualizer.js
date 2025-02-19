@@ -118,13 +118,9 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
   const toPop = {};
   const mergedMessages = [];
 
-  console.log(compulsoryMessages);
-
   const neededStatements = compulsoryMessages
     .map((msg, index) => ({ match: msg.match(multiCrossCheckRegex), index, fullMsg: msg }))
     .filter(entry => entry.match);
-
-  console.log("Matched Statements:", neededStatements);
 
   neededStatements.forEach(({ match, index, fullMsg }) => {
     if (match) {
@@ -140,8 +136,6 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
     }
   });
 
-  console.log("toPop Dictionary:", toPop);
-
   const indicesToRemove = new Set();
 
   Object.entries(toPop).forEach(([key, values]) => {
@@ -155,7 +149,6 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
 
       originalMessages.forEach(v => indicesToRemove.add(v.index));
 
-      // Push a new merged message
       mergedMessages.push(
         `Your most recent performance in ${key} has ${keyStatus} across both your short-term and long-term trends. Keep it going!`
       );
@@ -169,17 +162,11 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
   }
 
   compulsoryMessages.push(...mergedMessages);
-
-  console.log("Final Cleaned Messages:", compulsoryMessages);
 };
 
 if (compulsoryChecks) {
   processCompulsoryChecks(compulsoryChecks);
-  console.log("initial compulsoryMessages: ", compulsoryMessages)
-  console.log('-'.repeat(15));
   compulsoryMessagesCleaner(compulsoryMessages);
-  console.log("Final compulsoryMessages: ", compulsoryMessages)
-  console.log('-'.repeat(15))
 };
 
 const processPersonalChecks = (checks) => {
@@ -207,8 +194,34 @@ const processPersonalChecks = (checks) => {
   return personalMessages;
 };
 
+const personalMessagesCleaner = (personalMessages) => {
+  const multipleCrossRegex = /your performance in ([\w\s]+)courses has (surpassed|dropped below) your (long-term )?average/i;
+  //const toPop = {};
+  //const mergedMessages = [];
+
+  const neededStatements = personalMessages
+    .map((msg, index) => ({ match: msg.match(multipleCrossRegex), index, fullMsg: msg }))
+    .filter(entry => entry.match);
+
+  neededStatements.forEach(({ match, index, fullMsg }) => {
+    if (match) {
+      const neededKey = match[1];
+      const positiveStatus = match[2] === "surpassed";
+      const longTermOrNo = !!match[3];
+
+      console.log(neededKey, "positive: ", positiveStatus, "long-term? ", longTermOrNo)
+      console.log('-'.repeat(50))
+    }
+  })
+  return;  
+}
+
 if (studentSpecificChecks) {
   processPersonalChecks(studentSpecificChecks);
+  personalMessagesCleaner(personalMessages);
+  console.log('-'.repeat(50))
+  console.log("Initial personal messages: ", personalMessages)
+  personalMessagesCleaner(personalMessages)
 }
 
 ////console.log("student specific checks: \n")
