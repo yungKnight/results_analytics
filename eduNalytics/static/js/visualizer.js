@@ -162,6 +162,7 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
   }
 
   compulsoryMessages.push(...mergedMessages);
+  return;
 };
 
 if (compulsoryChecks) {
@@ -196,8 +197,8 @@ const processPersonalChecks = (checks) => {
 
 const personalMessagesCleaner = (personalMessages) => {
   const multipleCrossRegex = /your performance in ([\w\s]+)courses has (surpassed|dropped below) your (long-term )?average/i;
-  //const toPop = {};
-  //const mergedMessages = [];
+  const toPop = {};
+  const mergedMessages = [];
 
   const neededStatements = personalMessages
     .map((msg, index) => ({ match: msg.match(multipleCrossRegex), index, fullMsg: msg }))
@@ -209,19 +210,65 @@ const personalMessagesCleaner = (personalMessages) => {
       const positiveStatus = match[2] === "surpassed";
       const longTermOrNo = !!match[3];
 
-      console.log(neededKey, "positive: ", positiveStatus, "long-term? ", longTermOrNo)
-      console.log('-'.repeat(50))
+      if (!toPop[neededKey]) {
+        toPop[neededKey] = [];
+      }
+
+      toPop[neededKey].push({ positiveStatus, longTermOrNo, index, fullMsg });
     }
-  })
-  return;  
-}
+  });
+  
+  const indicesToRemove = new Set();
+
+  Object.entries(toPop).forEach(([key, values]) => {
+    const positiveStatus = [];
+
+    const longTermEntries = values.filter(value => value.longTermOrNo);
+    const shortTermEntries = values.filter(value => !value.longTermOrNo);
+    
+    const positiveEntries = values.filter(value => value.positiveStatus);
+    const negativeEntries = values.filter(value => !value.positiveStatus);
+
+    if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
+      const keyType = positiveStatus ? "positive" : "negative";
+
+      const originalMessages = [...longTermEntries, ...shortTermEntries];
+
+      originalMessages.forEach(msg => indicesToRemove.add(msg.index));
+
+      if (keyType === "positive") {
+        mergedMessages.push(
+          `Your most recent performance in courses of the ${
+            key} branch has surpassed your cumulative adjusted average and also is better than semester adjusted average. Keep the momentum going!`
+        )
+      }
+
+      if (keyType === "negative") {
+        mergedMessages.push(
+          `Your most recent performance in courses of the ${
+            key} branch has dipped below your cumulative adjusted average and is worse than semester adjusted average. Take immediate actions to get back on track!`
+        )
+      }
+
+    }
+  });
+
+  for (let i = personalMessages.length - 1; i >= 0; i--) {
+    if (indicesToRemove.has(i)) {
+      personalMessages.splice(i, 1);
+    }
+  } 
+
+  personalMessages.push(...mergedMessages);
+  return;
+};
 
 if (studentSpecificChecks) {
   processPersonalChecks(studentSpecificChecks);
-  personalMessagesCleaner(personalMessages);
   console.log('-'.repeat(50))
   console.log("Initial personal messages: ", personalMessages)
   personalMessagesCleaner(personalMessages)
+  console.log("Final personal messages: ", personalMessages)
 }
 
 ////console.log("student specific checks: \n")
@@ -485,3 +532,5 @@ minimizeBtn.addEventListener('click', () => {
   advisory.style.display = "none";
   viewBtn.style.display = "block";
 });
+
+console.log("This is the end of the script,")
