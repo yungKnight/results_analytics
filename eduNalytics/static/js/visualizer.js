@@ -30,8 +30,6 @@ const {
   "necessary checks": compulsoryChecks, 
   "personal checks": studentSpecificChecks 
 } = emas_data
-//console.log(neededData);
-//console.log('-'.repeat(50));
 
 const semesterPerformanceMeanings = {
   "divergence": {
@@ -71,12 +69,6 @@ const semesterPerformanceOverview = ({ status, type }) => {
 if (semesterPerformance) {
   semesterOverview = semesterPerformanceOverview(semesterPerformance);
 }
-
-////console.log("semester overview: \n")
-////console.log('-'.repeat(15))
-////console.log(semesterOverview);
-////console.log(typeof semesterOverview);
-////console.log('-'.repeat(45))
 
 const processCompulsoryChecks = (checks) => {
   Object.entries(checks).forEach(([key, { crossover, cross_type }]) => {
@@ -265,17 +257,8 @@ const personalMessagesCleaner = (personalMessages) => {
 
 if (studentSpecificChecks) {
   processPersonalChecks(studentSpecificChecks);
-  console.log('-'.repeat(50))
-  console.log("Initial personal messages: ", personalMessages)
-  personalMessagesCleaner(personalMessages)
-  console.log("Final personal messages: ", personalMessages)
+  personalMessagesCleaner(personalMessages);
 }
-
-////console.log("student specific checks: \n")
-////console.log('-'.repeat(15))
-////console.log(personalMessages)
-////console.log(typeof personalMessages);
-////console.log('-'.repeat(45))
 
 const expectedVariables = ["total_units", "gpa", "cgpa", "semester_course_count"];
 const correlationPairMeanings = {
@@ -384,11 +367,6 @@ if (correlation_data) {
     if (meaning) correlationMeanings.push(meaning);
   });
 }
-////console.log("Correlation inference:")
-////console.log('-'.repeat(15))
-////console.log(correlationMeanings);
-////console.log(typeof correlationMeanings);
-////console.log('-'.repeat(50));
 
 const extractParCorrMeaning = ({ key, significance, strength, type }) => {
   const keyRegex = /^([a-zA-Z\s]+)(?:_([a-zA-Z]+))?$/;
@@ -450,11 +428,17 @@ if (partial_correlation_data) {
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
   })
 }
-//console.log("Partial Correlation inference:")
-//console.log('-'.repeat(15))
-//console.log(parCorrelationMeanings)
-//console.log(typeof parCorrelationMeanings)
-//console.log('=*'.repeat(20));
+
+const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
+  console.log("Partial Correlation inference:")
+  console.log('-'.repeat(15))
+  console.log(parCorrelationMeanings)
+  console.log(typeof parCorrelationMeanings)
+  console.log(Array.isArray(parCorrelationMeanings))
+  console.log('=*'.repeat(20));
+};
+
+parCorrelationMeaningsCleaner(parCorrelationMeanings);
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
@@ -463,9 +447,6 @@ if (partial_correlation_data) {
     for some kind of divergence e.g if any of the key[1] contains 'cgpa' and an inverse value
                                     might mean a disparity in potential
     (for me to recall faster)*/
-
-/* The function below is would be responsible for sending the inferences and in what manner to
-  the frontend */
 
 const newbieAdvices = [
   "Engage with material through active techniques like summarizing key points in your own words, creating mind maps, teaching concepts to others, and using practice questions. This approach enhances comprehension and retention.", 
