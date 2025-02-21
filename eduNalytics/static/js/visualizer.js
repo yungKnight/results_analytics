@@ -379,7 +379,7 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
     if (!predictorSuffix) {
         return {
           message: `The influence of ${key[0]} on ${key[1]} is ${
-            type.toLowerCase()}ly ${strength} and statistically ${significance}.`,
+            type.toLowerCase()}ly ${strength.toLowerCase()} and statistically ${significance.toLowerCase()}.`,
           suffix: predictorSuffix
         }
     } 
@@ -420,6 +420,15 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
   }
 };
 
+const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
+  console.log("Partial Correlation inference:")
+  console.log('-'.repeat(15))
+  console.log(parCorrelationMeanings)
+  console.log('=*'.repeat(20));
+
+  const noSuffixRegex = /[\w\s]+of\s/i;
+};
+
 if (partial_correlation_data) {
   secondTitle.style.display = "block";
 
@@ -427,18 +436,10 @@ if (partial_correlation_data) {
     const meaning = extractParCorrMeaning(item);
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
   })
+  
+  parCorrelationMeaningsCleaner(parCorrelationMeanings);
 }
 
-const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
-  console.log("Partial Correlation inference:")
-  console.log('-'.repeat(15))
-  console.log(parCorrelationMeanings)
-  console.log(typeof parCorrelationMeanings)
-  console.log(Array.isArray(parCorrelationMeanings))
-  console.log('=*'.repeat(20));
-};
-
-parCorrelationMeaningsCleaner(parCorrelationMeanings);
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
