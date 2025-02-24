@@ -128,7 +128,7 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
     }
   });
 
-  const indicesToRemove = new Set();
+  const indexesToRemove = new Set();
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(v => v.longTermOrNo);
@@ -139,7 +139,7 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
 
       const originalMessages = [...longTermEntries, ...shortTermEntries];
 
-      originalMessages.forEach(v => indicesToRemove.add(v.index));
+      originalMessages.forEach(v => indexesToRemove.add(v.index));
 
       mergedMessages.push(
         `Your most recent performance in ${key} has ${keyStatus} across both your short-term and long-term trends. Keep it going!`
@@ -148,7 +148,7 @@ const compulsoryMessagesCleaner = (compulsoryMessages) => {
   });
 
   for (let i = compulsoryMessages.length - 1; i >= 0; i--) {
-    if (indicesToRemove.has(i)) {
+    if (indexesToRemove.has(i)) {
       compulsoryMessages.splice(i, 1);
     }
   }
@@ -210,7 +210,7 @@ const personalMessagesCleaner = (personalMessages) => {
     }
   });
   
-  const indicesToRemove = new Set();
+  const indexesToRemove = new Set();
 
   Object.entries(toPop).forEach(([key, values]) => {
     const positiveStatus = [];
@@ -226,7 +226,7 @@ const personalMessagesCleaner = (personalMessages) => {
 
       const originalMessages = [...longTermEntries, ...shortTermEntries];
 
-      originalMessages.forEach(msg => indicesToRemove.add(msg.index));
+      originalMessages.forEach(msg => indexesToRemove.add(msg.index));
 
       if (keyType === "positive") {
         mergedMessages.push(
@@ -246,7 +246,7 @@ const personalMessagesCleaner = (personalMessages) => {
   });
 
   for (let i = personalMessages.length - 1; i >= 0; i--) {
-    if (indicesToRemove.has(i)) {
+    if (indexesToRemove.has(i)) {
       personalMessages.splice(i, 1);
     }
   } 
@@ -426,7 +426,59 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   console.log(parCorrelationMeanings)
   console.log('=*'.repeat(20));
 
-  const noSuffixRegex = /[\w\s]+of\s/i;
+  const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
+  const toPop = {};
+  const mergedMessages = [];
+
+  const neededStatements = parCorrelationMeanings
+    .map((meaning, index) => ({match: meaning.match(noSuffixRegex), index, fullMeaning: meaning}))
+    .filter(entry => entry.match);
+
+  console.log(neededStatements)
+  console.log('-'.repeat(45))
+
+  neededStatements.forEach(({match, index, fullMeaning}) => {
+    if (match) {
+      const neededKey = match[1];
+      const longTermOrNo = match[2];
+      const status = match[3];
+      console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+
+      if (!toPop[neededKey]) {
+        toPop[neededKey] = [];
+      }
+
+      toPop[neededKey].push({ status, longTermOrNo, index, fullMeaning });
+    }
+
+  });
+  const indexesToRemove = new Set();
+
+  Object.entries(toPop).forEach(([key, values]) => {
+    const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
+    const shortTermEntries = values.filter(value => value.longTermOrNo === "gpa");
+    if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
+      const longTermStatus = longTermEntries[0].status;
+      const shortTermStatus = shortTermEntries[0].status;
+      if (longTermStatus === shortTermStatus) {  
+        [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
+
+        mergedMessages.push(
+          `The influence of ${key} on both short and long term performances is ${longTermStatus}ly significant.`
+        );
+      }
+    }
+  })
+
+  for (let i = parCorrelationMeanings.length - 1; i >= 0; i--) {
+    if (indexesToRemove.has(i)) {
+      parCorrelationMeanings.splice(i, 1);
+    }
+  }
+  
+  parCorrelationMeanings.push(...mergedMessages);
+  console.log("Final Cleaned Messages:", parCorrelationMeanings);
+  return;
 };
 
 if (partial_correlation_data) {
@@ -439,7 +491,6 @@ if (partial_correlation_data) {
   
   parCorrelationMeaningsCleaner(parCorrelationMeanings);
 }
-
 
 /*This set of meanings above will be a part of an object that disseminates final messages
   to the frontend-
@@ -515,4 +566,4 @@ minimizeBtn.addEventListener('click', () => {
   viewBtn.style.display = "block";
 });
 
-console.log("This is the end of the script,")
+console.log("This is the end of the script.")
