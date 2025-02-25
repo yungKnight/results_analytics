@@ -389,7 +389,7 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
           return {
             message: type === "Positive" 
               ? `Taking more units from ${predictorBranch} can benefit your long-term performance.`
-              : `Reducing courses from ${predictorBranch} may help avoid long-term negative effects.`,
+              : `Reducing course units from ${predictorBranch} may help avoid long-term negative effects.`,
             suffix: predictorSuffix
           };
         }
@@ -428,7 +428,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   const indexesToRemove = new Set();
   
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
-  const unitSuffixRegex = /(?:Taking more units from|Reducing courses from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:\scan benefit your long-term performance|may help avoid long-term negative effects|\.|$)/i;
+  const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;
 
   const neededStatements = parCorrelationMeanings
     .map((meaning, index) => ({match: meaning.match(noSuffixRegex), index, fullMeaning: meaning}))
@@ -447,6 +447,8 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       const longTermOrNo = match[2];
       const status = match[3];
 
+      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+
       if (!toPop[neededKey]) {
         toPop[neededKey] = [];
       }
@@ -455,13 +457,14 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   });
 
-  //unitNeededStatements.forEach(({match, index, fullMeaning}) => {
-  //  if (match) {
-  //    const neededKey = match[1];
-  //    const status = match[2]
-      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
-  //  }
-  //})
+  unitNeededStatements.forEach(({match, index, fullMeaning}) => {
+    if (match) {
+      const neededKey = match[1];
+      const longTermOrNo = fullMeaning.includes("long-term") ? true : false;
+      const status = fullMeaning.includes("can benefit" || "taking more units") ? "positive" : "negative";
+      console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+    }
+  })
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
@@ -473,7 +476,9 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
         [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
 
         mergedMessages.push(
-          `The influence of ${key} on both short and long term performances is ${longTermStatus}ly significant.`
+          `The influence of ${
+            key} on both short and long term performances is ${
+              longTermStatus}ly significant.`
         );
       }
     }
