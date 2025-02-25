@@ -421,20 +421,24 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
 };
 
 const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
-  console.log("Partial Correlation inference:")
-  console.log('-'.repeat(15))
-  console.log(parCorrelationMeanings)
-  console.log('=*'.repeat(20));
-
-  const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
   const toPop = {};
+  const unitToPop = {};
+
   const mergedMessages = [];
+  const indexesToRemove = new Set();
+  
+  const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
+  const unitSuffixRegex = /(?:Taking more units from|Reducing courses from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:\scan benefit your long-term performance|may help avoid long-term negative effects|\.|$)/i;
 
   const neededStatements = parCorrelationMeanings
     .map((meaning, index) => ({match: meaning.match(noSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match);
 
-  console.log(neededStatements)
+  const unitNeededStatements = parCorrelationMeanings
+    .map((meaning, index) => ({match: meaning.match(unitSuffixRegex), index, fullMeaning: meaning}))
+    .filter(entry => entry.match)
+
+  console.log(unitNeededStatements)
   console.log('-'.repeat(45))
 
   neededStatements.forEach(({match, index, fullMeaning}) => {
@@ -442,7 +446,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       const neededKey = match[1];
       const longTermOrNo = match[2];
       const status = match[3];
-      console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
 
       if (!toPop[neededKey]) {
         toPop[neededKey] = [];
@@ -450,9 +453,15 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
       toPop[neededKey].push({ status, longTermOrNo, index, fullMeaning });
     }
-
   });
-  const indexesToRemove = new Set();
+
+  //unitNeededStatements.forEach(({match, index, fullMeaning}) => {
+  //  if (match) {
+  //    const neededKey = match[1];
+  //    const status = match[2]
+      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+  //  }
+  //})
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
@@ -488,6 +497,8 @@ if (partial_correlation_data) {
     const meaning = extractParCorrMeaning(item);
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
   })
+
+  console.log("Original meanings: ", parCorrelationMeanings)
   
   parCorrelationMeaningsCleaner(parCorrelationMeanings);
 }
@@ -533,8 +544,6 @@ const parseToView = () => {
   if (studentSpecificChecks) {
     studentSpecificPerformance.textContent = personalMessages.map(msg => String(
         msg)).join(" ");
-    //to-do: check if a branch crosses both the historical and long-term historical to
-    //  display dynamic sentence capturing the fact.
     const multipleCrossesRegex = /[A-Za-z\s]+of([A-Za-z]+)\son[(c)?gpa]+\sis\s((?:positively|negatively))/ig;
   }
 
