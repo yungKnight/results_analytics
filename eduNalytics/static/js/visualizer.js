@@ -428,6 +428,8 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   const mergedMessages = [];
   const indexesToRemove = new Set();
   
+  console.log("indexes pre pop: ",indexesToRemove);
+  
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
   const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;  
   const countSuffixRegex = /^(?:Adding more courses from|Avoiding courses from|Consider taking more courses from|Reducing courses from)\s([A-Za-z\s]+?)(?:could boost your long-term performance|may help prevent negative academic impact|might be a good strategy|$)\.?$/i;
@@ -447,8 +449,8 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     .map((meaning, index) => ({match: meaning.match(countSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match)
 
-  console.log("count needed statements: ", countNeededStatements)
-  console.log('-'.repeat(45))
+  //console.log("count needed statements: ", countNeededStatements)
+  //console.log('-'.repeat(45))
 
   neededStatements.forEach(({match, index, fullMeaning}) => {
     if (match) {
@@ -502,11 +504,12 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }
   })
 
-  console.log("Our count keys to pop: ", countToPop)
+  console.log("Our count keys to pop: ", countToPop);
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
     const shortTermEntries = values.filter(value => value.longTermOrNo === "gpa");
+
     if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
       const longTermStatus = longTermEntries[0].status;
       const shortTermStatus = shortTermEntries[0].status;
@@ -521,6 +524,41 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }
     }
   })
+
+  console.log("indexes post pop: ",indexesToRemove);
+
+  console.log("indexes pre unit pop: ",indexesToRemove);
+
+  Object.entries(unitToPop).forEach(([key, values]) => {
+    const longTermEntries = values.filter(value => value.longTerm);
+    const shortTermEntries = values.filter(value => !value.longTerm);
+
+    if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
+      const longTermStatus = longTermEntries[0].status;
+      const shortTermStatus = shortTermEntries[0].status;
+
+
+      if (longTermStatus === shortTermStatus && longTermStatus === "positive") {
+        [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
+        
+        mergedMessages.push(
+          `You should really consider adding more courses from ${
+            key} branch as it has historically proven to be beneficial to your cause.`
+        );
+      }
+
+      if (longTermStatus === shortTermStatus && longTermStatus === "negative") {
+        [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
+        
+        mergedMessages.push(
+          `You should really consider reducing number of courses offered from ${
+            key} branch as it has historically proven to be detrimental to your cause.`
+        );
+      }      
+    }
+  })
+
+  console.log("indexes post unit pop: ", indexesToRemove);
 
   for (let i = parCorrelationMeanings.length - 1; i >= 0; i--) {
     if (indexesToRemove.has(i)) {
