@@ -423,7 +423,7 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
 const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   const toPop = {};
   const unitToPop = {};
-  const countToPop = {};
+  const countToPop = {}; 
 
   const mergedMessages = [];
   const indexesToRemove = new Set();
@@ -432,7 +432,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
   const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;  
-  const countSuffixRegex = /^(?:Adding more courses from|Avoiding courses from|Consider taking more courses from|Reducing courses from)\s([A-Za-z\s]+?)(?:could boost your long-term performance|may help prevent negative academic impact|might be a good strategy|$)\.?$/i;
+  const countSuffixRegex = /^(?:Adding more courses from|Avoiding courses from|Consider taking more courses from|Reducing courses from)\s([A-Za-z\s]+?)(?:\s)(?:could boost your long-term performance|may help prevent negative academic impact|might be a good strategy|$)\.?$/i;
 
   const neededStatements = parCorrelationMeanings
     .map((meaning, index) => ({match: meaning.match(noSuffixRegex), index, fullMeaning: meaning}))
@@ -504,6 +504,25 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }
   })
 
+  const mergeObjectsWithArrayValues = (obj1, obj2) => {
+    const result = { ...obj1 };
+    
+    Object.keys(obj2).forEach(key => {
+      if (key in result) {
+        result[key] = Array.isArray(result[key]) 
+          ? [...result[key], obj2[key]]
+          : [result[key], obj2[key]];
+      } else {
+        result[key] = obj2[key];
+      }
+    });
+    
+    return result;
+  }
+
+  const conjoinPop = mergeObjectsWithArrayValues(unitToPop, countToPop);
+
+  console.log("My conjoin pop dict: ",conjoinPop);
   console.log("Our count keys to pop: ", countToPop);
 
   Object.entries(toPop).forEach(([key, values]) => {
