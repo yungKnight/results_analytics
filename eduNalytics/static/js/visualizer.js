@@ -423,13 +423,15 @@ const extractParCorrMeaning = ({ key, significance, strength, type }) => {
 const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   const toPop = {};
   const unitToPop = {};
+  const countToPop = {};
 
   const mergedMessages = [];
   const indexesToRemove = new Set();
   
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
-  const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;
-
+  const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;  
+  const countSuffixRegex = /^(?:Adding more courses from|Avoiding courses from|Consider taking more courses from|Reducing courses from)\s([A-Za-z\s]+?)(?:could boost your long-term performance|may help prevent negative academic impact|might be a good strategy|$)\.?$/i;
+  
   const neededStatements = parCorrelationMeanings
     .map((meaning, index) => ({match: meaning.match(noSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match);
@@ -438,7 +440,14 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     .map((meaning, index) => ({match: meaning.match(unitSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match)
 
-  console.log(unitNeededStatements)
+  console.log("unit needed statements: ", unitNeededStatements)
+  console.log('-'.repeat(45))
+
+  const countNeededStatements = parCorrelationMeanings
+    .map((meaning, index) => ({match: meaning.match(countSuffixRegex), index, fullMeaning: meaning}))
+    .filter(entry => entry.match)
+
+  console.log("count needed statements: ", countNeededStatements)
   console.log('-'.repeat(45))
 
   neededStatements.forEach(({match, index, fullMeaning}) => {
@@ -457,14 +466,25 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   });
 
+  //console.log("Our keys to pop: ", toPop)
+
   unitNeededStatements.forEach(({match, index, fullMeaning}) => {
     if (match) {
       const neededKey = match[1];
       const longTermOrNo = fullMeaning.includes("long-term") ? true : false;
       const status = fullMeaning.includes("can benefit" || "taking more units") ? "positive" : "negative";
-      console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+      
+      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
+
+      if (!unitToPop[neededKey]) {
+        unitToPop[neededKey] = [];
+      }
+
+      unitToPop[neededKey].push({ status, longTermOrNo, index, fullMeaning });
     }
   })
+
+  //console.log("Our unit keys to pop: ", unitToPop)
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
