@@ -427,7 +427,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   const mergedMessages = [];
   const indexesToRemove = new Set();
-  
+
   console.log("indexes pre pop: ",indexesToRemove);
   
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
@@ -527,8 +527,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   console.log("indexes post pop: ",indexesToRemove);
 
-  console.log("indexes pre unit pop: ",indexesToRemove);
-
   Object.entries(unitToPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
     const shortTermEntries = values.filter(value => !value.longTerm);
@@ -542,7 +540,38 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
         [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
         
         mergedMessages.push(
-          `You should really consider adding more courses from ${
+          `You should really consider adding course units from ${
+            key} branch as it has historically proven to be beneficial to your cause.`
+        );
+      }
+
+      if (longTermStatus === shortTermStatus && longTermStatus === "negative") {
+        [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
+        
+        mergedMessages.push(
+          `You should really consider reducing number of units offered from ${
+            key} branch as it has historically proven to be detrimental to your cause.`
+        );
+      }      
+    }
+  })
+
+  console.log("indexes post unit pop: ", indexesToRemove);
+
+  Object.entries(countToPop).forEach(([key, values]) => {
+    const longTermEntries = values.filter(value => value.longTerm);
+    const shortTermEntries = values.filter(value => !value.longTerm);
+
+    if (longTermEntries.length > 0 && shortTermEntries.length > 0) {
+      const longTermStatus = longTermEntries[0].status;
+      const shortTermStatus = shortTermEntries[0].status;
+
+
+      if (longTermStatus === shortTermStatus && longTermStatus === "positive") {
+        [...longTermEntries, ...shortTermEntries].forEach(value => indexesToRemove.add(value.index));
+        
+        mergedMessages.push(
+          `You should really consider adding more of courses from ${
             key} branch as it has historically proven to be beneficial to your cause.`
         );
       }
@@ -558,7 +587,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  console.log("indexes post unit pop: ", indexesToRemove);
+  console.log("indexes post count pop: ", indexesToRemove)
 
   for (let i = parCorrelationMeanings.length - 1; i >= 0; i--) {
     if (indexesToRemove.has(i)) {
