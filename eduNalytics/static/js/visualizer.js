@@ -427,8 +427,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   const mergedMessages = [];
   const indexesToRemove = new Set();
-
-  console.log("indexes pre pop: ",indexesToRemove);
   
   const noSuffixRegex = /^[\w\s]+of\s([A-Za-z\s]+)\son\s([A-Za-z]+)\sis\s([A-Za-z]+)ly/i;
   const unitSuffixRegex = /^(?:Taking more units from|Reducing course units from|Consider taking more units from|It may be beneficial to limit courses from)\s([A-Za-z\s]+)(?:can benefit your long-term performance|may help avoid long-term negative effects|.)$/i;  
@@ -442,23 +440,15 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     .map((meaning, index) => ({match: meaning.match(unitSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match)
 
-  //console.log("unit needed statements: ", unitNeededStatements)
-  //console.log('-'.repeat(45))
-
   const countNeededStatements = parCorrelationMeanings
     .map((meaning, index) => ({match: meaning.match(countSuffixRegex), index, fullMeaning: meaning}))
     .filter(entry => entry.match)
-
-  //console.log("count needed statements: ", countNeededStatements)
-  //console.log('-'.repeat(45))
 
   neededStatements.forEach(({match, index, fullMeaning}) => {
     if (match) {
       const neededKey = match[1];
       const longTermOrNo = match[2];
       const status = match[3];
-
-      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
 
       if (!toPop[neededKey]) {
         toPop[neededKey] = [];
@@ -468,15 +458,11 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   });
 
-  //console.log("Our keys to pop: ", toPop)
-
   unitNeededStatements.forEach(({match, index, fullMeaning}) => {
     if (match) {
       const neededKey = match[1];
       const longTerm = fullMeaning.includes("long-term") ? true : false;
       const status = fullMeaning.includes("can benefit" || "taking more units") ? "positive" : "negative";
-      
-      //console.log(neededKey, " ", status, " ", longTermOrNo, " ",index);
 
       if (!unitToPop[neededKey]) {
         unitToPop[neededKey] = [];
@@ -486,15 +472,11 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  //console.log("Our unit keys to pop: ", unitToPop)
-
   countNeededStatements.forEach(({match, index, fullMeaning}) => {
       if (match) {
         const neededKey = match[1];
         const longTerm = fullMeaning.includes("long-term" || "academic impact") ? true : false;
         const status = fullMeaning.includes("more courses from") ? "positive" : "negative";
-
-        //console.log(neededKey, " ", status, " ", longTerm, " ",index);
 
         if (!countToPop[neededKey]) {
             countToPop[neededKey] = [];
@@ -503,8 +485,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
         countToPop[neededKey].push({ status, longTerm, index, fullMeaning });
       }
   })
-
-  //console.log("Our count keys to pop: ", countToPop)
 
   const mergeObjectsWithArrayValues = (obj1, obj2) => {
     const result = { ...obj1 };
@@ -530,13 +510,9 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   const conjoinPop = mergeObjectsWithArrayValues(unitToPop, countToPop);
 
-  console.log("My conjoin pop dict: ",conjoinPop);
-  console.log('-'.repeat(40));
-
   Object.entries(conjoinPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
     const shortTermEntries = values.filter(value => !value.longTerm);
-    console.log(shortTermEntries);
 
     const shortTermNegatives = values.filter(value => 
       value["fullMeaning"].includes("It may be") || 
@@ -569,6 +545,20 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
         const neededLongPositives = longTermEntries.filter(entry => 
           longTermPositives.includes(entry)
         );
+
+        if (neededLongPositives.length > 1) {
+          mergedMessages.push(
+            `You should be really looking to offer more courses of ${
+              key} branch as it has historically proven to be beneficial in the long-term.`
+          );
+        }
+
+        if (neededLongNegatives.length > 1) {
+          mergedMessages.push(
+            `You should remove as many courses of the ${
+              key} branch with immediate alacrity to put a stop to its historical drastic effects.`
+          );
+        }
       }
 
       if (shortTermEntries.length > 1) {
@@ -579,12 +569,20 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
         const neededShortPositives = shortTermEntries.filter(entry => 
           shortTermPositives.includes(entry)
         );
-        console.log("My current positive items for test purpose: ", neededShortPositives);
-        console.log('-'.repeat(50));
-        console.log("My current negative items for test purpose: ", neededShortNegatives);
-        //if () {
-        //  
-        //}
+        
+        if (neededShortPositives.length > 1) {
+          mergedMessages.push(
+            `You should look to seize on any available opportunities to offer more courses from ${
+              key} branch as it bodes well and if maintained can probably extend into the long-run.`
+          );
+        }
+
+        if (neededShortNegatives.length > 1) {
+          mergedMessages.push(
+            `You must actively look to reduce courses of the ${
+              key} branch to avoid a drawdown on long-term performance by extension.`
+          );
+        }
       }
     }
   });
@@ -608,9 +606,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  console.log("indexes post pop: ",indexesToRemove);
-
-  /*Object.entries(unitToPop).forEach(([key, values]) => {
+  Object.entries(unitToPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
     const shortTermEntries = values.filter(value => !value.longTerm);
 
@@ -638,8 +634,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }      
     }
   })
-
-  console.log("indexes post unit pop: ", indexesToRemove);
 
   Object.entries(countToPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
@@ -670,8 +664,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  console.log("indexes post count pop: ", indexesToRemove)*/
-
   for (let i = parCorrelationMeanings.length - 1; i >= 0; i--) {
     if (indexesToRemove.has(i)) {
       parCorrelationMeanings.splice(i, 1);
@@ -679,7 +671,6 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   }
   
   parCorrelationMeanings.push(...mergedMessages);
-  console.log("Final Cleaned Messages:", parCorrelationMeanings);
   return;
 };
 
@@ -690,19 +681,9 @@ if (partial_correlation_data) {
     const meaning = extractParCorrMeaning(item);
     if (meaning) parCorrelationMeanings.push(meaning["message"]);
   })
-
-  //console.log("Original meanings: ", parCorrelationMeanings)
   
   parCorrelationMeaningsCleaner(parCorrelationMeanings);
 }
-
-/*This set of meanings above will be a part of an object that disseminates final messages
-  to the frontend-
-    This would be used to advise overall on impact of the 
-    total units and courses offered per semester with the ones against cgpa the tests
-    for some kind of divergence e.g if any of the key[1] contains 'cgpa' and an inverse value
-                                    might mean a disparity in potential
-    (for me to recall faster)*/
 
 const newbieAdvices = [
   "Engage with material through active techniques like summarizing key points in your own words, creating mind maps, teaching concepts to others, and using practice questions. This approach enhances comprehension and retention.", 
@@ -767,5 +748,3 @@ minimizeBtn.addEventListener('click', () => {
   advisory.style.display = "none";
   viewBtn.style.display = "block";
 });
-
-console.log("This is the end of the script.")
