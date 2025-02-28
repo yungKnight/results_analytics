@@ -504,26 +504,48 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }
   })
 
+  console.log("Our count keys to pop: ", countToPop)
+
   const mergeObjectsWithArrayValues = (obj1, obj2) => {
     const result = { ...obj1 };
     
     Object.keys(obj2).forEach(key => {
       if (key in result) {
-        result[key] = Array.isArray(result[key]) 
-          ? [...result[key], obj2[key]]
-          : [result[key], obj2[key]];
+        if (!Array.isArray(result[key])) {
+          result[key] = [result[key]];
+        }
+        
+        if (Array.isArray(obj2[key])) {
+          result[key] = [...result[key], ...obj2[key]];
+        } else {
+          result[key].push(obj2[key]);
+        }
       } else {
         result[key] = obj2[key];
       }
     });
     
     return result;
-  }
+  };
 
   const conjoinPop = mergeObjectsWithArrayValues(unitToPop, countToPop);
 
   console.log("My conjoin pop dict: ",conjoinPop);
-  console.log("Our count keys to pop: ", countToPop);
+
+  Object.entries(conjoinPop).forEach(([key, values]) => {
+    //console.log("Key is: ", key)
+    //console.log('-'.repeat(42))
+    //console.log("Values is/are: ", values)
+    //console.log(Array.isArray(values));
+    //console.log('-'.repeat(50))
+    //console.log('-'.repeat(35))
+    //console.log('-'.repeat(50))
+
+    const longTermEntries = values.filter(value => value.longTerm);
+    console.log(longTermEntries)
+    const shortTermEntries = values.filter(value => !value.longTerm);
+    console.log(shortTermEntries)    
+  })
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
@@ -546,7 +568,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   console.log("indexes post pop: ",indexesToRemove);
 
-  Object.entries(unitToPop).forEach(([key, values]) => {
+  /*Object.entries(unitToPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
     const shortTermEntries = values.filter(value => !value.longTerm);
 
@@ -606,7 +628,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  console.log("indexes post count pop: ", indexesToRemove)
+  console.log("indexes post count pop: ", indexesToRemove)*/
 
   for (let i = parCorrelationMeanings.length - 1; i >= 0; i--) {
     if (indexesToRemove.has(i)) {
