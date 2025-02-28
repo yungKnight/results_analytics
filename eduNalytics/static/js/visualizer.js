@@ -535,35 +535,37 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
 
   Object.entries(conjoinPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
-    console.log("long term entries as it stands: ",longTermEntries)
     const shortTermEntries = values.filter(value => !value.longTerm);
-    console.log("short term entries as it stands: ", shortTermEntries);
 
     const shortTermNegatives = values.filter(value => 
       value["fullMeaning"].includes("It may be") || 
       value["fullMeaning"].includes("Reducing courses from")
     );
-    console.log("short term negatives are: ", shortTermNegatives)
     
     const longTermNegatives = values.filter(value => 
       value["fullMeaning"].includes("Reducing course units from") || 
       value["fullMeaning"].includes("Avoiding courses from")
     );
-    console.log("long term negatives are: ", longTermNegatives);
 
     const shortTermPositives = values.filter(value => 
       value["fullMeaning"].includes("Consider taking more courses") || 
       value["fullMeaning"].includes("Consider taking more units from")
     );
-    console.log("short term positives are: ", shortTermPositives);
     
     const longTermPositives = values.filter(value => 
       value["fullMeaning"].includes("Taking more units from") || 
-      value["fullMeaning"].includes("Adding more courses from"));    
-    console.log("long term positives are: ", longTermPositives);
+      value["fullMeaning"].includes("Adding more courses from")
+    );
 
     console.log('-'.repeat(55))
     console.log('-'.repeat(55))
+
+    const keysWithMultipleValues = values.length > 1;
+    console.log(keysWithMultipleValues)
+
+    if (keysWithMultipleValues) {
+      
+    }
   })
 
   Object.entries(toPop).forEach(([key, values]) => {
