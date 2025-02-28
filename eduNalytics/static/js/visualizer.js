@@ -486,7 +486,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
     }
   })
 
-  console.log("Our unit keys to pop: ", unitToPop)
+  //console.log("Our unit keys to pop: ", unitToPop)
 
   countNeededStatements.forEach(({match, index, fullMeaning}) => {
       if (match) {
@@ -504,7 +504,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       }
   })
 
-  console.log("Our count keys to pop: ", countToPop)
+  //console.log("Our count keys to pop: ", countToPop)
 
   const mergeObjectsWithArrayValues = (obj1, obj2) => {
     const result = { ...obj1 };
@@ -536,6 +536,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   Object.entries(conjoinPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTerm);
     const shortTermEntries = values.filter(value => !value.longTerm);
+    console.log(shortTermEntries);
 
     const shortTermNegatives = values.filter(value => 
       value["fullMeaning"].includes("It may be") || 
@@ -557,16 +558,36 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
       value["fullMeaning"].includes("Adding more courses from")
     );
 
-    console.log('-'.repeat(55))
-    console.log('-'.repeat(55))
-
     const keysWithMultipleValues = values.length > 1;
-    console.log(keysWithMultipleValues)
 
     if (keysWithMultipleValues) {
-      
+      if (longTermEntries.length > 1) {
+        const neededLongNegatives = longTermEntries.filter(entry => 
+          longTermNegatives.includes(entry)
+        );
+        
+        const neededLongPositives = longTermEntries.filter(entry => 
+          longTermPositives.includes(entry)
+        );
+      }
+
+      if (shortTermEntries.length > 1) {
+        const neededShortNegatives = shortTermEntries.filter(entry => 
+          shortTermNegatives.includes(entry)
+        );
+        
+        const neededShortPositives = shortTermEntries.filter(entry => 
+          shortTermPositives.includes(entry)
+        );
+        console.log("My current positive items for test purpose: ", neededShortPositives);
+        console.log('-'.repeat(50));
+        console.log("My current negative items for test purpose: ", neededShortNegatives);
+        //if () {
+        //  
+        //}
+      }
     }
-  })
+  });
 
   Object.entries(toPop).forEach(([key, values]) => {
     const longTermEntries = values.filter(value => value.longTermOrNo === "cgpa");
