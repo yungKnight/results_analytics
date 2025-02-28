@@ -531,20 +531,39 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
   const conjoinPop = mergeObjectsWithArrayValues(unitToPop, countToPop);
 
   console.log("My conjoin pop dict: ",conjoinPop);
+  console.log('-'.repeat(40));
 
   Object.entries(conjoinPop).forEach(([key, values]) => {
-    //console.log("Key is: ", key)
-    //console.log('-'.repeat(42))
-    //console.log("Values is/are: ", values)
-    //console.log(Array.isArray(values));
-    //console.log('-'.repeat(50))
-    //console.log('-'.repeat(35))
-    //console.log('-'.repeat(50))
-
     const longTermEntries = values.filter(value => value.longTerm);
-    console.log(longTermEntries)
+    console.log("long term entries as it stands: ",longTermEntries)
     const shortTermEntries = values.filter(value => !value.longTerm);
-    console.log(shortTermEntries)    
+    console.log("short term entries as it stands: ", shortTermEntries);
+
+    const shortTermNegatives = values.filter(value => 
+      value["fullMeaning"].includes("It may be") || 
+      value["fullMeaning"].includes("Reducing courses from")
+    );
+    console.log("short term negatives are: ", shortTermNegatives)
+    
+    const longTermNegatives = values.filter(value => 
+      value["fullMeaning"].includes("Reducing course units from") || 
+      value["fullMeaning"].includes("Avoiding courses from")
+    );
+    console.log("long term negatives are: ", longTermNegatives);
+
+    const shortTermPositives = values.filter(value => 
+      value["fullMeaning"].includes("Consider taking more courses") || 
+      value["fullMeaning"].includes("Consider taking more units from")
+    );
+    console.log("short term positives are: ", shortTermPositives);
+    
+    const longTermPositives = values.filter(value => 
+      value["fullMeaning"].includes("Taking more units from") || 
+      value["fullMeaning"].includes("Adding more courses from"));    
+    console.log("long term positives are: ", longTermPositives);
+
+    console.log('-'.repeat(55))
+    console.log('-'.repeat(55))
   })
 
   Object.entries(toPop).forEach(([key, values]) => {
