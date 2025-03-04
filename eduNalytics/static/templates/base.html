@@ -8,12 +8,12 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'images/thoth96.png' %}">
-
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/general.css' %}">
+    <link rel="preload" href="{% static 'css/general.css' %}" as="style" onload="this.rel='stylesheet'">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
 
