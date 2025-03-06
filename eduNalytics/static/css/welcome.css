@@ -12,7 +12,6 @@ header {
     text-align: center;
 }
 
-
 .big-shoulders-stencil-appName {
   font-family: "Big Shoulders Stencil", sans-serif;
   font-optical-sizing: auto;
@@ -30,4 +29,137 @@ header {
     text-align: center;
     margin: 0 auto;
     color: green;
+    line-height: 1.65rem;
+}
+
+#about-the-app {
+    display: grid;
+    grid-template-columns: 60% 40%%;
+    gap: 2rem;
+    position: relative;
+    margin: calc(var(--default-padding) * 1.7) 0;
+}
+
+#about-the-app > div:first-child {
+    grid-column: 1;
+    text-align: center;
+    border-right: 0.15rem solid var(--primary-color);
+    border-bottom: 0.15rem solid var(--primary-color);
+    padding-right: var(--default-padding);
+}
+
+.advantage-card > strong {
+    font-size: 1.3rem;
+}
+
+.advantage-card > p {
+    margin-top: 1rem;
+}
+
+#advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin: 1rem 0;
+    align-items: center;
+    justify-content: center;
+}
+
+#advantages-grid > div.advantage-card:first-child,
+#advantages-grid > div.advantage-card:nth-child(2) {
+    margin: 1.3rem  0;
+}
+
+#advantages-grid > div.advantage-card:first-child {
+    border-right: 2px dotted var(--primary-color);
+    border-bottom: 2px dotted var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+#advantages-grid > div.advantage-card:nth-child(2) {
+    border-left: 2px dotted var(--primary-color);
+    border-bottom: 2px dotted var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+#advantages-grid > div.advantage-card:nth-child(3) {
+    border-right: 2px dotted var(--primary-color);
+    border-top: 2px dotted var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+#advantages-grid > div.advantage-card:nth-child(4) {
+    border-left: 2px dotted var(--primary-color);
+    border-top: 2px dotted var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+.advantage-card {
+    height: 10rem;
+    background-color: white;
+    padding: 0.65rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    opacity: 1;
+}
+
+#about-the-app > aside {
+    grid-column: 2;
+}
+
+.svg-text {
+    width: 90%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    font-size: 0.45rem;
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-left: 0.15rem solid var(--primary-color);
+    border-bottom: 0.15rem solid var(--primary-color);
+}
+
+aside > .svg-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* For the third SVG (circle) */
+aside > .svg-row:last-child {
+    justify-content: center;
+}
+
+#analysis-logic {
+    border-top: 0.15rem solid var(--primary-color);
+    border-bottom: 0.15rem solid var(--primary-color);
+    padding: var(--default-padding) 0;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.1fr 1.1fr 0.1fr 1.2fr 0.1fr 1.4fr;
+    gap: 0.65rem;
+    margin: 1rem 0;
+    align-items: center;
+}
+
+.step-card {
+    height: 6rem;
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 0.5rem;
+    padding: 0.65rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    opacity: 1;
+    align-content: center;
 }

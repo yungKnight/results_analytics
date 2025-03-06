@@ -1,6 +1,5 @@
 :root {
-    --primary-color: #88B04B;
-    --secondary-color: rgba(0, 105, 0, 0.40);
+    --primary-color: rgba(136, 176, 75, 0.55);
     --text-color: black;
     --default-padding: 0.625rem;
 }
