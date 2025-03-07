@@ -36,3 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cards.forEach(card => observer.observe(card));
 });
+
+document.querySelector("summary").addEventListener("click", function () {
+    this.style.display = "none"; 
+    setTimeout(() => document.getElementById("username").focus(), 30); 
+});
