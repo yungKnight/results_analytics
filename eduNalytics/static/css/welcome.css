@@ -163,3 +163,43 @@ aside > .svg-row:last-child {
     opacity: 1;
     align-content: center;
 }
+
+summary {
+    width: max-content;
+    cursor: pointer;
+}
+
+details > div {
+    display: grid;
+    grid-template-columns: 27% 73%;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
+    margin-left: var(--default-padding);
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 10px 3px rgb(136, 176, 75) !important;
+}
+
+form > button {
+    background-color: lightseagreen !important;
+    padding: 10px 15px !important;
+    border-color: gold !important;
+    border-radius: 10px 7px 10px 7px !important;
+}
+
+form > button:hover {
+    background-color: rgb(136, 176, 75) !important;
+}
+
+div.socials {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    justify-items: center; 
+    align-items: center; 
+    text-align: center; 
+    height: auto; 
+}
