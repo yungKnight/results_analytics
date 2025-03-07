@@ -89,11 +89,21 @@
     </section>
     <details>
         <summary>Click Here To Get Started</summary>
-        <form id="name-form" method="POST" aria-label="Name submission form">
-            {% csrf_token %}
-            <input type="text" id="username" name="username" class="form-control mb-1 p-2" placeholder="    Enter your name here" required aria-required="true">
-            <button type="submit" id="submit" class="btn btn-primary py-1 mt-1" style="display: inline-block;">Get Started</button>
-        </form>
+        <div>
+            <form id="name-form" method="POST" aria-label="Name submission form">
+                {% csrf_token %}
+                <input type="text" id="username" name="username" class="form-control mb-1 p-2" placeholder="    Enter your name here" required aria-required="true">
+                <button type="submit" id="submit" class="btn btn-primary py-1 mt-1" style="display: inline-block;">Get Started</button>
+            </form>
+            <div class="socials">
+                <h3>
+                    EduNalytica v1.0 by <mark>Kennery</mark> Follow us on X for more updates
+                </h3>
+                <h3>
+                    Help us bring EduNalytica to your school, contact dev on ...
+                </h3>
+            </div>
+        </div>
     </details>
 </main>
 
