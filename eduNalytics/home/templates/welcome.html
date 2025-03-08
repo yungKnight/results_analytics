@@ -33,7 +33,7 @@
                 </div>
                 <div class="advantage-card">
                     <strong>Personalized Growth Strategies</strong>  
-                    <p>Get AI-driven, actionable recommendations tailored to help you optimize performance and reach your full potential.</p>  
+                    <p>Get data-driven, actionable recommendations tailored to help you optimize performance and reach your full potential.</p>  
                 </div>
             </div>
         </div>
@@ -93,14 +93,32 @@
             <form id="name-form" method="POST" aria-label="Name submission form">
                 {% csrf_token %}
                 <input type="text" id="username" name="username" class="form-control mb-1 p-2" placeholder="    Enter your name here" required aria-required="true">
-                <button type="submit" id="submit" class="btn btn-primary py-1 mt-1" style="display: inline-block;">Get Started</button>
+                <button type="submit" id="submit" class="btn btn-primary py-2 mt-1" style="display: inline-block;">Get Started</button>
             </form>
             <div class="socials">
                 <h3>
-                    EduNalytica v1.0 by <mark>Kennery</mark> Follow us on X for more updates
+                    <b>&copy;</b>
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    EduNalytica v1.0 by 
+                    <a href="https://yungknight.github.io" target="_blank" class="hover-preview">
+                        <mark class="playfair-display-devName">Kennery</mark>
+                    </a>. Follow us on <a href="https://x.com/EduNalytica" target="_blank" id="contact-us">
+                        <img src="{% static 'images/x.svg' %}" alt="Stay updated with latest features on our socials." />
+                    </a> for more updates
+                    <span class="iframe-container">
+                        <iframe src="https://yungknight.github.io"></iframe>
+                    </span>
                 </h3>
                 <h3>
-                    Help us bring EduNalytica to your school, contact dev on ...
+                    To help us bring EduNalytica to your school or to support our mission in any form,<br>&nbsp;Reach out to dev on 
+                    <a href="https://x.com/k3nn3ry" target="_blank" id="contact-us">
+                        <img src="{% static 'images/x.svg' %}" alt="Contact Us" />
+                    </a>
+                    <a href="https://www.linkedin.com/in/ajayi-eniola-8a5a2431a/" target="_blank" id="contact-us">
+                        <img src="{% static 'images/linkdin.svg' %}" alt="Contact Us" />
+                    </a>&nbsp;
                 </h3>
             </div>
         </div>

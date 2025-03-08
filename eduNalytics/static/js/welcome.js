@@ -1,7 +1,7 @@
 const usernameInput = document.getElementById('username');
 const submitButton = document.getElementById('submit');
 
-const regex = /^(\s)?[A-Za-z]+(\s+[A-Za-z]*\s*)+$/;
+const regex = /^(\s)?[A-Za-z]+(\s+[A-Za-z]*\s*)?$/;
 
 submitButton.addEventListener('click', (e) => {
     const username = usernameInput.value.trim();
