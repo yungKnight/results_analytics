@@ -9,9 +9,14 @@
 <div id="main-content" class="container">
     <div class="chat-box">
         <div class="chat-header">
-            <img src="{% static 'images/sun.png' %}" alt="pictorial representation of time" style="display: inline-block;" />
+            <img alt="pictorial representation of time" id="time-of-day-img"
+                data-morning="{% static 'images/morning.png' %}"
+                data-afternoon="{% static 'images/sun.png' %}"
+                data-evening="{% static 'images/moon.png' %}"
+                data-late-night="{% static 'images/late-night.png' %}" style="display: inline-block;" />
             <span class="chat-greeting">
-                Good afternoon, 
+                <span id="time-of-day">
+                </span> 
                 <span class="big-shoulders-stencil-userName" id="greetingText">{{ username }}</span>
             </span>
         </div>
