@@ -22,7 +22,7 @@ html, body {
 }
 
 .chat-header {
-    font-size: 1.5rem;
+    font-size: 1.66rem;
     color: var(--text-color);
     margin-bottom: 1rem;
     justify-content: space-between;
@@ -31,7 +31,7 @@ html, body {
 .big-shoulders-stencil-userName {
     font-family: "Big Shoulders Stencil", sans-serif;
     font-weight: 900;
-    font-size: 1.65rem;
+    font-size: 1.75rem;
     display: inline-block;
     letter-spacing: 0.1rem;
     font-style: oblique;
@@ -88,11 +88,13 @@ hr {
   background-color: rgba(136, 176, 75, 0.45);
   text-align: left;
   padding: var(--default-padding);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  box-shadow: 2px 2px 8px 2px rgb(136, 176, 75)
 }
 
 #userbase > li::before {
-  content: "+";
+  content: "\2795";
+  margin-right: 0.25rem;
 }
 
 #userbase > li {
@@ -102,5 +104,6 @@ hr {
 .userDemo {
   margin-top: var(--default-padding);
   max-width: 40%;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  padding: 7px;
 }

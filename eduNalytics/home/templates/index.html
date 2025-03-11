@@ -11,7 +11,8 @@
         <div class="chat-header">
             <img src="{% static 'images/sun.png' %}" alt="pictorial representation of time" style="display: inline-block;" />
             <span class="chat-greeting">
-                Good afternoon, <span class="big-shoulders-stencil-userName">{{ username }}</span>
+                Good afternoon, 
+                <span class="big-shoulders-stencil-userName" id="greetingText">{{ username }}</span>
             </span>
         </div>
         <div class="chat-body">
@@ -34,14 +35,16 @@
 
         <ul id="userbase">
             <li>
-                This login section is only available for select school(s)- (OOU). We promise to support more schools in future updates, with your help of course.
+                The login section is only available for select school(s)- (OOU). We promise to support more schools in future updates, with your help of course. &#128522;
             </li>
             <li>
-                To test the full version features with an already existing student result (for non-students), use the "Request Demo" button below<br>
+                To test the full version features with an already existing student result (for non-students), use the "Request Demo" button below &#128071;<br>
                 <button class="btn-submit userDemo">Request Demo</button> 
             </li>
         </ul>
     </div>
 </div>
+
+<script src="{% static 'js/index.js'  %}"></script>
 
 {% endblock %}
