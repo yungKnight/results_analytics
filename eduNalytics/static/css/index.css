@@ -1,0 +1,106 @@
+
+html, body {
+  background-color: lightseagreen;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 40rem;
+    min-width: 30rem;
+}
+
+.chat-box {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 2px 3px 20px -4px var(--primary-color);
+    padding: 2rem;
+    text-align: center;
+}
+
+.chat-header {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    justify-content: space-between;
+}
+
+.big-shoulders-stencil-userName {
+    font-family: "Big Shoulders Stencil", sans-serif;
+    font-weight: 900;
+    font-size: 1.65rem;
+    display: inline-block;
+    letter-spacing: 0.1rem;
+    font-style: oblique;
+}
+
+.alert {
+    background: rgba(255, 0, 0, 0.1);
+    color: red;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 10px 3px rgb(136, 176, 75) !important;
+}
+
+.btn-submit {
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: white !important;
+    background-color: lightseagreen !important;
+    padding: 10px 15px !important;
+    border: 2px solid;
+    border-color: gold !important;
+    border-radius: 10px 7px 10px 7px !important;
+}
+
+.btn-submit:hover {
+  background-color: rgb(136, 176, 75) !important;
+}
+
+hr {
+  height: 15px;
+  margin-top: var(--default-padding); 
+}
+
+#userbase {
+  background-color: rgba(136, 176, 75, 0.45);
+  text-align: left;
+  padding: var(--default-padding);
+  font-size: 0.75rem;
+}
+
+#userbase > li::before {
+  content: "+";
+}
+
+#userbase > li {
+  padding-bottom: calc(var(--default-padding) / 2) ;
+}
+
+.userDemo {
+  margin-top: var(--default-padding);
+  max-width: 40%;
+  font-size: 0.75rem;
+}
