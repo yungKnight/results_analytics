@@ -4,29 +4,43 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
 
-<div id="main-content" class="container mt-5">
-    <div class="card">
-        <div class="card-header">
-            <span id="greeting" class="text-4xl font-bold">Hello, {{ username }}</span>
+<div id="main-content" class="container">
+    <div class="chat-box">
+        <div class="chat-header">
+            <img src="{% static 'images/sun.png' %}" alt="pictorial representation of time" style="display: inline-block;" />
+            <span class="chat-greeting">
+                Good afternoon, <span class="big-shoulders-stencil-userName">{{ username }}</span>
+            </span>
         </div>
-        <div class="card-body">
+        <div class="chat-body">
             {% if error_message %}
-            <div class="alert alert-danger">{{ error_message }}</div>
+            <div class="alert">{{ error_message }}</div>
             {% endif %}
             <form method="POST" action="{% url 'collector:scrape' %}">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="matric_number">Matric Number</label>
-                    <input type="text" class="form-control" id="matric_number" name="matric_number" required>
+                <div class="input-group">
+                    <input type="text" id="matric_number" name="matric_number" placeholder="Matric Number" required>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn-submit">Submit</button>
             </form>
         </div>
+
+        <hr>
+
+        <ul id="userbase">
+            <li>
+                This login section is only available for select school(s)- (OOU). We promise to support more schools in future updates, with your help of course.
+            </li>
+            <li>
+                To test the full version features with an already existing student result (for non-students), use the "Request Demo" button below<br>
+                <button class="btn-submit userDemo">Request Demo</button> 
+            </li>
+        </ul>
     </div>
 </div>
 
