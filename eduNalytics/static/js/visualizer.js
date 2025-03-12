@@ -551,6 +551,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
             `You should be really looking to offer more courses of ${
               key} branch as it has historically proven to be beneficial in the long-term.`
           );
+          neededLongPositives.forEach(value => indexesToRemove.add(value.index))
         }
 
         if (neededLongNegatives.length > 1) {
@@ -558,6 +559,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
             `You should remove as many courses of the ${
               key} branch with immediate alacrity to put a stop to its historical drastic effects.`
           );
+          neededLongNegatives.forEach(value => indexesToRemove.add(value.index))
         }
       }
 
@@ -575,6 +577,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
             `You should look to seize on any available opportunities to offer more courses from ${
               key} branch as it bodes well and if maintained can probably extend into the long-run.`
           );
+          neededShortPositives.forEach(value => indexesToRemove.add(value.index))
         }
 
         if (neededShortNegatives.length > 1) {
@@ -582,6 +585,7 @@ const parCorrelationMeaningsCleaner = (parCorrelationMeanings) => {
             `You must actively look to reduce courses of the ${
               key} branch to avoid a drawdown on long-term performance by extension.`
           );
+          neededShortNegatives.forEach(value => indexesToRemove.add(value.index))
         }
       }
     }
