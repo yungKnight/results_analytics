@@ -12,7 +12,7 @@ html {
 }
 
 body {
-	padding: calc(var(--default-padding) / 4);
+	padding: calc(var(--default-padding) / 1.5);
 	overflow-x: hidden;
 }
 
