@@ -12,9 +12,20 @@
     <div id="student-dash">
         <h2 id="title-dash">Course Results for {{ student.name }}</h2>
         <div id="info-dash">
-            <h3>Status: {{ request.session.context.student_info.Status }}</h3>
-            <h3>Department: {{ request.session.context.student_info.Department }}</h3>
-            <h3>Entry Type: {{ request.session.context.student_info.EntryType }}</h3>
+            <div class="personal-info personal-info-status">
+                <img style="display: inline;" src="{% static 'images/student.png' %}" />: 
+                <h3 style="display: inline; padding: 0 0.25rem;">{{ request.session.context.student_info.Status }}</h3>
+            </div>
+
+            <div class="personal-info personal-info-dept">
+                <img style="display: inline;" src="{% static 'images/department.png' %}" />: 
+                <h3 style="display: inline; padding: 0 0.25rem;">{{ request.session.context.student_info.Department }}</h3>
+            </div>
+
+            <div class="personal-info personal-info-entry">
+                <img style="display: inline;" src="{% static 'images/entry.png' %}" />: 
+                <h3 style="display: inline; padding: 0 0.25rem;">{{ request.session.context.student_info.EntryType }}</h3>
+            </div>
         </div>
     </div>
 
@@ -44,11 +55,11 @@
                 </tbody>
             </table>
         {% endfor %}
-        <div class="container mt-2 align-right pb-3">
-            <button class="btn btn-primary">View Analysis</button>
-        </div>
+        
+        <button class="btn btn-primary">View Analysis</button>
+        
     {% else %}
-        <p>No results available for this student.</p>
+        <h3>No results available for this student.</h3>
     {% endif %}
 </div>
 {% endblock %}
