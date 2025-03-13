@@ -1,17 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
    {{ student.name }} Results
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/cleaned.css' %}">
 
-<div class="container mt-5">
-    <h1 class="text-center">Detailed Course Results for {{ student.name }}</h1>
+<div>
+    <div id="student-dash">
+        <h2 id="title-dash">Course Results for {{ student.name }}</h2>
+        <div id="info-dash">
+            <h3>Status: {{ request.session.context.student_info.Status }}</h3>
+            <h3>Department: {{ request.session.context.student_info.Department }}</h3>
+            <h3>Entry Type: {{ request.session.context.student_info.EntryType }}</h3>
+        </div>
+    </div>
 
     {% if cleaned_results_by_semester %}
         {% for semester, results in cleaned_results_by_semester %}
-            <h2 class="mt-4">{{ semester }}</h2>
+            <h3 class="mt-3">{{ semester }}</h3>
             <table class="table table-striped mt-3">
                 <thead>
                     <tr>

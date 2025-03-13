@@ -1,0 +1,22 @@
+#student-dash {
+	margin-top: 0.25rem;
+	height: 20vh;
+	width: inherit;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+    background-color: var(--primary-color);
+    align-content: center;
+    padding: calc(var(--default-padding)*1.5) 0;
+    color: var(--text-color);
+    box-shadow: 2px 2px 15px gold;
+    border-radius: 0.5rem;
+}
+
+#info-dash {
+	margin-top: calc(var(--default-padding) * 1.5);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	/*gap: calc(var(--default-padding) * 2.5);*/
+}
