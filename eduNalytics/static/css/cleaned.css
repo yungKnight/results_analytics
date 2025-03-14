@@ -1,9 +1,9 @@
 #student-dash {
-	margin-top: 0.25rem;
-	width: inherit;
-	text-align: center;
-	display: flex;
-	flex-direction: column;
+    margin-top: 0.25rem;
+    width: inherit;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
     background-color: var(--primary-color);
     align-content: center;
     padding: calc(var(--default-padding)* 3) 0;
@@ -12,11 +12,23 @@
     border-radius: 0.5rem;
 }
 
+#student-name {
+    font-family: "Playfair Display", Arial;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: oblique;
+}
+
 #info-dash {
-	margin-top: calc(var(--default-padding) * 1.85);
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
+    margin-top: calc(var(--default-padding) * 1.85);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.personal-info {
+    display: flex;
+    align-items: center;
 }
 
 .personal-info img {
@@ -24,17 +36,15 @@
 }
 
 .personal-info-status span,
-.personal-info-entry span {
-    margin: 0 0 0 -0.5rem;
-}
-
-.personal-info-dept span {
-    margin: 0 0 0 -0.3rem;
+.personal-info-entry span,
+.personal-info-dept span  {
+    margin: 0 0 0 -0.1rem;
 }
 
 .personal-info h3 {
     display: inline;
     padding: 0 0.25rem;
+    text-transform: uppercase;
 }
 
 .table-striped tbody tr:nth-child(odd) td {
@@ -43,11 +53,11 @@
 }
 
 .btnContainer {
-	text-align: center;
+    text-align: center;
 }
 
 .btn-primary {
-	width: 50%;
+    width: 50%;
     font-size: 1.07rem;
     cursor: pointer;
     transition: background 0.3s ease;
