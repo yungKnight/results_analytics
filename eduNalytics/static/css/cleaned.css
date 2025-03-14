@@ -19,14 +19,36 @@
 	justify-content: space-around;
 }
 
+.personal-info img {
+    display: inline;
+}
+
+.personal-info-status span,
+.personal-info-entry span {
+    margin: 0 0 0 -0.5rem;
+}
+
+.personal-info-dept span {
+    margin: 0 0 0 -0.3rem;
+}
+
+.personal-info h3 {
+    display: inline;
+    padding: 0 0.25rem;
+}
+
 .table-striped tbody tr:nth-child(odd) td {
     background-color: var(--primary-color);
     opacity: 0.85;
 }
 
+.btnContainer {
+	text-align: center;
+}
+
 .btn-primary {
-    width: 100%;
-    font-size: 1rem;
+	width: 50%;
+    font-size: 1.07rem;
     cursor: pointer;
     transition: background 0.3s ease;
     color: white !important;
