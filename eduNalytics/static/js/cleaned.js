@@ -1,3 +1,9 @@
-const infoDetails = document.getElementsByClassName('personal-info');
-
-infoDetails.style.nth-child(3) = value.capitalize;
+document.addEventListener('DOMContentLoaded', () => {
+    const analysisButton = document.querySelector('.btnContainer .btn-primary');
+    
+    if (analysisButton) {
+        analysisButton.addEventListener('click', () => {
+            window.location.href += 'insight/visual';
+        });
+    }
+});
