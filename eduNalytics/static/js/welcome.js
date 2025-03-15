@@ -12,8 +12,8 @@ submitButton.addEventListener('click', (e) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    var cards = document.querySelectorAll('.step-card');
+document.addEventListener('DOMContentLoaded', () => {
+    let cards = document.querySelectorAll('.step-card');
 
     gsap.set(cards, { opacity: 0, y: 20, scale: 1.1 });
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cards.forEach(card => observer.observe(card));
 });
 
-document.querySelector("summary").addEventListener("click", function () {
+document.querySelector("summary").addEventListener("click", () => {
     this.style.display = "none"; 
     setTimeout(() => document.getElementById("username").focus(), 30); 
 });

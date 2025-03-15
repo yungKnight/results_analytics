@@ -27,4 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: "power4.out"
         });
     }
+
+    gsap.set(analysisButton, {opacity: 0, y: 40, scale: 1.2});
+
+    const observer = new IntersectionObserver(entries => {
+        let btnIsVisible = entries.filter(entry => entry.isIntersecting).map(entry => entry.target);
+
+        gsap.to(btnIsVisible, {
+            opacity: 1,
+            scale: 1.0,
+            y: 0,
+            duration: 0.5,
+            ease: 'power4.out'
+        })
+    })
+
+     observer.observe(analysisButton);
 });
