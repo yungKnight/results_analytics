@@ -1,0 +1,130 @@
+/* Main layout containers */
+.chart-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: inherit;
+  flex-direction: row;
+}
+
+/* Chart sections */
+.chart-section {
+  padding-bottom: 1rem;
+}
+
+.chart-row {
+  display: flex;  /* Only applies to this row */
+  justify-content: space-between;
+  width: 100%;  /* Ensures full width */
+}
+
+.branch-gpa-chart, .semester-avg-chart {
+  width: 55vw; /* Avoids negative calc issues */
+  height: 450px;
+  padding-top: 1rem;
+}
+
+.cgpa-chart {
+  width: 45vw;
+  height: 450px;
+  padding-top: 1rem;
+}
+
+.level-boxplot {
+  height: 450px;
+  width: 33vw;
+  padding-top: 4.5rem;
+}
+
+.semester-boxplot {
+  height: 450px;
+  width: 67vw;
+  padding-top: 4.5rem;
+  padding-left: 30px;
+}
+
+.scatter-plot {
+  height: 450px;
+  width: 60vw;
+  padding-top: 6.7rem;
+}
+
+.overall-boxplot {
+  height: 450px;
+  width: 40vw;
+  padding-top: 6.7rem;
+}
+
+.alternate-semester-avg-chart {
+  height: 450px;
+  width: 45vw;
+  padding-top: 9rem;
+}
+
+.branch-avg-chart {
+  height: 450px;
+  width: 55vw;
+  padding-top: 9rem;
+}
+
+.branch-pie-chart {
+  height: 650px;
+  width: 38vw;
+  padding-top: 11rem;
+}
+
+.semester-distribution {
+  height: 650px;
+  width: 62vw;
+  padding-top: 11rem;
+}
+
+.semester-distribution-inner {
+  padding-top: 4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.semester-distribution-item {
+  flex: 0 0 calc(25% - 20px);
+}
+
+.branch-distribution-stacked {
+  height: 630px;
+  width: 100vw;
+  padding-top: 15rem;
+}
+
+.pass-rate-chart {
+  height: 650px;
+  width: 100vw;
+  padding-top: 11rem;
+  padding-right: 0.7rem;
+}
+
+/* Typography */
+.chart-title {
+  text-align: center;
+}
+
+/* Spacing */
+.spacer {
+  padding-top: 4px;
+  margin-bottom: 8px;
+}
+
+/* Button and advisory section */
+.analysis-button {
+  display: inline-block;
+  width: 100vw;
+}
+
+.advisory-section {
+  margin: 40px 0 5px;
+}
+
+.minimize-button {
+  width: 100vw;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
