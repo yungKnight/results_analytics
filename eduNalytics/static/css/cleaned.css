@@ -13,7 +13,7 @@
 }
 
 #student-name {
-    font-family: "Playfair Display", Arial;
+    /*font-family: "Playfair Display", sans-serif;*/
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: oblique;

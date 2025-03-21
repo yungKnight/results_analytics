@@ -6,105 +6,118 @@
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/visualizer.css' %}">
 
 <script>
   const neededData = JSON.parse('{{ needed_data|safe }}');
 </script>
 
 <div>
-  <div style="display: flex; flex-wrap: wrap; width: inherit; flex-direction: row;">
+  <div class="chart-container">
     
-    {% if branch_gpa_chart_html %}
-      <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 2rem;">
-        <h2 style="text-align: center;" class="text-4xl">Branch GPA</h2>
-        {{ branch_gpa_chart_html|safe }}
-      </div>
-    {% else %}
-      <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 2rem;">
-        <h2 style="text-align: center;" class="text-4xl">Semester Average Score</h2>
-        {{ semester_avg_chart_html|safe }}
-      </div>
-    {% endif %}
-
-    <div style="height: 450px; width: 35vw; padding-bottom: 1rem; padding-top: 2rem;">
-      <h2 style="text-align: center;" class="text-4xl">CGPA & GPA</h2>
-      {{ combined_chart_html|safe }}
-    </div>
+    <div class="chart-row">
+      {% if branch_gpa_chart_html %}
+        <div class="chart-section branch-gpa-chart">
+          <h2 class="chart-title">Branch GPA</h2>
+          {{ branch_gpa_chart_html|safe }}
+        </div>
+      {% else %}
+        <div class="chart-section semester-avg-chart">
+          <h2 class="chart-title">Semester Average Score</h2>
+          {{ semester_avg_chart_html|safe }}
+        </div>
+      {% endif %}
     
-    <div style="height: 450px; width: 33vw; padding-bottom: 1rem; padding-top: 4.5rem;">
-      <h2 style="text-align: center;" class="text-4xl">Per Level boxplot</h2>
-      {{ level_boxplot_html|safe }}
-    </div>
-
-    <div style="height: 450px; width: 67vw; padding-bottom: 1rem; padding-top: 4.5rem; padding-left: 30px;">
-      <h2 style="text-align: center;" class="text-4xl">Per Semester boxplot</h2>
-      {{ semester_boxplot_html|safe }}
-    </div>
-
-    <div style="height: 450px; width: 60vw; padding-bottom: 1rem; padding-top: 6.7rem;">
-      <h2 style="text-align: center;" class="text-4xl">Scatterplot of Course results</h2>
-      {{ scatter_plot_html|safe }}
-    </div>
-
-    <div style="height: 450px; width: 40vw; padding-bottom: 1rem; padding-top: 6.7rem;">
-      <h2 style="text-align: center;" class="text-4xl">Overall Boxplot</h2>
-      {{ all_scores_boxplot_html|safe }}
-    </div>
-
-    {% if branch_gpa_chart_html %}
-      <div style="height: 450px; width: 45vw; padding-bottom: 1rem; padding-top: 9rem;">
-        <h2 style="text-align: center;" class="text-4xl">Semester Average Score</h2>
-        {{ semester_avg_chart_html|safe }}
+      <div class="chart-section cgpa-chart">
+        <h2 class="chart-title">CGPA & GPA</h2>
+        {{ combined_chart_html|safe }}
       </div>
-    {% endif %}
+    </div>
 
-    {% if branch_avg_chart_html %}
-      <div style="height: 450px; width: 55vw; padding-bottom: 1rem; padding-top: 9rem;">
-        <h2 style="text-align: center;" class="text-4xl">Branch Average Score per Semester</h2>
-        {{ branch_avg_chart_html|safe }}
+    <div class="chart-row">
+      <div class="chart-section level-boxplot">
+        <h2 class="chart-title">Per Level boxplot</h2>
+        {{ level_boxplot_html|safe }}
       </div>
-    {% endif %}
-
-    {% if overall_branch_pie_chart_html %}
-      <div style="height: 650px; width: 38vw; padding-bottom: 1rem; padding-top: 11rem;">
-        <h2 style="text-align: center;" class="text-4xl">Overall Branch Distribution</h2>
-         {{ overall_branch_pie_chart_html|safe }}
+  
+      <div class="chart-section semester-boxplot">
+        <h2 class="chart-title">Per Semester boxplot</h2>
+        {{ semester_boxplot_html|safe }}
       </div>
-    {% endif %}
+    </div>
 
-    {% if semester_distribution_pie_chart_html_list %}
-      <div style="height: 650px; width: 62vw; padding-bottom: 1rem; padding-top: 11rem;">
-        <h2 style="text-align: center;" class="text-4xl">Branch Distribution of Courses per Semester</h2>
-        <div style="padding-top: 4rem;">
-          <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
-              {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
-                  <div style="flex: 0 0 calc(25% - 20px);">
-                      {{ pie_chart_html|safe }}
-                  </div>
-              {% endfor %}
+    <div class="chart-row">
+      <div class="chart-section scatter-plot">
+        <h2 class="chart-title">Scatterplot of Course results</h2>
+        {{ scatter_plot_html|safe }}
+      </div>
+  
+      <div class="chart-section overall-boxplot">
+        <h2 class="chart-title">Overall Boxplot</h2>
+        {{ all_scores_boxplot_html|safe }}
+      </div>
+    </div>
+
+    <div class="chart-row">
+      {% if branch_gpa_chart_html %}
+        <div class="chart-section alternate-semester-avg-chart">
+          <h2 class="chart-title">Semester Average Score</h2>
+          {{ semester_avg_chart_html|safe }}
+        </div>
+      {% endif %}
+  
+      {% if branch_avg_chart_html %}
+        <div class="chart-section branch-avg-chart">
+          <h2 class="chart-title">Branch Average Score per Semester</h2>
+          {{ branch_avg_chart_html|safe }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="chart-row">
+      {% if overall_branch_pie_chart_html %}
+        <div class="chart-section branch-pie-chart">
+          <h2 class="chart-title">Overall Branch Distribution</h2>
+           {{ overall_branch_pie_chart_html|safe }}
+        </div>
+      {% endif %}
+  
+      {% if semester_distribution_pie_chart_html_list %}
+        <div class="chart-section semester-distribution">
+          <h2 class="chart-title">Branch Distribution of Courses per Semester</h2>
+          <div class="semester-distribution-inner">
+            {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
+                <div class="semester-distribution-item">
+                    {{ pie_chart_html|safe }}
+                </div>
+            {% endfor %}
           </div>
         </div>
-      </div>
-    {% endif %}
+      {% endif %}
+    </div>
 
-    {% if branch_distribution_stacked_bar_chart_html %}
-      <div style="height: 630px; width: 100vw; padding-bottom: 1rem; padding-top: 15rem;">
-        <h2 style="text-align: center;" class="text-4xl">Overall Branch Distribution</h2>
-         {{ branch_distribution_stacked_bar_chart_html|safe }}
-      </div>
-    {% endif %}
+    <div class="chart-row">
+      {% if branch_distribution_stacked_bar_chart_html %}
+        <div class="chart-section branch-distribution-stacked">
+          <h2 class="chart-title">Overall Branch Distribution</h2>
+           {{ branch_distribution_stacked_bar_chart_html|safe }}
+        </div>
+      {% endif %}
+    </div>
 
-    <div style="height: 650px; width: 100vw; padding-top: 11rem; padding-right: 0.7rem;">
-      <h2 style="text-align: center;" class="text-4xl">Overall Passed Branch Distribution</h2>
-      {{ pass_rate_html|safe }}
+    <div class="chart-row">
+      <div class="chart-section pass-rate-chart">
+        <h2 class="chart-title">Overall Passed Branch Distribution</h2>
+        {{ pass_rate_html|safe }}
+      </div>
     </div>
   </div>
 </div>
 
-<br class="pt-4 mb-2">
+<br class="spacer">
 
-<aside style="margin: 40px 0 5px;">
-  <button type="submit" id="view_analysis" class="btn btn-primary py-1" style="display: inline-block; width: 100vw;">Click here to view detailed analysis of your result
+<aside class="advisory-section">
+  <button type="submit" id="view_analysis" class="btn btn-primary py-1 analysis-button">Click here to view detailed analysis of your result
   </button>
   <content id="advisory">
     <h2 class="advisory-section-title text-2xl bold text-center">Your Overall Semester Performance</h2>
@@ -113,7 +126,7 @@
     <p id="studentSpecificPerformance"></p>
     <h2 class="advisory-section-title text-2xl bold text-center">Advice To Improve Performance</h2>
     <p id="toDoMoreOrNot"></p>
-    <button type="submit" id="minimize_analysis" class="btn btn-primary py-1 my-2" style="width: 100vw;">
+    <button type="submit" id="minimize_analysis" class="btn btn-primary py-1 minimize-button">
       Click here to minimize detailed analysis of your result
     </button>
   </content>
