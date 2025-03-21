@@ -48,6 +48,10 @@ header {
     padding-right: var(--default-padding);
 }
 
+#about-the-app > aside {
+    grid-column: 2;
+}
+
 .advantage-card > strong {
     font-size: 1.3rem;
 }
@@ -102,10 +106,6 @@ header {
     opacity: 1;
 }
 
-#about-the-app > aside {
-    grid-column: 2;
-}
-
 .svg-text {
     width: 90%;
     height: 100%;
@@ -136,6 +136,28 @@ aside > .svg-row:last-child {
     justify-content: center;
 }
 
+@media (max-width: 1100px) {
+    /*#advantages-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /*#about-the-app {
+        grid-template-columns: 1fr;
+    }
+
+    /*#about-the-app > div:first-child {
+        grid-column: auto;
+    }
+
+    #about-the-app > aside {
+        grid-column: auto;
+    }
+
+    .svg-row > svg {
+        width: 33%;
+    }*/
+}
+
 #analysis-logic {
     border-top: 0.15rem solid var(--primary-color);
     border-bottom: 0.15rem solid var(--primary-color);
@@ -150,6 +172,12 @@ aside > .svg-row:last-child {
     gap: 0.65rem;
     margin: 1rem 0;
     align-items: center;
+}
+
+@media (max-width: 1280px) {
+    .steps-grid {
+        grid-template-columns: 0.9fr 0.1fr 1fr 0.1fr 1.1fr 0.1fr 1.4fr;
+    }
 }
 
 .step-card {
