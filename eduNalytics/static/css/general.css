@@ -11,6 +11,12 @@ html {
     font-family: 'Arial', sans-serif;
 }
 
+@media (max-width: 450px) {
+    html {
+        font-size: 14px;
+    }
+}
+
 body {
 	padding: calc(var(--default-padding) / 1.5);
 	overflow-x: hidden;
