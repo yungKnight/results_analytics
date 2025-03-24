@@ -34,9 +34,8 @@ header {
 
 #about-the-app {
     display: grid;
-    grid-template-columns: 60% 40%%;
-    gap: 2rem;
-    position: relative;
+    grid-template-columns: 60% 40%;
+    gap: 1rem;
     margin: calc(var(--default-padding) * 1.7) 0;
 }
 
@@ -136,26 +135,38 @@ aside > .svg-row:last-child {
     justify-content: center;
 }
 
-@media (max-width: 1100px) {
-    /*#advantages-grid {
-        grid-template-columns: 1fr;
+@media (min-width: 1025px) and (max-width: 1280px) {
+    html {
+        font-size: 14px;
     }
 
-    /*#about-the-app {
-        grid-template-columns: 1fr;
+    #appName {
+        font-size: 4rem;
     }
 
-    /*#about-the-app > div:first-child {
+    details > div {
+        display: grid;
+        grid-template-columns: 27% 73%;
+        gap: 8rem;
+        align-items: center;
+        text-align: center;
+        margin-left: var(--default-padding);
+    }
+
+    .steps-grid {
+        grid-template-columns: 0.9fr 0.1fr 1fr 0.1fr 1.1fr 0.1fr 1.4fr;
+    }
+
+    #about-the-app > div:first-child {
         grid-column: auto;
+        border-right: none;
     }
 
     #about-the-app > aside {
         grid-column: auto;
+        border-top: 0.15rem solid var(--primary-color);
+        border-left: none;
     }
-
-    .svg-row > svg {
-        width: 33%;
-    }*/
 }
 
 #analysis-logic {
@@ -172,12 +183,6 @@ aside > .svg-row:last-child {
     gap: 0.65rem;
     margin: 1rem 0;
     align-items: center;
-}
-
-@media (max-width: 1280px) {
-    .steps-grid {
-        grid-template-columns: 0.9fr 0.1fr 1fr 0.1fr 1.1fr 0.1fr 1.4fr;
-    }
 }
 
 .step-card {
@@ -225,52 +230,21 @@ div.socials {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    justify-items: left; 
-    align-items: left; 
-    text-align: left; 
-    height: auto; 
+    justify-items: start;
+    align-items: start;
+    text-align: left;
 }
-
-.hover-preview {
-    position: relative;
-    text-decoration: none; 
-}
-
-.iframe-container {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 400px;
-    height: 200px;
-    border: 1px solid gold;
-    background: var(--primary-color);
-    z-index: 10;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
-
-.iframe-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.hover-preview:hover ~ .iframe-container {
-    display: block;
-}
-
 
 #contact-us {
     display: inline-block;
 }
 
-a > img {
+a {
     width: 1rem;
     height: 1rem;
 }
 
-a > img::nth-child(2) {
+a img:nth-child(2) {
     padding-left: 4px;
 }
 
