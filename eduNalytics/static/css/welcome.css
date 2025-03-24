@@ -234,6 +234,87 @@ a > img:hover {
   background-color: transparent;
 }
 
+@media(max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+
+    #motto {
+        width: 90%;
+    }
+
+    #about-the-app {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: calc(var(--default-padding) * 1.7) 0;
+    }
+
+    .advantage-card {
+        height: 14.5rem;
+        background-color: white;
+        padding: 0.65rem;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        opacity: 1;
+    }
+
+    #about-the-app > div:first-child {
+        text-align: center;
+        border-right: none;
+    }
+
+    #about-the-app > aside {
+        padding-top: var(--default-padding);
+        border-top: 0.15rem solid var(--primary-color);
+        border-left: none;
+    }
+
+    .svg-text {
+        font-size: 0.67rem;
+    }
+
+}
+
+@media(min-width: 481px) and (max-width: 767px) {
+    html {
+        font-size: 12px;
+    }
+
+    #motto {
+        width: 90%;
+    }
+
+    #about-the-app {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: calc(var(--default-padding) * 1.7) 0;
+    }
+
+    .advantage-card {
+        background-color: white;
+        padding: 0.65rem;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        opacity: 1;
+    }
+
+    #about-the-app > div:first-child {
+        text-align: center;
+        border-right: none;
+    }
+
+    #about-the-app > aside {
+        padding-top: var(--default-padding);
+        border-top: 0.15rem solid var(--primary-color);
+        border-left: none;
+    }
+
+    .svg-text {
+        font-size: 0.67rem;
+    }
+
+}
+
 @media (min-width: 768px) and (max-width: 1024px) {
     html {
         font-size: 12px;
