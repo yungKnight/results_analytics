@@ -135,40 +135,6 @@ aside > .svg-row:last-child {
     justify-content: center;
 }
 
-@media (min-width: 1025px) and (max-width: 1280px) {
-    html {
-        font-size: 14px;
-    }
-
-    #appName {
-        font-size: 4rem;
-    }
-
-    details > div {
-        display: grid;
-        grid-template-columns: 27% 73%;
-        gap: 8rem;
-        align-items: center;
-        text-align: center;
-        margin-left: var(--default-padding);
-    }
-
-    .steps-grid {
-        grid-template-columns: 0.9fr 0.1fr 1fr 0.1fr 1.1fr 0.1fr 1.4fr;
-    }
-
-    #about-the-app > div:first-child {
-        grid-column: auto;
-        border-right: none;
-    }
-
-    #about-the-app > aside {
-        grid-column: auto;
-        border-top: 0.15rem solid var(--primary-color);
-        border-left: none;
-    }
-}
-
 #analysis-logic {
     border-top: 0.15rem solid var(--primary-color);
     border-bottom: 0.15rem solid var(--primary-color);
@@ -266,4 +232,43 @@ a > img:hover {
   letter-spacing: 0.2rem;
   background-image: linear-gradient(to top, var(--primary-color) 40%, transparent 50%);
   background-color: transparent;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    html {
+        font-size: 12px;
+    }
+
+    .svg-text {
+        font-size: 0.67rem;
+    }
+
+    details > div {
+        gap: 2rem;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+    html {
+        font-size: 14px;
+    }
+
+    #appName {
+        font-size: 4rem;
+    }
+
+    .steps-grid {
+        grid-template-columns: 0.9fr 0.1fr 1fr 0.1fr 1.1fr 0.1fr 1.4fr;
+    }
+
+    #about-the-app > div:first-child {
+        grid-column: auto;
+        border-right: none;
+    }
+
+    #about-the-app > aside {
+        grid-column: auto;
+        border-top: 0.15rem solid var(--primary-color);
+        border-left: none;
+    }
 }
