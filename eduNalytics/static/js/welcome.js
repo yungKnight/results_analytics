@@ -12,6 +12,16 @@ submitButton.addEventListener('click', (e) => {
     }
 });
 
+const updateArrows = () => {
+    const arrows = document.querySelectorAll('.steps-grid .arrow');
+    arrows.forEach(arrow => {
+        arrow.innerHTML = window.innerWidth < 768 ? '↓' : '→';
+    });
+};
+
+window.addEventListener('load', updateArrows);
+window.addEventListener('resize', updateArrows);
+
 document.addEventListener('DOMContentLoaded', () => {
     let cards = document.querySelectorAll('.step-card');
 
