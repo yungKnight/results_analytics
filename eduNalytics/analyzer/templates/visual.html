@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
    My Results Insight
@@ -7,6 +8,8 @@
 {% block content %}
 
 {% if processed_semester_data %}
+    <link rel="stylesheet" href="{% static 'css/visual.css' %}">
+
     <table>
         <thead>
             <tr>
@@ -102,31 +105,33 @@
 {% endif %}
 
 {% if partials %}
-    <h2 class="text-center text-2xl font-bold px-4 py-4">Partial Correlation Analysis</h2>
-    <table>
-        <thead>
-            <tr>
-                <th class="px-4 pt-4 pb-1">Dependent Var.</th>
-                <th class="px-4 pt-4 pb-1">Independent Var. </th>
-                <th class="px-4 pt-4 pb-1">Observations</th>
-                <th class="px-4 pt-4 pb-1">Correlation</th>
-                <th class="px-4 pt-4 pb-1">Confidence Interval(95%)</th>
-                <th class="px-4 pt-4 pb-1">Prob. Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for partial in partials %}
-            <tr>
-                <td class="px-4 py-1">{{ partial.y }}</td>
-                <td class="px-4 py-1">{{ partial.x }}</td>
-                <td class="px-4 py-1">{{ partial.n }}</td>
-                <td class="px-4 py-1">{{ partial.r }}</td>
-                <td class="px-4 py-1">{{ partial.ci95 }}</td>
-                <td class="px-4 py-1">{{ partial.p_val }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div id="par-corr-section">
+        <h2 class="text-center text-2xl font-bold px-4 py-4">Partial    Correlation Analysis</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th class="px-4 pt-4 pb-1">Dependent Var.</th>
+                    <th class="px-4 pt-4 pb-1">Independent Var. </th>
+                    <th class="px-4 pt-4 pb-1">Observations</th>
+                    <th class="px-4 pt-4 pb-1">Correlation</th>
+                    <th class="px-4 pt-4 pb-1">Confidence Interval(95%)</th>
+                    <th class="px-4 pt-4 pb-1">Prob. Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for partial in partials %}
+                <tr>
+                    <td class="px-4 py-1">{{ partial.y }}</td>
+                    <td class="px-4 py-1">{{ partial.x }}</td>
+                    <td class="px-4 py-1">{{ partial.n }}</td>
+                    <td class="px-4 py-1">{{ partial.r }}</td>
+                    <td class="px-4 py-1">{{ partial.ci95 }}</td>
+                    <td class="px-4 py-1">{{ partial.p_val }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <h2 class="text-center text-2xl font-bold px-4 py-4">No partial correlation analysis available.</h2>
 {% endif %}
