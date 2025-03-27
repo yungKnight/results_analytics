@@ -48,4 +48,14 @@ document.addEventListener("DOMContentLoaded", () => {
             ease: "power4.out"
         });
     }
+
+    const demoButton = document.querySelector('.userDemo');
+    if (demoButton) {
+        const demoUrl = demoButton.getAttribute('data-url');
+        demoButton.addEventListener('click', () => {
+            if (demoUrl) {
+                window.location.href = demoUrl;
+            }
+        });
+    }
 });
