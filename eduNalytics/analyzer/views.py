@@ -66,6 +66,49 @@ def get_student_from_context(request):
 
     return None, None  
 
+def request_demo(request):
+    """
+    Provides a demo experience for the specific student 'Ajayi E.A'
+    """
+    try:
+        demo_student = Student.objects.get(name='AJAYI E.A')
+        
+        demo_student_info = {
+            'Name': demo_student.name,
+            'Department': demo_student.department.name,
+            'EntryType': demo_student.entry_type
+        }
+
+        demo_course_details = [
+            {
+                'course_code': result.course,
+                'session': result.level,
+                'semester': result.semester,
+                'level': result.level,
+                'grade': result.grade,
+                'score': result.score,
+                'branch': result.branch,
+                'unit': result.unit
+            } 
+            for result in demo_student.analyzer_results.all()
+        ]
+        
+        request.session['context'] = {
+            'student_info': demo_student_info,
+            'course_details': demo_course_details,
+            'is_demo': True
+        }
+        
+        return redirect('analyzer:cleaned_results')
+    
+    except Student.DoesNotExist:
+        request.session['error_message'] = 'Demo student not available'
+        return redirect('home:home')
+    
+    except Exception as e:
+        request.session['error_message'] = f'An error occurred: {str(e)}'
+        return redirect('home:home')
+
 def student_cleaned_results(request):
     """Displays cleaned results for a student."""
     student, course_details = get_student_from_context(request)

@@ -12,7 +12,13 @@
             <div class="personal-info personal-info-status">
                 <img src="{% static 'images/student.png' %}" />
                 <span>:</span>
-                <h3>{{ request.session.context.student_info.Status }}</h3>
+                <h3>
+                    {% if request.session.context.is_demo %}
+                        GRADUATED
+                    {% else %}
+                        {{ request.session.context.student_info.Status }}
+                    {% endif %}
+                </h3>
             </div>
             <div class="personal-info personal-info-dept">
                 <img src="{% static 'images/department.png' %}" />
