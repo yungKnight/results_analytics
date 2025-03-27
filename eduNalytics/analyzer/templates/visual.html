@@ -10,34 +10,36 @@
 {% if processed_semester_data %}
     <link rel="stylesheet" href="{% static 'css/visual.css' %}">
 
-    <table>
-        <thead>
-            <tr>
-                <th class="px-4 pt-4 pb-1">Semester</th>
-                <th class="px-4 pt-4 pb-1">GPA</th>
-                <th class="px-4 pt-4 pb-1">CGPA</th>
-                <th class="px-4 pt-4 pb-1">Branch GPA</th>
-                <th class="px-4 pt-4 pb-1">Units Offered</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for semester, data in processed_semester_data.items %}
-            <tr>
-                <td class="px-4 py-1">{{ semester }}</td>
-                <td class="px-4 py-1">{{ data.GPA }}</td>
-                <td class="px-4 py-1">{{ data.CGPA }}</td>
-                <td class="px-4 py-2">
-                    <ul>
-                        {% for branch, gpa in data.Branch_GPA.items %}
-                        <li>{{ branch }}: {{ gpa }}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-                <td class="px-4 py-1">{{ data.Total_units }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div id="gpa-data-section">
+        <table>
+            <thead>
+                <tr>
+                    <th class="px-4 pt-4 pb-1">Semester</th>
+                    <th class="px-4 pt-4 pb-1">GPA</th>
+                    <th class="px-4 pt-4 pb-1">CGPA</th>
+                    <th class="px-4 pt-4 pb-1">Branch GPA</th>
+                    <th class="px-4 pt-4 pb-1">Units Offered</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for semester, data in processed_semester_data.items %}
+                <tr>
+                    <td class="px-4 py-1">{{ semester }}</td>
+                    <td class="px-4 py-1">{{ data.GPA }}</td>
+                    <td class="px-4 py-1">{{ data.CGPA }}</td>
+                    <td class="px-4 py-2">
+                        <ul>
+                            {% for branch, gpa in data.Branch_GPA.items %}
+                            <li>{{ branch }}: {{ gpa }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-1">{{ data.Total_units }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <p>No GPA data available for display.</p>
 {% endif %}

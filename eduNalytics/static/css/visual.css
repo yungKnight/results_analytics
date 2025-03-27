@@ -1,22 +1,29 @@
-@media (min-width: 310px) and (max-width: 380px) {
-	table {
-		font-size: 11px !important;
-	}
+@media (max-width: 1100px) {
+    div#par-corr-section,
+    div#gpa-data-section {
+        overflow-x: auto;
+        width: 100%;
+    }
+    div#par-corr-section table,
+    div#gpa-data-section table {
+        min-width: 500px;
+    }
+
+
 }
-
-@media (max-width: 580px) {
-	html {
-		font-size: 12px;
-	}
-
-	div.border {
-		grid-column: 1;
-		width: 340px;
-		place-content: center;
-		text-align: center;
-	}
-
-	div#par-corr-section {
-		display: none;
-	}
-}
+/*@media (max-width: 580px) {
+/*	html {
+/*		font-size: 12px;
+/*	}
+/*
+/*	div.border {
+/*		grid-column: 1;
+/*		width: 340px;
+/*		place-content: center;
+/*		text-align: center;
+/*	}
+/*
+/*	div#par-corr-section {
+/*		display: none;
+/*	}
+/*}*/
