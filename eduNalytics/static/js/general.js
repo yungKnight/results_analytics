@@ -5,4 +5,8 @@ window.addEventListener("resize", function () {
     if (Math.abs(currentWidth - previousWidth) > 200) { 
         location.reload();
     }
+    if (currentWidth < 767) {
+        adjustChartsForSmallScreens();
+    } 
+    previousWidth = currentWidth;
 });

@@ -741,6 +741,18 @@ const parseToView = () => {
   return;
 }
 
+const adjustChartsForSmallScreens = () => {
+  if (window.innerWidth < 767) { 
+    document.querySelectorAll('.chart-container .js-plotly-plot').forEach(plot => {
+      Plotly.relayout(plot, {
+        showlegend: false,
+        width: window.innerWidth,
+        height: 400
+      });
+    });
+  }
+}
+adjustChartsForSmallScreens();
 
 viewBtn.addEventListener('click', () => {
   viewBtn.style.display = "none";
