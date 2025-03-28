@@ -7,7 +7,13 @@
 <link rel="stylesheet" href="{% static 'css/cleaned.css' %}">
 <div>
     <div id="student-dash">
-        <h2 id="title-dash">Course Results for <span id="student-name">{{ student.name }}</span></h2>
+        <h2 id="title-dash">Course Results for <span id="student-name">
+            {% if request.session.context.is_demo %}
+                Student
+            {% else %}
+                {{ student.name }}
+            {% endif %}
+        </span></h2>
         <div id="info-dash">
             <div class="personal-info personal-info-status">
                 <img src="{% static 'images/student.png' %}" />

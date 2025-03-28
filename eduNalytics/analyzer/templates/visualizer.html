@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-   Result Visualizer
+   Result Visualizer 
 {% endblock %}
 
 {% block content %}
@@ -10,106 +10,106 @@
 
 <script>
   const neededData = JSON.parse('{{ needed_data|safe }}');
+  console.log(neededData )
 </script>
 
-<div>
-  <div class="chart-container">
-    
-    <div class="chart-row">
-      {% if branch_gpa_chart_html %}
-        <div class="chart-section branch-gpa-chart">
-          <h2 class="chart-title">Branch GPA</h2>
-          {{ branch_gpa_chart_html|safe }}
-        </div>
-      {% else %}
-        <div class="chart-section semester-avg-chart">
-          <h2 class="chart-title">Semester Average Score</h2>
-          {{ semester_avg_chart_html|safe }}
-        </div>
-      {% endif %}
-    
-      <div class="chart-section cgpa-chart">
-        <h2 class="chart-title">CGPA & GPA</h2>
-        {{ combined_chart_html|safe }}
+<div class="chart-container"> 
+  <div class="chart-row">
+    {% if branch_gpa_chart_html %}
+      <div class="chart-section branch-gpa-chart">
+        <h2 class="chart-title">Branch GPA</h2>
+        {{ branch_gpa_chart_html|safe }}
       </div>
+    {% else %}
+      <div class="chart-section semester-avg-chart">
+        <h2 class="chart-title">Semester Average Score</h2>
+        {{ semester_avg_chart_html|safe }}
+      </div>
+    {% endif %}
+  
+    <div class="chart-section cgpa-chart">
+      <h2 class="chart-title">CGPA & GPA</h2>
+      {{ combined_chart_html|safe }}
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-section level-boxplot">
+      <h2 class="chart-title">Per Level boxplot</h2>
+      {{ level_boxplot_html|safe }}
     </div>
 
-    <div class="chart-row">
-      <div class="chart-section level-boxplot">
-        <h2 class="chart-title">Per Level boxplot</h2>
-        {{ level_boxplot_html|safe }}
-      </div>
-  
-      <div class="chart-section semester-boxplot">
-        <h2 class="chart-title">Per Semester boxplot</h2>
-        {{ semester_boxplot_html|safe }}
-      </div>
+    <div class="chart-section semester-boxplot">
+      <h2 class="chart-title">Per Semester boxplot</h2>
+      {{ semester_boxplot_html|safe }}
     </div>
+  </div>
 
-    <div class="chart-row">
-      <div class="chart-section scatter-plot">
-        <h2 class="chart-title">Scatterplot of Course results</h2>
-        {{ scatter_plot_html|safe }}
-      </div>
-  
-      <div class="chart-section overall-boxplot">
-        <h2 class="chart-title">Overall Boxplot</h2>
-        {{ all_scores_boxplot_html|safe }}
-      </div>
+  <div class="chart-row">
+    <div class="chart-section scatter-plot">
+      <h2 class="chart-title">Scatterplot of Course results</h2>
+      {{ scatter_plot_html|safe }}
     </div>
-
-    <div class="chart-row">
-      {% if branch_gpa_chart_html %}
-        <div class="chart-section alternate-semester-avg-chart">
-          <h2 class="chart-title">Semester Average Score</h2>
-          {{ semester_avg_chart_html|safe }}
-        </div>
-      {% endif %}
   
-      {% if branch_avg_chart_html %}
-        <div class="chart-section branch-avg-chart">
-          <h2 class="chart-title">Branch Average Score per Semester</h2>
-          {{ branch_avg_chart_html|safe }}
-        </div>
-      {% endif %}
+    <div class="chart-section overall-boxplot">
+      <h2 class="chart-title">Overall Boxplot</h2>
+      {{ all_scores_boxplot_html|safe }}
     </div>
+  </div>
 
-    <div class="chart-row">
-      {% if overall_branch_pie_chart_html %}
-        <div class="chart-section branch-pie-chart">
-          <h2 class="chart-title">Overall Branch Distribution</h2>
-           {{ overall_branch_pie_chart_html|safe }}
-        </div>
-      {% endif %}
+  <div class="chart-row">
+    {% if branch_gpa_chart_html %}
+      <div class="chart-section alternate-semester-avg-chart">
+        <h2 class="chart-title">Semester Average Score</h2>
+        {{ semester_avg_chart_html|safe }}
+      </div>
+    {% endif %}
+
+    {% if branch_avg_chart_html %}
+      <div class="chart-section branch-avg-chart">
+        <h2 class="chart-title">Branch Average Score per Semester</h2>
+        {{ branch_avg_chart_html|safe }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="chart-row">
+    {% if overall_branch_pie_chart_html %}
+      <div class="chart-section branch-pie-chart">
+        <h2 class="chart-title">Overall Branch Distribution</h2>
+         {{ overall_branch_pie_chart_html|safe }}
+      </div>
+    {% endif %}
   
-      {% if semester_distribution_pie_chart_html_list %}
-        <div class="chart-section semester-distribution">
-          <h2 class="chart-title">Branch Distribution of Courses per Semester</h2>
-          <div class="semester-distribution-inner">
-            {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
-                <div class="semester-distribution-item">
-                    {{ pie_chart_html|safe }}
-                </div>
+    {% if semester_distribution_pie_chart_html_list %}
+      <div class="chart-section semester-distribution">
+        <h2 class="chart-title">
+          Branch Distribution of Courses per Semester
+        </h2>
+        <div class="semester-distribution-inner">
+          {% for pie_chart_html in semester_distribution_pie_chart_html_list %}
+              <div class="semester-distribution-item">
+                  {{ pie_chart_html|safe }}
+              </div>
             {% endfor %}
-          </div>
         </div>
-      {% endif %}
-    </div>
-
-    <div class="chart-row">
-      {% if branch_distribution_stacked_bar_chart_html %}
-        <div class="chart-section branch-distribution-stacked">
-          <h2 class="chart-title">Overall Branch Distribution</h2>
-           {{ branch_distribution_stacked_bar_chart_html|safe }}
-        </div>
-      {% endif %}
-    </div>
-
-    <div class="chart-row">
-      <div class="chart-section pass-rate-chart">
-        <h2 class="chart-title">Overall Passed Branch Distribution</h2>
-        {{ pass_rate_html|safe }}
       </div>
+    {% endif %}
+  </div>
+
+  <div class="chart-row">
+    {% if branch_distribution_stacked_bar_chart_html %}
+      <div class="chart-section branch-distribution-stacked">
+        <h2 class="chart-title">Overall Branch Distribution</h2>
+         {{ branch_distribution_stacked_bar_chart_html|safe }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-section pass-rate-chart">
+      <h2 class="chart-title">Overall Passed Branch Distribution</h2>
+      {{ pass_rate_html|safe }}
     </div>
   </div>
 </div>
