@@ -123,3 +123,25 @@
   margin-top: 8px;
   margin-bottom: 8px;
 }
+
+@media (min-width: 2100px) {
+  .level-boxplot {
+    width: 40vw;
+  }
+  
+  .semester-boxplot {
+    width: 55vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .chart-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;  
+  }
+
+  .chart-section {
+    width: 100% !important;
+  }
+}
