@@ -13,10 +13,11 @@
 }
 
 #student-name {
-    /*font-family: "Playfair Display", sans-serif;*/
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: oblique;
+    font-family: "Big Shoulders Stencil", sans-serif !important;
+    font-weight: 480 !important;
+    font-size: 2rem !important;
+    letter-spacing: 0.1rem !important;
+    font-style: oblique !important;
 }
 
 #info-dash {

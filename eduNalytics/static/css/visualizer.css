@@ -144,4 +144,64 @@
   .chart-section {
     width: 100% !important;
   }
+
+  .chart-section.semester-distribution {
+    height: max-content;
+  }
+
+  .level-boxplot {
+    padding-top: 1.5rem;
+  }
+
+  .semester-boxplot {
+    padding-top: 0rem;
+    height: 350px;
+    padding-left: 0px;
+  }
+
+  .scatter-plot {
+    padding-top: 5.7rem;
+  }
+
+  .overall-boxplot {
+    height: 400px;
+    padding-top: 5.7rem;
+  }
+
+  .branch-pie-chart {
+    height: 350px;
+    padding-top: 2.5rem;
+  }
+
+  .alternate-semester-avg-chart {
+    height: 350px;
+    padding-top: 7.85rem;
+  }
+
+  .branch-avg-chart {
+    padding-top: 0.75rem;
+    margin-top: 15rem;
+  }
+
+  .semester-distribution-inner {
+    padding-top: 1rem;
+  }
+
+  .pass-rate-chart {
+    padding-top: 0px;
+    padding-right: 0px;
+  }
+
+  .branch-distribution-stacked {
+    padding-top: 0.75rem;
+    margin-top: 5.75rem;
+    height: 450px;
+  }
+
+  .pass-rate-chart {
+    padding-top: 0px;
+    padding-right: 0px;
+    height: 350px;
+    z-index: -999;
+  }
 }

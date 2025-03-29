@@ -746,8 +746,8 @@ const adjustChartsForSmallScreens = () => {
     document.querySelectorAll('.chart-container .js-plotly-plot').forEach(plot => {
       Plotly.relayout(plot, {
         showlegend: false,
-        width: window.innerWidth,
-        height: 400
+        width: window.innerWidth * 0.95, 
+        height: 400 
       });
     });
   }
