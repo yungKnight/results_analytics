@@ -331,13 +331,11 @@ def plot_view(request):
     par_corr = request.session.get('par_corr')
     emas = request.session.get('emas')
 
-    context_corr = extract_correlations(correlations)
+    context_corr = extract_correlations(correlations) if correlations else {}
     
     correlation_details = {}
     for param, value in context_corr.items():
-
         correlation_type, correlation_strength = get_correlation(value)
-                
         correlation_details[param] = {
             'value': value,
             'type': correlation_type,
@@ -345,27 +343,36 @@ def plot_view(request):
         }
 
     partial_corr = {}
-    if bool(json.loads(par_corr)):
-        context_partials = extract_partial_corr(par_corr)
+    if par_corr:
+        try:
+            par_corr_data = json.loads(par_corr)
+            if bool(par_corr_data):
+                context_partials = extract_partial_corr(par_corr_data)
 
-        for param, value in context_partials.items():
-            corr_value = value["partial_corr"]
-            p_val = value["prob_val"]
+                for param, value in context_partials.items():
+                    corr_value = value["partial_corr"]
+                    p_val = value["prob_val"]
 
-            partials_significance, partials_strength, partials_correlation_type = get_partial_corr_result(corr_value, p_val)
+                    partials_significance, partials_strength, partials_correlation_type = get_partial_corr_result(corr_value, p_val)
 
-            partial_corr[param] = {
-            "partial_corr": corr_value,
-            "prob_val": p_val,
-            "significance": partials_significance,
-            "strength": partials_strength,
-            "type": partials_correlation_type,
-            }
+                    partial_corr[param] = {
+                        "partial_corr": corr_value,
+                        "prob_val": p_val,
+                        "significance": partials_significance,
+                        "strength": partials_strength,
+                        "type": partials_correlation_type,
+                    }
+        except json.JSONDecodeError as e:
+            print(f"Error decoding par_corr JSON: {e}")
 
-    context_exponentials = extract_emas(emas)
+    context_exponentials = extract_emas(emas) if emas else {}
     student_emas = get_results_from_emas(context_exponentials)
+
+    if isinstance(student_emas, list):
+        student_emas = {"semester performance": student_emas} 
     
     needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
+
     cleaned_needed_data = json.dumps(needed_data)
 
     branch_gpa_data = {}
