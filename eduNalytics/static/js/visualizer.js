@@ -694,7 +694,8 @@ const newbieAdvices = [
   "Familiarize yourself with academic support services like tutoring centers, writing labs, study skills workshops, and peer mentoring programs. These free resources can provide targeted assistance and help you develop stronger academic skills.", 
   "Form study groups with motivated, focused peers who complement your learning style. Choose collaborators who are committed to mutual learning.", 
   "Communicate promptly with professors about challenges, seek clarification early, and take responsibility for your learning.", 
-  "Embrace a Growth Mindset, view challenges as opportunities for learning, not insurmountable obstacles. Understand that intelligence and abilities can be developed through dedication and hard work. Celebrate progress, learn from setbacks, and maintain a positive, resilient attitude toward academic challenges."
+  "Embrace a growth mindset by viewing academic challenges as opportunities for development rather than obstacles. Consistent effort and adaptive strategies lead to improvement over time.",
+  "Maintain a balanced schedule that prioritizes academic commitments while allowing time for relaxation, exercise, and social engagement. Sustainable habits contribute to long-term academic success."
 ]
 
 const parseToView = () => {
@@ -763,4 +764,64 @@ viewBtn.addEventListener('click', () => {
 minimizeBtn.addEventListener('click', () => {
   advisory.style.display = "none";
   viewBtn.style.display = "block";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const initAutoScroll = () => {
+    if (window.innerWidth >= 768) {
+      return;
+    }
+
+    gsap.registerPlugin(ScrollToPlugin);
+
+    const container = document.querySelector(".semester-distribution-inner");
+    const items = document.querySelectorAll(".semester-distribution-item");
+
+    if (!container || items.length === 0) {
+      return;
+    }
+
+    let currentIndex = 0;
+    const itemWidth = items[0].offsetWidth;
+    const totalItems = items.length;
+    let isUserScrolling = false;
+    let scrollTimeout;
+
+    const scrollToNext = () => {
+      if (isUserScrolling) {
+        return;
+      }
+
+      currentIndex = (currentIndex + 1) % totalItems;
+
+      gsap.to(container, {
+        duration: 1,
+        scrollTo: { x: itemWidth * currentIndex },
+        ease: "power2.inOut",
+      });
+    }
+
+    function updateIndexFromScroll() {
+      const scrollLeft = container.scrollLeft;
+      currentIndex = Math.round(scrollLeft / itemWidth);
+    }
+
+    container.addEventListener("scroll", () => {
+      isUserScrolling = true;
+      clearTimeout(scrollTimeout);
+
+      scrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+        updateIndexFromScroll();
+      }, 1000);
+    });
+
+    setInterval(scrollToNext, 3000);
+  }
+
+  initAutoScroll();
+  window.addEventListener("resize", () => {
+    location.reload();
+  });
 });
