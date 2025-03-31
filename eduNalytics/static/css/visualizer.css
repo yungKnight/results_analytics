@@ -196,16 +196,16 @@
     overflow-y: clip;
     scroll-behavior: smooth;
   }
-  
+   
   .semester-distribution-inner::-webkit-scrollbar {
     height: 6px;
   }
-  
+   
   .semester-distribution-inner::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 4px;
   }
-  
+   
   .semester-distribution-inner::-webkit-scrollbar-track {
     background: transparent;
   }

@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block title %}
-   {% if request.session.context and request.session.context.is_demo %}
-       Demo Student Results
-   {% else %}
-       {{ student.name }} Results
-   {% endif %}
-{% endblock %}
+    {% if request.session.context and request.session.context.is_demo %}
+        Demo Student Results
+    {% else %}
+        {{ student.name }} Results
+    {% endif %}
+ {% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/cleaned.css' %}">
