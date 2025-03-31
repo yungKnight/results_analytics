@@ -164,27 +164,50 @@
   }
 
   .overall-boxplot {
-    height: 400px;
-    padding-top: 5.7rem;
+    height: 420px;
+    margin-top: 1rem;
   }
 
   .branch-pie-chart {
-    height: 350px;
+    height: 350px !important;
     padding-top: 2.5rem;
   }
 
   .alternate-semester-avg-chart {
     height: 350px;
-    padding-top: 7.85rem;
+    padding-top: 0.75rem;
+    margin-top: 8rem;
   }
 
   .branch-avg-chart {
     padding-top: 0.75rem;
-    margin-top: 15rem;
+    margin-top: 6rem;
   }
 
   .semester-distribution-inner {
+    display: flex;
     padding-top: 1rem;
+    padding-bottom: 2rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color); transparent;
+    height: auto; 
+    overflow-y: clip;
+    scroll-behavior: smooth;
+  }
+   
+  .semester-distribution-inner::-webkit-scrollbar {
+    height: 6px;
+  }
+   
+  .semester-distribution-inner::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+   
+  .semester-distribution-inner::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .pass-rate-chart {
@@ -194,14 +217,14 @@
 
   .branch-distribution-stacked {
     padding-top: 0.75rem;
-    margin-top: 5.75rem;
-    height: 450px;
+    margin-top: 1rem;
+    height: 480px !important;
   }
 
   .pass-rate-chart {
     padding-top: 0px;
     padding-right: 0px;
-    height: 350px;
+    height: 400px !important;
     z-index: -999;
   }
 }
