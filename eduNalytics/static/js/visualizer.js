@@ -752,6 +752,24 @@ const adjustChartsForSmallScreens = () => {
       });
     });
   }
+
+  if (window.innerWidth > 767 && window.innerWidth < 1025) {
+    const branch_gpa_removal = Array.from(document.getElementsByClassName('branch-gpa-chart'));
+    const boxplot_removals = [
+      ...Array.from(document.getElementsByClassName('level-boxplot')),
+      ...Array.from(document.getElementsByClassName('semester-boxplot'))
+    ];
+    const branch_avg_removal = Array.from(document.getElementsByClassName('branch-avg-chart'));
+    const pass_rate_removal = Array.from(document.getElementsByClassName('pass-rate-chart'));
+    
+    const all_removals = [
+      ...branch_gpa_removal,
+      ...boxplot_removals,
+      ...branch_avg_removal,
+      ...pass_rate_removal
+    ];    
+    //console.log(all_removals.length);
+  }
 }
 adjustChartsForSmallScreens();
 
