@@ -307,6 +307,12 @@ def display_insights(request):
 
     processed_semester_data = process_gpa_data()
 
+    request.session['plot_view_data_populated'] = True
+    
+    redirect_url = request.session.pop('redirect_after_insights', None)
+    if redirect_url:
+        return redirect(redirect_url)
+
     return render(request, 'visual.html', {
         'processed_semester_data': processed_semester_data,
         'cleaned_results': cleaned_results,
@@ -324,113 +330,113 @@ def plot_view(request):
     if not student:
         return redirect('home:welcome')
 
-    gpa_data = request.session.get('gpa_data_by_semester')
-    semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
-    
-    correlations = request.session.get('correlations')
-    par_corr = request.session.get('par_corr')
-    emas = request.session.get('emas')
+    if request.session.get('plot_view_data_populated'):
+        request.session['plot_view_data_populated'] = False
 
-    context_corr = extract_correlations(correlations) if correlations else {}
-    
-    correlation_details = {}
-    for param, value in context_corr.items():
-        correlation_type, correlation_strength = get_correlation(value)
-        correlation_details[param] = {
-            'value': value,
-            'type': correlation_type,
-            'strength': correlation_strength
-        }
-
-    partial_corr = {}
-    if par_corr:
-        try:
-            par_corr_data = json.loads(par_corr)
-            if bool(par_corr_data):
-                context_partials = extract_partial_corr(par_corr_data)
-
-                for param, value in context_partials.items():
-                    corr_value = value["partial_corr"]
-                    p_val = value["prob_val"]
-
-                    partials_significance, partials_strength, partials_correlation_type = get_partial_corr_result(corr_value, p_val)
-
-                    partial_corr[param] = {
-                        "partial_corr": corr_value,
-                        "prob_val": p_val,
-                        "significance": partials_significance,
-                        "strength": partials_strength,
-                        "type": partials_correlation_type,
-                    }
-        except json.JSONDecodeError as e:
-            print(f"Error decoding par_corr JSON: {e}")
-
-    context_exponentials = extract_emas(emas) if emas else {}
-    student_emas = get_results_from_emas(context_exponentials)
-
-    if isinstance(student_emas, list):
-        student_emas = {"semester performance": student_emas} 
-    
-    needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
-
-    cleaned_needed_data = json.dumps(needed_data)
-
-    branch_gpa_data = {}
-    if gpa_data:
-        for semester, data in gpa_data.items():
-            branch_gpas = data.get('Branch_GPA', {})
-            for branch, branch_gpa in branch_gpas.items():
-                if branch not in branch_gpa_data:
-                    branch_gpa_data[branch] = {'semesters': [], 'gpas': []}
-                branch_gpa_data[branch]['semesters'].append(semester)
-                branch_gpa_data[branch]['gpas'].append(branch_gpa)
-
-    branch_gpa_chart_html = generate_branch_gpa_chart(branch_gpa_data) if branch_gpa_data else ''
-    combined_chart_html = generate_combined_gpa_cgpa_chart(semesters_gpa, gpa_values, cgpa_values)
-
-    cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
-    if cleaned_results_by_semester:
-        semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
-
-        scatter_plot_html = generate_scatter_plot(courses, scores)
-        pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
-        semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester, branch_colors)
-
-        semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
+        gpa_data = request.session.get('gpa_data_by_semester')
+        semesters_gpa, gpa_values, cgpa_values = extract_combined_gpa_cgpa_data(gpa_data) if gpa_data else ([], [], [])
         
-        if len(set(branches)) > 1:
-            overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
-            semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
-            branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
-            branch_avg_chart_html = branch_avg_chart.to_html(full_html=False)
+        correlations = request.session.get('correlations')
+        par_corr = request.session.get('par_corr')
+        emas = request.session.get('emas')
+    
+        context_corr = extract_correlations(correlations)
+        
+        correlation_details = {}
+        for param, value in context_corr.items():
+    
+            correlation_type, correlation_strength = get_correlation(value)
+                    
+            correlation_details[param] = {
+                'value': value,
+                'type': correlation_type,
+                'strength': correlation_strength
+            }
+    
+        partial_corr = {}
+        if bool(json.loads(par_corr)):
+            context_partials = extract_partial_corr(par_corr)
+    
+            for param, value in context_partials.items():
+                corr_value = value["partial_corr"]
+                p_val = value["prob_val"]
+    
+                partials_significance, partials_strength, partials_correlation_type = get_partial_corr_result(corr_value, p_val)
+    
+                partial_corr[param] = {
+                "partial_corr": corr_value,
+                "prob_val": p_val,
+                "significance": partials_significance,
+                "strength": partials_strength,
+                "type": partials_correlation_type,
+                }
+    
+        context_exponentials = extract_emas(emas)
+        student_emas = get_results_from_emas(context_exponentials)
+        
+        needed_data = extract_needed_data(correlation_details, partial_corr, student_emas)
+        cleaned_needed_data = json.dumps(needed_data)
+    
+        branch_gpa_data = {}
+        if gpa_data:
+            for semester, data in gpa_data.items():
+                branch_gpas = data.get('Branch_GPA', {})
+                for branch, branch_gpa in branch_gpas.items():
+                    if branch not in branch_gpa_data:
+                        branch_gpa_data[branch] = {'semesters': [], 'gpas': []}
+                    branch_gpa_data[branch]['semesters'].append(semester)
+                    branch_gpa_data[branch]['gpas'].append(branch_gpa)
+    
+        branch_gpa_chart_html = generate_branch_gpa_chart(branch_gpa_data) if branch_gpa_data else ''
+        combined_chart_html = generate_combined_gpa_cgpa_chart(semesters_gpa, gpa_values, cgpa_values)
+    
+        cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
+        if cleaned_results_by_semester:
+            semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
+    
+            scatter_plot_html = generate_scatter_plot(courses, scores)
+            pass_rate_chart_html = generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester)
+            semester_avg_chart, branch_avg_chart = generate_semester_score_charts(cleaned_results_by_semester, branch_colors)
+    
+            semester_avg_chart_html = semester_avg_chart.to_html(full_html=False)
+            
+            if len(set(branches)) > 1:
+                overall_branch_pie_chart_html = generate_overall_branch_representation_pie_chart(cleaned_results_by_semester)
+                semester_distribution_pie_chart_html_list = generate_branch_distribution_pie_charts(cleaned_results_by_semester)
+                branch_distribution_stacked_bar_chart_html = generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester)
+                branch_avg_chart_html = branch_avg_chart.to_html(full_html=False)
+            else:
+                overall_branch_pie_chart_html = ''
+                semester_distribution_pie_chart_html_list = []
+                branch_distribution_stacked_bar_chart_html = ''
+                branch_avg_chart_html = ''
         else:
+            scatter_plot_html = ''
             overall_branch_pie_chart_html = ''
             semester_distribution_pie_chart_html_list = []
+            pass_rate_chart_html = ''
             branch_distribution_stacked_bar_chart_html = ''
+            semester_avg_chart_html = ''
             branch_avg_chart_html = ''
+    
+        semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
+    
+        return render(request, 'visualizer.html', {
+            'needed_data': cleaned_needed_data,
+            'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
+            'combined_chart_html': combined_chart_html,
+            'semester_boxplot_html': semester_boxplot_html,
+            'level_boxplot_html': level_boxplot_html,
+            'all_scores_boxplot_html': all_scores_boxplot_html,
+            'scatter_plot_html': scatter_plot_html,
+            'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
+            'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,
+            'pass_rate_html': pass_rate_chart_html,
+            'branch_distribution_stacked_bar_chart_html': branch_distribution_stacked_bar_chart_html,
+            'semester_avg_chart_html': semester_avg_chart_html,
+            'branch_avg_chart_html': branch_avg_chart_html,
+        })
+
     else:
-        scatter_plot_html = ''
-        overall_branch_pie_chart_html = ''
-        semester_distribution_pie_chart_html_list = []
-        pass_rate_chart_html = ''
-        branch_distribution_stacked_bar_chart_html = ''
-        semester_avg_chart_html = ''
-        branch_avg_chart_html = ''
-
-    semester_boxplot_html, level_boxplot_html, all_scores_boxplot_html = generate_boxplot_charts(cleaned_results_by_semester)
-
-    return render(request, 'visualizer.html', {
-        'needed_data': cleaned_needed_data,
-        'branch_gpa_chart_html': branch_gpa_chart_html if len(set(branches)) > 1 else '',
-        'combined_chart_html': combined_chart_html,
-        'semester_boxplot_html': semester_boxplot_html,
-        'level_boxplot_html': level_boxplot_html,
-        'all_scores_boxplot_html': all_scores_boxplot_html,
-        'scatter_plot_html': scatter_plot_html,
-        'overall_branch_pie_chart_html': overall_branch_pie_chart_html,
-        'semester_distribution_pie_chart_html_list': semester_distribution_pie_chart_html_list,
-        'pass_rate_html': pass_rate_chart_html,
-        'branch_distribution_stacked_bar_chart_html': branch_distribution_stacked_bar_chart_html,
-        'semester_avg_chart_html': semester_avg_chart_html,
-        'branch_avg_chart_html': branch_avg_chart_html,
-    })
+        request.session['redirect_after_insights'] = request.path
+        return redirect('/analysis/results/insight/')
