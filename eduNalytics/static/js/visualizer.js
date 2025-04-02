@@ -34,6 +34,22 @@ const adjustChartsForSmallScreens = () => {
         showlegend: false
       });
     });
+
+    document.querySelectorAll('.branch-pie-chart .js-plotly-plot').forEach(plot => {
+      Plotly.relayout(plot, {
+        'legend.font.size': 8,
+        'legend.width': 100,
+        'legend.height': 400 
+      });
+    });
+
+    branch_avg_removal.forEach(plot => {
+      Plotly.relayout(plot, {
+        'xaxis.showticklabels': false,
+        'xaxis.title.text': 'Semesters',
+        'xaxis.title.font.size': 14, 
+      });
+    });
   }
 }
 adjustChartsForSmallScreens();
