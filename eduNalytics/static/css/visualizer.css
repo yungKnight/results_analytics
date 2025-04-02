@@ -228,3 +228,21 @@
     z-index: -999;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .semester-distribution {
+    z-index: 9999;
+    overflow-y: scroll;
+  }
+
+  .branch-distribution-stacked {
+    padding-top: 2rem;
+    z-index: 999;
+  }
+
+  .pass-rate-chart {
+    padding-top: 0rem;
+    padding-right: 0.7rem;
+    height: 500px;
+  }
+}
