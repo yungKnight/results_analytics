@@ -791,8 +791,8 @@ const parseToView = () => {
         ? `<span class="next-semester-courses-overview">${
             parCorrelationMeanings.map(msg => String(msg)).join(" ")
           }</span>`
-        : `<h1 class="next-semester-courses-overview">Available dataset isn't sufficient enough
-            to suggest specific targets for you, sorry you'll have to rawdog this mate.</h1>`
+        : `<h3 class="next-semester-courses-overview">Available dataset isn't sufficient enough
+            to suggest specific targets for you, sorry you'll have to rawdog this mate.</h3>`
     }`;
   }
   return;
