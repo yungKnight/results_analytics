@@ -1,4 +1,6 @@
 knr/ 
+slim/
 __pycache__/
-eduNalytics/db.sqlite3
+db.sqlite3
 .env
+all_libraries.txt
