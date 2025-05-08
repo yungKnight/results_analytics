@@ -13,31 +13,6 @@ def get_branch_color(branch):
         branch_colors[branch] = "#{:06x}".format(random.randint(0, 0xFFFFFF))
     return branch_colors[branch]
 
-def extract_total_units(gpa_data):
-    """Extract semesters and total units values for plotting."""
-    if not gpa_data:
-        return [], []
-    
-    semesters = list(gpa_data.keys())
-    total_units = [gpa_data[sem].get('Total_units', 0) for sem in semesters]
-    return semesters, total_units
-
-def extract_branch_gpa_data(gpa_data):
-    """Extract semesters and branch GPAs from gpa_data."""
-    branch_gpa_by_semester = {}
-
-    if gpa_data:
-        for semester, semester_data in gpa_data.items():
-            branches = semester_data.get('branches', {})
-            for branch, branch_gpa in branches.items():
-                if branch not in branch_gpa_by_semester:
-                    branch_gpa_by_semester[branch] = {'semesters': [], 'gpas': []}
-                
-                branch_gpa_by_semester[branch]['semesters'].append(semester)
-                branch_gpa_by_semester[branch]['gpas'].append(branch_gpa)
-    
-    return branch_gpa_by_semester
-
 def extract_combined_gpa_cgpa_data(gpa_data):
     """Extract semesters, GPA, and CGPA values for plotting."""
     if not gpa_data:
@@ -67,133 +42,81 @@ def extract_from_cleaned_semester(cleaned_results_by_semester):
     
     return semesters, courses, units, branches, grades, scores
 
-def extract_passed_courses_from_cleaned_semester(cleaned_results_by_semester):
-    """Extract values for semesters, courses, units, branches, grades, and scores for passed courses (score >= 40)."""
-    
-    if not cleaned_results_by_semester:
-        return [], [], [], [], [], []
-
-    semesters = list(cleaned_results_by_semester.keys())
-    courses, units, branches, grades, scores = [], [], [], [], []
-    
-    for semester in semesters:
-        for course_info in cleaned_results_by_semester[semester]:
-            if course_info.get('score', 0) >= 40:
-                courses.append(course_info.get('course'))
-                units.append(course_info.get('unit'))
-                branches.append(course_info.get('branch'))
-                grades.append(course_info.get('grade'))
-                scores.append(course_info.get('score'))
-    
-    return semesters, courses, units, branches, grades, scores
-
-def generate_branch_gpa_chart(branch_gpa_data):
-    """Generate a time series chart for each branch GPA."""
-    fig = go.Figure()
-
+def generate_branch_gpa_data(branch_gpa_data):
+    """Prepare branch GPA data for frontend rendering."""
+    chart_data = []
     for branch, data in branch_gpa_data.items():
-        fig.add_trace(go.Scatter(
-            x=data['semesters'],
-            y=data['gpas'],
-            mode='lines+markers',
-            name=branch
-        ))
+        chart_data.append({
+            'name': branch,
+            'semesters': data['semesters'],
+            'gpas': data['gpas']
+        })
+    return chart_data
 
-    fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="GPA",
-        template="plotly_white"
-    )
-    return fig.to_html(full_html=False)
+def generate_combined_gpa_cgpa_data(semesters, gpa_values, cgpa_values):
+    """Prepare GPA and CGPA data for frontend rendering."""
+    return {
+        'semesters': semesters,
+        'gpa': {
+            'name': 'GPA',
+            'values': gpa_values,
+            'color': 'blue'
+        },
+        'cgpa': {
+            'name': 'CGPA',
+            'values': cgpa_values,
+            'color': 'orange'
+        }
+    }
 
-def generate_combined_gpa_cgpa_chart(semesters, gpa_values, cgpa_values):
-    """Generate a combined GPA and CGPA time series chart using Plotly."""
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=semesters,
-        y=gpa_values,
-        mode='lines+markers',
-        name='GPA',
-        line=dict(color='blue'),
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=semesters,
-        y=cgpa_values,
-        mode='lines+markers',
-        name='CGPA',
-        line=dict(color='orange'),
-    ))
-
-    fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Value",
-        template="plotly_white",
-    )
-    return fig.to_html(full_html=False)
-
-def generate_boxplot_charts(course_data):
+def generate_boxplot_data(course_data):
     """
-    Generate boxplots for scores per semester, per level, and a combined boxplot for all courses,
+    Generate data for boxplots for scores per semester, per level, and a combined boxplot for all courses,
     with scatter points embedded directly within the all-courses boxplot.
     
     Args:
         course_data (dict): Dictionary with semesters as keys and lists of course details as values.
         
     Returns:
-        tuple: HTML strings for per-semester, per-level, and all-course boxplot figures.
+        dict: JSON-serializable data structure for the three boxplot charts.
     """
-    semester_fig = go.Figure()
-    level_fig = go.Figure()
-    all_scores_fig = go.Figure()
-
+    if not course_data:
+        return {
+            'semester_boxplot': {},
+            'level_boxplot': {},
+            'all_scores_boxplot': {}
+        }
+        
     colors = pc.qualitative.Plotly
     num_colors = len(colors)
 
+    # Semester boxplot data
+    semester_traces = []
     for i, (semester, courses) in enumerate(course_data.items()):
         scores = [course['score'] for course in courses]
-        semester_fig.add_trace(go.Box(
-            y=scores,
-            name=semester,
-            marker=dict(color=colors[i % num_colors]),
-            boxmean=True,
-            median=('blue', 2, 'dot', 0.6)
-        ))
+        semester_traces.append({
+            'type': 'box',
+            'y': scores,
+            'name': semester,
+            'marker': {'color': colors[i % num_colors]},
+            'boxmean': True,
+            'median': {'color': 'blue', 'width': 2, 'line': {'dash': 'dot'}, 'opacity': 0.6}
+        })
+    
+    semester_boxplot = {
+        'data': semester_traces,
+        'layout': {
+            'yaxis_title': 'Scores',
+            'template': 'plotly_white',
+            'modebar': {
+                'remove': [
+                    'pan', 'zoom', 'zoomIn', 'zoomOut', 'lasso2d', 'resetScale2d'
+                ]
+            }
+        }
+    }
 
-    semester_fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Scores",
-        template="plotly_white"
-    )
-
+    # Level boxplot data
     level_scores = {}
     for semester, courses in course_data.items():
         level = semester.split(' ')[0] + " level"
@@ -201,110 +124,133 @@ def generate_boxplot_charts(course_data):
             level_scores[level] = []
         level_scores[level].extend([course['score'] for course in courses])
 
+    level_traces = []
     for i, (level, scores) in enumerate(level_scores.items()):
-        level_fig.add_trace(go.Box(
-            y=scores,
-            name=level,
-            marker=dict(color=colors[i % num_colors]),
-            boxmean=True,
-        ))
+        level_traces.append({
+            'type': 'box',
+            'y': scores,
+            'name': level,
+            'marker': {'color': colors[i % num_colors]},
+            'boxmean': True
+        })
+    
+    level_boxplot = {
+        'data': level_traces,
+        'layout': {
+            'yaxis_title': 'Scores',
+            'template': 'plotly_white',
+            'modebar': {
+                'remove': [
+                    'pan', 'zoom', 'zoomIn', 'zoomOut', 'lasso2d', 'resetScale2d'
+                ]
+            }
+        }
+    }
 
-    level_fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Scores",
-        template="plotly_white"
-    )
-
+    # All courses boxplot with embedded scatter points
     all_scores = [course['score'] for courses in course_data.values() for course in courses]
     all_courses_text = [f"Course: {course['course']}" for courses in course_data.values() for course in courses]
 
-    all_scores_fig.add_trace(go.Box(
-        y=all_scores,
-        name="All Courses",
-        boxpoints="all",  
-        marker_color='brown',
-        jitter=0.7, 
-        pointpos=0,
-        text=all_courses_text,
-        hoverinfo="text + y",
-        boxmean=True,
-    ))
+    all_scores_trace = {
+        'type': 'box',
+        'y': all_scores,
+        'name': 'All Courses',
+        'boxpoints': 'all',
+        'marker': {'color': 'brown'},
+        'jitter': 0.7,
+        'pointpos': 0,
+        'text': all_courses_text,
+        'hoverinfo': 'text + y',
+        'boxmean': True
+    }
     
-    all_scores_fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Scores",
-        xaxis=dict(
-            showticklabels=False,
-            showgrid=False
-        ),
-        template="plotly_white"
-    )
+    all_scores_boxplot = {
+        'data': [all_scores_trace],
+        'layout': {
+            'yaxis_title': 'Scores',
+            'template': 'plotly_white',
+            'xaxis': {
+                'showticklabels': False,
+                'showgrid': False
+            },
+            'modebar': {
+                'remove': [
+                    'pan', 'zoom', 'zoomIn', 'zoomOut', 'lasso2d', 'resetScale2d'
+                ]
+            }
+        }
+    }
 
-    return (
-        semester_fig.to_html(full_html=False),
-        level_fig.to_html(full_html=False),
-        all_scores_fig.to_html(full_html=False)
-    )
+    return {
+        'semester_boxplot': semester_boxplot,
+        'level_boxplot': level_boxplot,
+        'all_scores_boxplot': all_scores_boxplot
+    }
 
-def generate_scatter_plot(courses, scores):
+def prepare_scatter_plot_data(courses, scores):
     """
-    Generate a scatter plot for courses and scores.
+    Prepare raw data for a scatter plot of courses and scores.
     
     Args:
         courses (list): List of course names.
         scores (list): List of corresponding scores for each course.
         
     Returns:
-        str: HTML string for the scatter plot figure.
+        dict: JSON-serializable data structure for the scatter plot.
     """
-    scatter_fig = go.Figure()
+    # Basic validation
+    if not courses or not scores or len(courses) != len(scores):
+        return {}
+    
+    # Prepare the data structure
+    scatter_data = {
+        'type': 'scatter',
+        'data': {
+            'x': courses,
+            'y': scores,
+            'mode': 'markers',
+            'marker': {
+                'size': 7,
+                'color': 'red',
+                'opacity': 0.6
+            },
+            'text': courses
+        },
+        'layout': {
+            'yaxis_title': 'Scores',
+            'template': 'plotly_white',
+            'xaxis': {
+                'tickangle': 60,
+                'tickfont': {
+                    'size': 11,
+                    'style': 'italic'
+                }
+            },
+            'modebar': {
+                'remove': [
+                    'pan',
+                    'zoom',
+                    'zoomIn',
+                    'zoomOut',
+                    'lasso2d',
+                    'resetScale2d'
+                ]
+            }
+        }
+    }
+    
+    return scatter_data
 
-    scatter_fig.add_trace(go.Scatter(
-        x=courses,
-        y=scores,
-        mode='markers',
-        marker=dict(size=7, color='red', opacity=0.6),
-        text=courses
-    ))
-
-    scatter_fig.update_layout(
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Scores",
-        template="plotly_white",
-        xaxis=dict(tickangle=60, tickfont=dict(size=11, style="italic"))
-    )
-
-    return scatter_fig.to_html(full_html=False)
-
-def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester):
-    global branch_counts
+def generate_overall_branch_representation_data(cleaned_results_by_semester):
+    """
+    Generate JSON data for overall branch representation pie chart instead of HTML.
+    
+    Args:
+        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
+        
+    Returns:
+        dict: JSON-serializable data structure for a pie chart.
+    """
     branch_counts = {}
 
     for semester, courses in cleaned_results_by_semester.items():
@@ -318,18 +264,44 @@ def generate_overall_branch_representation_pie_chart(cleaned_results_by_semester
     values = list(branch_counts.values())
     colors = [get_branch_color(branch) for branch in labels]
 
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))])
-    fig.update_layout(
-        template="plotly_white",
-        margin=dict(l=40, r=40, t=50, b=5),
-        height=580
-    )
-    return fig.to_html(full_html=False)
+    # Prepare pie chart data
+    pie_data = {
+        'type': 'pie',
+        'data': [{
+            'labels': labels,
+            'values': values,
+            'marker': {
+                'colors': colors
+            }
+        }],
+        'layout': {
+            'template': 'plotly_white',
+            'margin': {
+                'l': 40, 
+                'r': 40, 
+                't': 50, 
+                'b': 5
+            },
+            'height': 580
+        }
+    }
+    
+    return pie_data
 
-def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
+def generate_branch_distribution_pie_data(cleaned_results_by_semester):
+    """
+    Generate JSON data for branch distribution pie charts by semester.
+    
+    Args:
+        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
+        
+    Returns:
+        list: List of pie chart data structures, one for each semester.
+    """
     if not cleaned_results_by_semester:
         return []
 
+    # Calculate branch distribution by semester
     branch_distribution = {}
     for semester, courses in cleaned_results_by_semester.items():
         branch_distribution[semester] = {}
@@ -339,26 +311,52 @@ def generate_branch_distribution_pie_charts(cleaned_results_by_semester):
                 branch_distribution[semester][branch] = 0
             branch_distribution[semester][branch] += 1
 
-    pie_chart_html_list = []
+    # Create pie chart data for each semester
+    pie_chart_data_list = []
 
     for semester, distribution in branch_distribution.items():
         labels = list(distribution.keys())
         values = list(distribution.values())
         colors = [get_branch_color(branch) for branch in labels]
 
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))])
-        fig.update_layout(
-            title_text=f'{semester}', 
-            template="plotly_white",
-            margin=dict(l=10, r=20, t=50, b=5),
-            height=300,
-            showlegend=False
-        )
-        pie_chart_html_list.append(fig.to_html(full_html=False))
+        pie_data = {
+            'type': 'pie',
+            'title': semester,
+            'data': {
+                'labels': labels,
+                'values': values,
+                'marker': {
+                    'colors': colors
+                }
+            },
+            'layout': {
+                'title': semester,
+                'template': 'plotly_white',
+                'margin': {
+                    'l': 10, 
+                    'r': 20, 
+                    't': 50, 
+                    'b': 5
+                },
+                'height': 300,
+                'showlegend': False
+            }
+        }
+        pie_chart_data_list.append(pie_data)
 
-    return pie_chart_html_list
+    return pie_chart_data_list
 
-def generate_semester_score_charts(cleaned_results_by_semester, branch_colors):
+def generate_semester_score_data(cleaned_results_by_semester, branch_colors):
+    """
+    Generate JSON data for semester score charts instead of Plotly chart objects.
+    
+    Args:
+        cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
+        branch_colors (dict): Dictionary mapping branches to colors.
+        
+    Returns:
+        dict: JSON-serializable data structure with semester averages and branch averages.
+    """
     data = []
     for semester, courses in cleaned_results_by_semester.items():
         for course in courses:
@@ -373,61 +371,70 @@ def generate_semester_score_charts(cleaned_results_by_semester, branch_colors):
     semester_avg_scores = calculate_semester_avg_scores(df)
     branch_semester_avg_scores = calculate_branch_semester_avg_scores(df)
 
-    semester_avg_trace = go.Scatter(
-        x=list(semester_avg_scores.keys()),
-        y=list(semester_avg_scores.values()),
-        mode='lines+markers',
-        name="Average Score per Semester",
-        marker=dict(color='blue')
-    )
-    semester_avg_chart = go.Figure(data=[semester_avg_trace])
-    semester_avg_chart.update_layout(
-        yaxis_title="Average Score",
-        modebar=dict(
-            remove=["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"],
-        ),
-    )
+    # Prepare semester average chart data
+    semester_avg_data = {
+        'type': 'scatter',
+        'data': {
+            'x': list(semester_avg_scores.keys()),
+            'y': list(semester_avg_scores.values()),
+            'mode': 'lines+markers',
+            'name': 'Average Score per Semester',
+            'marker': {'color': 'blue'}
+        },
+        'layout': {
+            'yaxis_title': 'Average Score',
+            'modebar': {
+                'remove': ['pan', 'zoom', 'zoomIn', 'zoomOut', 'lasso2d', 'resetScale2d']
+            }
+        }
+    }
     
-    branch_avg_traces = []
+    # Prepare branch average chart data
+    branch_avg_data = {
+        'type': 'multi_scatter',
+        'data': [],
+        'layout': {
+            'yaxis_title': 'Average Score',
+            'legend_title': 'Branches',
+            'modebar': {
+                'remove': ['pan', 'zoom', 'zoomIn', 'zoomOut', 'lasso2d', 'resetScale2d']
+            }
+        }
+    }
+    
+    # Add traces for each branch
     for branch, color in branch_colors.items():
         branch_scores = [
             branch_semester_avg_scores.get(semester, {}).get(branch, None) 
             for semester in semester_avg_scores.keys()
         ]
         
-        branch_avg_trace = go.Scatter(
-            x=list(semester_avg_scores.keys()),
-            y=branch_scores,
-            mode='lines+markers',
-            name=f"{branch}",
-            marker=dict(color=color), 
-            connectgaps=True
-        )
-        branch_avg_traces.append(branch_avg_trace)
+        branch_avg_data['data'].append({
+            'x': list(semester_avg_scores.keys()),
+            'y': branch_scores,
+            'mode': 'lines+markers',
+            'name': branch,
+            'marker': {'color': color},
+            'connectgaps': True
+        })
     
-    branch_avg_chart = go.Figure(data=branch_avg_traces)
-    branch_avg_chart.update_layout(
-        yaxis_title="Average Score",
-        legend_title="Branches",
-        modebar=dict(
-            remove=["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"],
-        ),
-    )
-    
-    return semester_avg_chart, branch_avg_chart
+    return {
+        'semester_avg': semester_avg_data,
+        'branch_avg': branch_avg_data
+    }
 
-def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_semester):
+def generate_courses_and_pass_rate_data(cleaned_results_by_semester):
     """
-    Generate a grouped bar chart that combines total courses per branch and passed courses per branch
-    to show the pass rate for each branch in a semester.
+    Generate raw data for courses and pass rate by branch and semester.
+    This optimized version only prepares the data structure, not the chart.
 
     Args:
         cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
 
     Returns:
-        str: HTML string for the grouped bar chart.
+        dict: Structured data for frontend pass rate visualization.
     """
-
+    # Process the data
     branch_data = {}
     all_branches = set()
 
@@ -447,70 +454,43 @@ def generate_grouped_bar_chart_for_courses_and_pass_rate(cleaned_results_by_seme
             'passed': passed_courses_per_branch
         }
 
+    # Define branch colors - maintaining your color scheme
     predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
     branch_colors = {branch: predefined_colors[i % len(predefined_colors)] for i, branch in enumerate(sorted(all_branches))}
+    
+    result = {
+        'semesters': list(branch_data.keys()),
+        'branches': {
+            branch: {
+                'color': branch_colors[branch],
+                'total': [branch_data.get(semester, {}).get('total', {}).get(branch, 0) for semester in branch_data],
+                'passed': [branch_data.get(semester, {}).get('passed', {}).get(branch, 0) for semester in branch_data]
+            }
+            for branch in all_branches
+        },
+        'chart_settings': {
+            'barmode': 'group',
+            'yaxis_title': 'Number of Courses',
+            'plot_bgcolor': '#ffffcc',
+            'height': 500
+        }
+    }
+    
+    return result
 
-    fig = go.Figure()
-
-    for branch, color in branch_colors.items():
-        total_courses = [branch_data.get(semester, {}).get('total', {}).get(branch, 0) for semester in branch_data]
-        passed_courses = [branch_data.get(semester, {}).get('passed', {}).get(branch, 0) for semester in branch_data]
-
-        fig.add_trace(go.Bar(
-            name=f"{branch} offered",
-            x=list(branch_data.keys()),
-            y=total_courses,
-            marker_color=color,
-            opacity=1.0 
-        ))
-
-        fig.add_trace(go.Bar(
-            name=f"Passed {branch}",
-            x=list(branch_data.keys()),
-            y=passed_courses,
-            marker_color=color,
-            opacity=0.55
-        ))
-
-    fig.update_layout(
-        barmode='group',
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        yaxis_title="Number of Courses",
-        template="plotly_white",
-        xaxis=dict(tickangle=0, tickfont=dict(
-            style="italic",
-            size = 10
-            )
-        ),
-        plot_bgcolor = "#ffffcc",
-        height=500,
-    )
-
-    return fig.to_html(full_html=False)
-
-def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
+def generate_branch_distribution_data(cleaned_results_by_semester):
     """
-    Generate a stacked bar chart to show the branch distribution per semester.
+    Generate data for a stacked bar chart to show the branch distribution per semester.
 
     Args:
         cleaned_results_by_semester (dict): Dictionary with semesters as keys and lists of course details as values.
 
     Returns:
-        str: HTML string for the stacked bar chart.
+        dict: Data structure for creating a stacked bar chart on the frontend.
     """
-    
     predefined_colors = ['#FF6347', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2']
-    branch_colors = {} 
-
+    
+    # Calculate branch course count per semester
     branch_course_count_per_semester = {}
     all_branches = set()
 
@@ -523,41 +503,36 @@ def generate_branch_distribution_stacked_bar_chart(cleaned_results_by_semester):
                 branch_course_count_per_semester[semester][branch] = 0
             branch_course_count_per_semester[semester][branch] += 1
 
+    # Assign colors to branches
+    branch_colors = {}
     for i, branch in enumerate(sorted(all_branches)):
         branch_colors[branch] = predefined_colors[i % len(predefined_colors)]
-
-    fig = go.Figure()
-
+    
+    # Prepare data for frontend
+    semesters = list(branch_course_count_per_semester.keys())
+    branches_data = []
+    
     for branch, color in branch_colors.items():
         branch_counts = [
             branch_course_count_per_semester[semester].get(branch, 0) 
-            for semester in branch_course_count_per_semester.keys()
+            for semester in semesters
         ]
         
-        fig.add_trace(go.Bar(
-            name=branch,
-
-            x=list(branch_course_count_per_semester.keys()),
-            y=branch_counts,
-            marker_color=color
-        ))
-
-    fig.update_layout(
-        barmode='stack',
-        yaxis_title="Number of Courses",
-        template="plotly_white",
-        height=500,
-        modebar=dict(
-            remove=[
-            "pan",               
-            "zoom",              
-            "zoomIn",            
-            "zoomOut",           
-            "lasso2d",
-            "resetScale2d",
-            ]
-        ),
-        bargap=0.4,
-    )
-
-    return fig.to_html(full_html=False)
+        branches_data.append({
+            'name': branch,
+            'counts': branch_counts,
+            'color': color
+        })
+    
+    # Return structured data for frontend
+    return {
+        'semesters': semesters,
+        'branches': branches_data,
+        'layout': {
+            'yaxis_title': 'Number of Courses',
+            'template': 'plotly_white',
+            'height': 500,
+            'barmode': 'stack',
+            'bargap': 0.4
+        }
+    }
