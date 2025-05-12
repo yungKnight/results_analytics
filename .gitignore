@@ -4,3 +4,6 @@ __pycache__/
 db.sqlite3
 .env
 all_libraries.txt
+visualizer2.html
+visualizer_utils2.py
+plot_view.py

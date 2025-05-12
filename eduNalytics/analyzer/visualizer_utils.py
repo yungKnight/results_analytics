@@ -100,7 +100,6 @@ def generate_boxplot_data(course_data):
             'name': semester,
             'marker': {'color': colors[i % num_colors]},
             'boxmean': True,
-            'median': {'color': 'blue', 'width': 2, 'line': {'dash': 'dot'}, 'opacity': 0.6}
         })
     
     semester_boxplot = {

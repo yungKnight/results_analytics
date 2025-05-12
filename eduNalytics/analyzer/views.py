@@ -27,6 +27,7 @@ from .visualizer_utils import (
     prepare_scatter_plot_data,  generate_overall_branch_representation_data,
     generate_branch_distribution_pie_data,    generate_semester_score_data,
     generate_courses_and_pass_rate_data, generate_branch_distribution_data,
+    get_branch_color,
 )
 from .decision_utils import (extract_correlations, get_correlation, 
     extract_partial_corr, get_partial_corr_result, extract_emas, get_results_from_emas,
@@ -393,6 +394,12 @@ def plot_view(request):
     
         cleaned_results_by_semester = request.session.get('cleaned_results_by_semester')
         if cleaned_results_by_semester:
+            for semester, courses in cleaned_results_by_semester.items():
+                for course in courses:
+                    branch = course.get('branch')
+                    if branch and branch not in branch_colors:
+                        get_branch_color(branch)
+
             semesters, courses, units, branches, grades, scores = extract_from_cleaned_semester(cleaned_results_by_semester)
             
             scatter_plot_data = json.dumps(prepare_scatter_plot_data(courses, scores))
