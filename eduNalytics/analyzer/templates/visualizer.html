@@ -10,7 +10,6 @@
 
 <script>
   const neededData = JSON.parse('{{ needed_data|safe }}');
-  console.log(neededData )
 </script>
 
 <div class="chart-container"> 
@@ -156,6 +155,165 @@
   </content>
 </aside>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function safeJSONParse(jsonString) {
+        if (!jsonString) return null;
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error("Error parsing JSON:", e);
+            return null;
+        }
+    }
+
+    function generateBranchGPAChart() {
+        const container = document.getElementById('branch-gpa-chart');
+        if (!container) return;
+        
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const branchGpaData = safeJSONParse(rawData);
+        if (!branchGpaData || !branchGpaData.length) return;
+        
+        const traces = branchGpaData.map(branch => ({
+            x: branch.semesters,
+            y: branch.gpas,
+            mode: 'lines+markers',
+            name: branch.name
+        }));
+        
+        const layout = {
+            modebar: {
+                remove: [
+                    "pan",
+                    "zoom",
+                    "zoomIn",
+                    "zoomOut",
+                    "lasso2d",
+                    "resetScale2d"
+                ]
+            },
+            yaxis: { title: "GPA" },
+            template: "plotly_white",
+            autosize: true,
+            height: 400,
+            margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
+        };
+        
+        Plotly.newPlot(container, traces, layout);
+    }
+    
+    function generateCombinedGPACGPAChart() {
+        const container = document.getElementById('combined-chart-data');
+        if (!container) return;
+        
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const combinedData = safeJSONParse(rawData);
+        if (!combinedData || !combinedData.semesters) return;
+        
+        const traces = [
+            {
+                x: combinedData.semesters,
+                y: combinedData.gpa.values,
+                mode: 'lines+markers',
+                name: combinedData.gpa.name,
+                line: { color: combinedData.gpa.color || 'blue' }
+            },
+            {
+                x: combinedData.semesters,
+                y: combinedData.cgpa.values,
+                mode: 'lines+markers',
+                name: combinedData.cgpa.name,
+                line: { color: combinedData.cgpa.color || 'orange' }
+            }
+        ];
+        
+        const layout = {
+            modebar: {
+                remove: [
+                    "pan",
+                    "zoom",
+                    "zoomIn",
+                    "zoomOut",
+                    "lasso2d",
+                    "resetScale2d"
+                ]
+            },
+            yaxis: { title: "Value" },
+            template: "plotly_white",
+            autosize: true,
+            height: 400,
+            margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
+        };
+        
+        Plotly.newPlot(container, traces, layout);
+    }
+
+    function generateLevelBoxplot() {
+        const container = document.getElementById('level-boxplot-data');
+        if (!container) return;
+        
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const boxplotData = safeJSONParse(rawData);
+        if (!boxplotData || !boxplotData.data) return;
+        
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+    }
+
+    function generateSemesterBoxplot() {
+        const container = document.getElementById('semester-boxplot-data');
+        if (!container) return;
+        
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const boxplotData = safeJSONParse(rawData);
+        if (!boxplotData || !boxplotData.data) return;
+
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+    }
+
+    function generateAllScoresBoxplot() {
+        const container = document.getElementById('all-boxplot-data');
+        if (!container) return;
+        
+        // Get the raw data and clear the container
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const boxplotData = safeJSONParse(rawData);
+        if (!boxplotData || !boxplotData.data) return;
+        
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+    }
+
+    function initializeCharts() {
+        generateBranchGPAChart();
+        generateCombinedGPACGPAChart();
+        
+        generateLevelBoxplot();
+        generateSemesterBoxplot();
+        generateAllScoresBoxplot();
+    }
+
+    initializeCharts()
+    
+    window.addEventListener('resize', function() {
+        const charts = document.querySelectorAll('.chart-section > div');
+        charts.forEach(function(chart) {
+            Plotly.relayout(chart, {
+                autosize: true
+            });
+        });
+    });
+});
+</script>
 <script src="{% static 'js/visualizer.js' %}" defer></script>
 
 {% endblock %}
