@@ -588,6 +588,46 @@ document.addEventListener('DOMContentLoaded', function() {
         Plotly.newPlot('branch-pie-chart', [trace], layout);
     }
 
+    // Generate Semester Distribution Pie Charts
+    function generateSemesterDistributionPies() {
+      const container = document.querySelector('.semester-distribution-inner');
+      if (!container) return;
+      
+      const pieContainers = container.querySelectorAll('.semester-distribution-item');
+      if (!pieContainers.length) return;
+      
+      pieContainers.forEach(function(pieContainer, index) {
+          const rawData = pieContainer.querySelector('pre').textContent;
+          const pieData = safeJSONParse(rawData);
+          if (!pieData) return;
+          
+          // Clear current content
+          pieContainer.innerHTML = '';
+          
+          // Create pie chart trace
+          const trace = {
+              type: 'pie',
+              labels: pieData.data.labels,
+              values: pieData.data.values,
+              marker: {
+                  colors: pieData.data.marker.colors
+              }
+          };
+          
+          // Configure layout
+          const layout = {
+              title: pieData.layout.title,
+              template: "plotly_white",
+              height: pieData.layout.height || 300,
+              margin: pieData.layout.margin,
+              showlegend: pieData.layout.showlegend
+          };
+          
+          // Create the plot
+          Plotly.newPlot(pieContainer, [trace], layout);
+      });
+    }
+
     function initializeCharts() {
         generateBranchGPAChart();
         generateCombinedGPACGPAChart();
@@ -603,6 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
         generatePassRateChart();
         generateBranchDistributionChart()
         generateOverallBranchPieChart()
+        generateSemesterDistributionPies()
     }
 
     initializeCharts()
