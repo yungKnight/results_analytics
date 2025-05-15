@@ -1,58 +1,58 @@
-const adjustChartsForSmallScreens = () => {
-  if (window.innerWidth < 767) { 
-    document.querySelectorAll('.chart-container .js-plotly-plot').forEach(plot => {
-      Plotly.relayout(plot, {
-        showlegend: false,
-        width: window.innerWidth * 0.95, 
-        height: 400 
-      });
-    });
-  }
-
-  if (window.innerWidth > 767 && window.innerWidth < 1025) {
-    const branch_gpa_removal = Array.from(document.querySelectorAll('.branch-gpa-chart .js-plotly-plot'));
-    const boxplot_removals = [
-      ...Array.from(document.querySelectorAll('.level-boxplot .js-plotly-plot')),
-      ...Array.from(document.querySelectorAll('.semester-boxplot .js-plotly-plot'))
-    ];
-    const branch_avg_removal = Array.from(document.querySelectorAll('.branch-avg-chart .js-plotly-plot'));
-    const pass_rate_removal = Array.from(document.querySelectorAll('.pass-rate-chart .js-plotly-plot'));
-    
-    const all_removals = [
-      ...branch_gpa_removal,
-      ...boxplot_removals,
-      ...branch_avg_removal,
-      ...pass_rate_removal
-    ];
-    console.log(Array.isArray(all_removals));
-
-    console.log(all_removals);
-
-    all_removals.forEach(removal => {
-      console.log(removal);
-      Plotly.relayout(removal, {
-        showlegend: false
-      });
-    });
-
-    document.querySelectorAll('.branch-pie-chart .js-plotly-plot').forEach(plot => {
-      Plotly.relayout(plot, {
-        'legend.font.size': 8,
-        'legend.width': 100,
-        'legend.height': 400 
-      });
-    });
-
-    branch_avg_removal.forEach(plot => {
-      Plotly.relayout(plot, {
-        'xaxis.showticklabels': false,
-        'xaxis.title.text': 'Semesters',
-        'xaxis.title.font.size': 14, 
-      });
-    });
-  }
-}
-adjustChartsForSmallScreens();
+//const adjustChartsForSmallScreens = () => {
+//  if (window.innerWidth < 767) { 
+//    document.querySelectorAll('.chart-container .js-plotly-plot').forEach(plot => {
+//      Plotly.relayout(plot, {
+//        showlegend: false,
+//        width: window.innerWidth * 0.95, 
+//        height: 400 
+//      });
+//    });
+//  }
+//
+//  if (window.innerWidth > 767 && window.innerWidth < 1025) {
+//    const branch_gpa_removal = Array.from(document.querySelectorAll('.branch-gpa-chart .js-plotly-plot'));
+//    const boxplot_removals = [
+//      ...Array.from(document.querySelectorAll('.level-boxplot .js-plotly-plot')),
+//      ...Array.from(document.querySelectorAll('.semester-boxplot .js-plotly-plot'))
+//    ];
+//    const branch_avg_removal = Array.from(document.querySelectorAll('.branch-avg-chart .js-plotly-plot'));
+//    const pass_rate_removal = Array.from(document.querySelectorAll('.pass-rate-chart .js-plotly-plot'));
+//    
+//    const all_removals = [
+//      ...branch_gpa_removal,
+//      ...boxplot_removals,
+//      ...branch_avg_removal,
+//      ...pass_rate_removal
+//    ];
+//    console.log(Array.isArray(all_removals));
+//
+//    console.log(all_removals);
+//
+//    all_removals.forEach(removal => {
+//      console.log(removal);
+//      Plotly.relayout(removal, {
+//        showlegend: false
+//      });
+//    });
+//
+//    document.querySelectorAll('.branch-pie-chart .js-plotly-plot').forEach(plot => {
+//      Plotly.relayout(plot, {
+//        'legend.font.size': 8,
+//        'legend.width': 100,
+//        'legend.height': 400 
+//      });
+//    });
+//
+//    branch_avg_removal.forEach(plot => {
+//      Plotly.relayout(plot, {
+//        'xaxis.showticklabels': false,
+//        'xaxis.title.text': 'Semesters',
+//        'xaxis.title.font.size': 14, 
+//      });
+//    });
+//  }
+//}
+//adjustChartsForSmallScreens();
 
 const viewBtn = document.getElementById('view_analysis');
 const minimizeBtn = document.getElementById('minimize_analysis');

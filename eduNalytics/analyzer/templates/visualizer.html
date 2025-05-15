@@ -407,6 +407,187 @@ document.addEventListener('DOMContentLoaded', function() {
       Plotly.newPlot(container, [trace], layout);
     }
 
+    // Generate Course Pass Rate Chart
+    function generatePassRateChart() {
+        const container = document.getElementById('pass-rate-data');
+        if (!container) return;
+        
+        // Get the raw data and clear the container
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const passRateData = safeJSONParse(rawData);
+        if (!passRateData || !passRateData.semesters || !passRateData.branches) return;
+        
+        const semesters = passRateData.semesters;
+        const branches = passRateData.branches;
+        
+        // Create traces for each branch - one for total courses and one for passed courses
+        const traces = [];
+        
+        // Loop through each branch and create traces for both total and passed courses
+        Object.entries(branches).forEach(([branchName, branchData]) => {
+            // Total courses trace
+            traces.push({
+                x: semesters,
+                y: branchData.total,
+                type: 'bar',
+                name: `${branchName} (Total)`,
+                marker: {
+                    color: branchData.color,
+                    opacity: 0.7
+                },
+                hoverinfo: 'none',
+            });
+            
+            // Passed courses trace
+            traces.push({
+                x: semesters,
+                y: branchData.passed,
+                type: 'bar',
+                name: `${branchName} (Passed)`,
+                marker: {
+                    color: branchData.color,
+                    opacity: 1.0
+                },
+                hoverinfo: 'none',
+            });
+        });
+        
+        // Configure layout according to chart settings
+        const layout = {
+            barmode: passRateData.chart_settings.barmode || 'group',
+            yaxis: { 
+                title: passRateData.chart_settings.yaxis_title || "Number of Courses" 
+            },
+            xaxis: {
+                tickangle: 20,
+                fontsize: 8,
+            },
+            plot_bgcolor: passRateData.chart_settings.plot_bgcolor || '#ffffcc',
+            height: passRateData.chart_settings.height || 500,
+            template: "plotly_white",
+            legend: {
+                orientation: "h",
+                yanchor: "bottom",
+                y: 1.02,
+                xanchor: "right",
+                x: 1
+            },
+            modebar: {
+                remove: [
+                    "pan",
+                    "zoom",
+                    "zoomIn",
+                    "zoomOut",
+                    "lasso2d",
+                    "resetScale2d"
+                ]
+            },
+            margin: { l: 60, r: 30, b: 100, t: 30, pad: 4 },
+        };
+        
+        // Create the plot
+        Plotly.newPlot(container, traces, layout);
+    }
+
+        // Generate Branch Distribution Stacked Chart
+    function generateBranchDistributionChart() {
+        const container = document.getElementById('branch-distribution-chart');
+        if (!container) return;
+        
+        // Get the raw data and clear the container
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const branchData = safeJSONParse(rawData);
+        if (!branchData || !branchData.semesters.length === 0) return;
+        
+        // Create traces for each branch
+        const traces = branchData.branches.map(branch => ({
+            x: branchData.semesters,
+            y: branch.counts,
+            type: 'bar',
+            name: branch.name,
+            marker: {
+                color: branch.color
+            }
+        }));
+        
+        // Configure layout based on the backend configuration
+        const layout = {
+            modebar: {
+                remove: [
+                    "pan",
+                    "zoom",
+                    "zoomIn",
+                    "zoomOut",
+                    "lasso2d",
+                    "resetScale2d"
+                ]
+            },
+            yaxis: { title: branchData.layout.yaxis_title },
+            xaxis: { title: "Semester" },
+            barmode: branchData.layout.barmode,
+            bargap: branchData.layout.bargap,
+            template: branchData.layout.template,
+            autosize: true,
+            height: branchData.layout.height,
+            margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
+        };
+        
+        // Create the plot
+        Plotly.newPlot(container, traces, layout);
+    }
+
+    // Generate Overall Branch Pie Chart
+    function generateOverallBranchPieChart() {
+        const container = document.querySelector('.branch-pie-chart .raw-data pre');
+        if (!container) return;
+        
+        // Get the container element and parent
+        const containerParent = container.parentElement.parentElement;
+        
+        // Get the raw data and clear the parent container
+        const rawData = container.textContent;
+        containerParent.removeChild(container.parentElement);
+        
+        // Create a new div for the chart
+        const chartDiv = document.createElement('div');
+        chartDiv.id = 'branch-pie-chart';
+        containerParent.appendChild(chartDiv);
+        
+        const pieData = safeJSONParse(rawData);
+        if (!pieData || !pieData.data || !pieData.data.length) return;
+        
+        // Create the trace for the pie chart
+        const trace = {
+            type: 'pie',
+            labels: pieData.data[0].labels,
+            values: pieData.data[0].values,
+            marker: {
+                colors: pieData.data[0].marker.colors
+            }
+        };
+        
+        // Configure layout to match backend configuration
+        const layout = {
+            template: pieData.layout.template || 'plotly_white',
+            height: pieData.layout.height || 580,
+            margin: pieData.layout.margin || { l: 40, r: 40, t: 50, b: 5 },
+            legend: {
+                orientation: 'h',
+                yanchor: 'bottom',
+                y: -0.2,
+                xanchor: 'center',
+                x: 0.5
+            }
+        };
+        
+        // Create the plot
+        Plotly.newPlot('branch-pie-chart', [trace], layout);
+    }
+
     function initializeCharts() {
         generateBranchGPAChart();
         generateCombinedGPACGPAChart();
@@ -419,6 +600,9 @@ document.addEventListener('DOMContentLoaded', function() {
         generateBranchAvgChart();
 
         generateScatterPlot();
+        generatePassRateChart();
+        generateBranchDistributionChart()
+        generateOverallBranchPieChart()
     }
 
     initializeCharts()
