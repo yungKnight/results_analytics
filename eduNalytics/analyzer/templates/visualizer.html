@@ -293,6 +293,120 @@ document.addEventListener('DOMContentLoaded', function() {
         Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
     }
 
+    // Generate Semester Average Score Chart
+    function generateSemesterAvgChart() {
+        const container = document.getElementById('semester-avg-data');
+        if (!container) return;
+        
+        // Get the raw data and clear the container
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const semesterAvgData = safeJSONParse(rawData);
+        if (!semesterAvgData || !semesterAvgData.type) return;
+        
+        // Create the trace using the provided data
+        const trace = {
+            x: semesterAvgData.data.x,
+            y: semesterAvgData.data.y,
+            mode: semesterAvgData.data.mode || 'lines+markers',
+            name: semesterAvgData.data.name,
+            marker: semesterAvgData.data.marker
+        };
+        
+        // Configure layout based on backend settings
+        const layout = {
+            modebar: semesterAvgData.layout.modebar,
+            yaxis: { title: semesterAvgData.layout.yaxis_title },
+            template: "plotly_white",
+            autosize: true,
+            height: 400,
+            margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
+        };
+        
+        // Create the plot
+        Plotly.newPlot(container, [trace], layout);
+    }
+
+// Generate Branch Average Score Chart
+    function generateBranchAvgChart() {
+        const container = document.getElementById('branch-avg-data');
+        if (!container) return;
+        
+        // Get the raw data and clear the container
+        const rawData = container.querySelector('pre').textContent;
+        container.innerHTML = '';
+        
+        const branchAvgData = safeJSONParse(rawData);
+        if (!branchAvgData || !branchAvgData.type || branchAvgData.type !== 'multi_scatter') return;
+    
+        // Create traces for each branch using the provided data
+        const traces = branchAvgData.data.map(branch => ({
+            x: branch.x,
+            y: branch.y,
+            mode: branch.mode || 'lines+markers',
+            name: branch.name,
+            marker: branch.marker,
+            connectgaps: branch.connectgaps
+        }));
+    
+        // Configure layout based on backend settings
+        const layout = {
+            modebar: branchAvgData.layout.modebar,
+            yaxis: { title: branchAvgData.layout.yaxis_title },
+            legend: { title: branchAvgData.layout.legend_title },
+            template: "plotly_white",
+            autosize: true,
+            height: 400,
+            margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
+        };
+    
+        // Create the plot
+        Plotly.newPlot(container, traces, layout);
+    }
+
+    function generateScatterPlot() {
+      const container = document.getElementById('scatter-plot-container');
+      if (!container) return;
+        
+      // Get the raw data and clear the container
+      const rawData = container.querySelector('pre').textContent;
+      container.innerHTML = '';
+        
+      const scatterData = safeJSONParse(rawData);
+      if (!scatterData || !scatterData.data) return;
+      
+      const trace = {
+          x: scatterData.data.x,
+          y: scatterData.data.y,
+          mode: scatterData.data.mode || 'markers',
+          marker: scatterData.data.marker || {
+              size: 7,
+              color: 'red',
+              opacity: 0.6
+          },
+          text: scatterData.data.text,
+          type: scatterData.type || 'scatter'
+      };
+        
+      const layout = {
+          yaxis: { title: scatterData.layout.yaxis_title || 'Scores' },
+          template: scatterData.layout.template || 'plotly_white',
+          xaxis: scatterData.layout.xaxis || {
+              tickangle: 60,
+              tickfont: { size: 11, style: 'italic' }
+          },
+          modebar: scatterData.layout.modebar || {
+                remove: ["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"]
+          },
+          autosize: true,
+          height: 400,
+          margin: { l: 50, r: 50, b: 120, t: 30, pad: 4 }
+      };
+        
+      Plotly.newPlot(container, [trace], layout);
+    }
+
     function initializeCharts() {
         generateBranchGPAChart();
         generateCombinedGPACGPAChart();
@@ -300,18 +414,14 @@ document.addEventListener('DOMContentLoaded', function() {
         generateLevelBoxplot();
         generateSemesterBoxplot();
         generateAllScoresBoxplot();
+
+        generateSemesterAvgChart();
+        generateBranchAvgChart();
+
+        generateScatterPlot();
     }
 
     initializeCharts()
-    
-    window.addEventListener('resize', function() {
-        const charts = document.querySelectorAll('.chart-section > div');
-        charts.forEach(function(chart) {
-            Plotly.relayout(chart, {
-                autosize: true
-            });
-        });
-    });
 });
 </script>
 <script src="{% static 'js/visualizer.js' %}" defer></script>

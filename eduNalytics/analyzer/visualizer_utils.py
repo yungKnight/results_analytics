@@ -403,14 +403,22 @@ def generate_semester_score_data(cleaned_results_by_semester, branch_colors):
     
     # Add traces for each branch
     for branch, color in branch_colors.items():
-        branch_scores = [
-            branch_semester_avg_scores.get(semester, {}).get(branch, None) 
-            for semester in semester_avg_scores.keys()
-        ]
+        # Only include branches that have actual data
+        branch_data = {}
+        for semester, branches in branch_semester_avg_scores.items():
+            if branch in branches:
+                branch_data[semester] = branches[branch]
+                
+        if not branch_data:
+            continue
+            
+        # Create x and y values only for semesters where this branch has data
+        semesters = list(branch_data.keys())
+        scores = list(branch_data.values())
         
         branch_avg_data['data'].append({
-            'x': list(semester_avg_scores.keys()),
-            'y': branch_scores,
+            'x': semesters,
+            'y': scores,
             'mode': 'lines+markers',
             'name': branch,
             'marker': {'color': color},
