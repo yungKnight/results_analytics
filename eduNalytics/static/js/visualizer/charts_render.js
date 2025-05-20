@@ -445,6 +445,21 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
+    const adjustChartsForSmallScreens = () => {
+        if (window.innerWidth < 767) { 
+            document.querySelectorAll('.js-plotly-plot').forEach(plot => {
+              Plotly.relayout(plot, {
+                showlegend: false,
+                width: window.innerWidth * 0.95, 
+                height: 400 ,
+                xaxis: {
+                  title: ''
+                },
+              });
+            });
+          }
+    }
+
     const initializeCharts = () => {
         generateBranchGPAChart();
         generateCombinedGPACGPAChart();
@@ -464,4 +479,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeCharts()
+    adjustChartsForSmallScreens()
 });
