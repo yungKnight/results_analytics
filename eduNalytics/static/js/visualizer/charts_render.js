@@ -457,7 +457,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
               });
             });
-          }
+        }
+
+        if (window.innerWidth > 767 && window.innerWidth < 1025) {
+            document.querySelectorAll('.js-plotly-plot').forEach(plot => {
+              Plotly.relayout(plot, {
+                xaxis: {
+                  title: ''
+                },
+              });
+            });
+
+            const branchGPAChart = document.getElementById('branch-gpa-chart'); 
+            if (branchGPAChart) {
+              Plotly.relayout(branchGPAChart, {
+                showlegend: false
+              });
+            }
+
+            const lvlBoxplot = document.getElementById('level-boxplot-data');
+            const semesterBoxplot = document.getElementById('semester-boxplot-data');
+            const branchAvgChart = document.getElementById('branch-avg-data');
+            const coursePassChart = document.getElementById('pass-rate-data');
+
+            [lvlBoxplot, semesterBoxplot, branchAvgChart, coursePassChart].forEach(plot => {
+              if (plot) Plotly.relayout(plot, { showlegend: false });
+            });
+
+            if (lvlBoxplot) {
+                Plotly.relayout(lvlBoxplot, {
+                    width: window.innerWidth * 0.40,
+                })
+            }
+        }
     }
 
     const initializeCharts = () => {
