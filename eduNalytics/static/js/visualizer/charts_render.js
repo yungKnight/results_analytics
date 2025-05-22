@@ -1,23 +1,143 @@
+let totalCharts = 0;
+let loadedCharts = 0;
+let isScrambling = true;
+
+function countTotalCharts() {
+    const chartSelectors = [
+        '#branch-gpa-chart',
+        '#combined-chart-data',
+        '#level-boxplot-data',
+        '#semester-boxplot-data',
+        '#all-boxplot-data',
+        '#semester-avg-data',
+        '#semester-avg-data2',
+        '#branch-avg-data',
+        '#scatter-plot-container',
+        '#pass-rate-data',
+        '#branch-distribution-chart',
+        '.branch-pie-chart .raw-data',
+        '.semester-distribution-item'
+    ];
+    
+    totalCharts = 0;
+    chartSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+            totalCharts += elements.length;
+        }
+    });
+        
+    if (totalCharts === 0) {
+        totalCharts = 1;
+    }
+}
+
+function scrambleText() {
+    const text = "Edunalytica";
+    const chars = "GIBBERISH";
+    const element = document.getElementById('scramble-text');
+    
+    if (!element) return;
+    
+    let iterations = 0;
+    
+    const scrambleInterval = setInterval(() => {
+        element.textContent = text
+            .split("")
+            .map((char, index) => {
+                if (index < iterations) {
+                    return text[index];
+                }
+                return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("");
+        
+        if (iterations >= text.length) {
+            clearInterval(scrambleInterval);
+            if (isScrambling) {
+                setTimeout(scrambleText, 500);
+            }
+        }
+        
+        iterations += 1/3;
+    }, 30);
+}
+
+function onChartLoaded() {
+    loadedCharts++;
+    const progress = loadedCharts / totalCharts;
+        
+    if (progress >= 0.8) {
+        isScrambling = false;
+        completeLoading();
+    }
+}
+
+function completeLoading() {
+    const tl = gsap.timeline();
+    
+    gsap.to("#scramble-text", {
+        textContent: "Edunalytica",
+        duration: 0.3,
+        ease: "none"
+    });
+    
+    tl.to("#fullscreen-loader", {
+        opacity: 0,
+        duration: 0.5,
+        delay: 0.2,
+        ease: "power2.out"
+    })
+    .to("#visualizer-page", {
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out"
+    }, "-=0.5")
+    .set("#fullscreen-loader", { display: "none" });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    countTotalCharts();
+    scrambleText();
+    
+    setTimeout(() => {
+        if (isScrambling) {
+            isScrambling = false;
+            completeLoading();
+        }
+    }, 4000);
+
     const safeJSONParse = (jsonString) => {
         if (!jsonString) return null;
         try {
             return JSON.parse(jsonString);
         } catch (e) {
-            console.error("Error parsing JSON:", e);
             return null;
         }
     }
 
     const generateBranchGPAChart = () => {
         const container = document.getElementById('branch-gpa-chart');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const branchGpaData = safeJSONParse(rawData);
-        if (!branchGpaData || !branchGpaData.length) return;
+        if (!branchGpaData || !branchGpaData.length) {
+            onChartLoaded();
+            return;
+
+        }
         
         const traces = branchGpaData.map(branch => ({
             x: branch.semesters,
@@ -44,18 +164,34 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
         };
         
-        Plotly.newPlot(container, traces, layout);
+        Plotly.newPlot(container, traces, layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
     
     const generateCombinedGPACGPAChart = () => {
         const container = document.getElementById('combined-chart-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const combinedData = safeJSONParse(rawData);
-        if (!combinedData || !combinedData.semesters) return;
+        if (!combinedData || !combinedData.semesters) {
+            onChartLoaded();
+            return;
+        }
         
         const traces = [
             {
@@ -92,46 +228,98 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
         };
         
-        Plotly.newPlot(container, traces, layout);
+        Plotly.newPlot(container, traces, layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateLevelBoxplot = () => {
         const container = document.getElementById('level-boxplot-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const boxplotData = safeJSONParse(rawData);
-        if (!boxplotData || !boxplotData.data) return;
+        if (!boxplotData || !boxplotData.data) {
+            onChartLoaded();
+            return;
+        }
         
-        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateSemesterBoxplot = () => {
         const container = document.getElementById('semester-boxplot-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const boxplotData = safeJSONParse(rawData);
-        if (!boxplotData || !boxplotData.data) return;
+        if (!boxplotData || !boxplotData.data) {
+            onChartLoaded();
+            return;
+        }
 
-        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateAllScoresBoxplot = () => {
         const container = document.getElementById('all-boxplot-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const boxplotData = safeJSONParse(rawData);
-        if (!boxplotData || !boxplotData.data) return;
+        if (!boxplotData || !boxplotData.data) {
+            onChartLoaded();
+            return;
+        }
         
-        Plotly.newPlot(container, boxplotData.data, boxplotData.layout);
+        Plotly.newPlot(container, boxplotData.data, boxplotData.layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateSemesterAvgChart = () => {
@@ -139,14 +327,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const container2 = document.getElementById('semester-avg-data2');
     
         const sourceContainer = container || container2;
-        if (!sourceContainer) return;
+        if (!sourceContainer) {
+            onChartLoaded();
+            return;
+        }
     
-        const pre = sourceContainer.querySelector('pre');
-        if (!pre) return;
+        const preElement = sourceContainer.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
     
-        const rawData = pre.textContent;
+        const rawData = preElement.textContent;
         const semesterAvgData = safeJSONParse(rawData);
-        if (!semesterAvgData || !semesterAvgData.type) return;
+        if (!semesterAvgData || !semesterAvgData.type) {
+            onChartLoaded();
+            return;
+        }
     
         const trace = {
             x: semesterAvgData.data.x,
@@ -165,26 +362,46 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
         };
     
+        const plotPromises = [];
+        
         if (container) {
             container.innerHTML = '';
-            Plotly.newPlot(container, [trace], layout);
+            plotPromises.push(Plotly.newPlot(container, [trace], layout));
         }
     
         if (container2) {
             container2.innerHTML = '';
-            Plotly.newPlot(container2, [trace], layout);
+            plotPromises.push(Plotly.newPlot(container2, [trace], layout));
         }
+        
+        Promise.all(plotPromises).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     };
 
     const generateBranchAvgChart = () => {
         const container = document.getElementById('branch-avg-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const branchAvgData = safeJSONParse(rawData);
-        if (!branchAvgData || !branchAvgData.type || branchAvgData.type !== 'multi_scatter') return;
+        if (!branchAvgData || !branchAvgData.type || branchAvgData.type !== 'multi_scatter') {
+            onChartLoaded();
+            return;
+        }
     
         const traces = branchAvgData.data.map(branch => ({
             x: branch.x,
@@ -205,59 +422,91 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
         };
     
-        Plotly.newPlot(container, traces, layout);
+        Plotly.newPlot(container, traces, layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateScatterPlot = () => {
-      const container = document.getElementById('scatter-plot-container');
-      if (!container) return;
+        const container = document.getElementById('scatter-plot-container');
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-      const rawData = container.querySelector('pre').textContent;
-      container.innerHTML = '';
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
         
-      const scatterData = safeJSONParse(rawData);
-      if (!scatterData || !scatterData.data) return;
-      
-      const trace = {
-          x: scatterData.data.x,
-          y: scatterData.data.y,
-          mode: scatterData.data.mode || 'markers',
-          marker: scatterData.data.marker || {
-              size: 7,
-              color: 'red',
-              opacity: 0.6
-          },
-          text: scatterData.data.text,
-          type: scatterData.type || 'scatter'
-      };
+        const rawData = preElement.textContent;
+        container.innerHTML = '';
         
-      const layout = {
-          yaxis: { title: scatterData.layout.yaxis_title || 'Scores' },
-          template: scatterData.layout.template || 'plotly_white',
-          xaxis: scatterData.layout.xaxis || {
-              tickangle: 60,
-              tickfont: { size: 11, style: 'italic' }
-          },
-          modebar: scatterData.layout.modebar || {
+        const scatterData = safeJSONParse(rawData);
+        if (!scatterData || !scatterData.data) {
+            onChartLoaded();
+            return;
+        }
+        
+        const trace = {
+            x: scatterData.data.x,
+            y: scatterData.data.y,
+            mode: scatterData.data.mode || 'markers',
+            marker: scatterData.data.marker || {
+                size: 7,
+                color: 'red',
+                opacity: 0.6
+            },
+            text: scatterData.data.text,
+            type: scatterData.type || 'scatter'
+        };
+        
+        const layout = {
+            yaxis: { title: scatterData.layout.yaxis_title || 'Scores' },
+            template: scatterData.layout.template || 'plotly_white',
+            xaxis: scatterData.layout.xaxis || {
+                tickangle: 60,
+                tickfont: { size: 11, style: 'italic' }
+            },
+            modebar: scatterData.layout.modebar || {
                 remove: ["pan", "zoom", "zoomIn", "zoomOut", "lasso2d", "resetScale2d"]
-          },
-          autosize: true,
-          height: 400,
-          margin: { l: 50, r: 50, b: 120, t: 30, pad: 4 }
-      };
+            },
+            autosize: true,
+            height: 400,
+            margin: { l: 50, r: 50, b: 120, t: 30, pad: 4 }
+        };
         
-      Plotly.newPlot(container, [trace], layout);
+        Plotly.newPlot(container, [trace], layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generatePassRateChart = () => {
         const container = document.getElementById('pass-rate-data');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const passRateData = safeJSONParse(rawData);
-        if (!passRateData || !passRateData.semesters || !passRateData.branches) return;
+        if (!passRateData || !passRateData.semesters || !passRateData.branches) {
+            onChartLoaded();
+            return;
+        }
         
         const semesters = passRateData.semesters;
         const branches = passRateData.branches;
@@ -322,18 +571,34 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 60, r: 30, b: 100, t: 30, pad: 4 },
         };
         
-        Plotly.newPlot(container, traces, layout);
+        Plotly.newPlot(container, traces, layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateBranchDistributionChart = () => {
         const container = document.getElementById('branch-distribution-chart');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
-        const rawData = container.querySelector('pre').textContent;
+        const preElement = container.querySelector('pre');
+        if (!preElement) {
+            onChartLoaded();
+            return;
+        }
+        
+        const rawData = preElement.textContent;
         container.innerHTML = '';
         
         const branchData = safeJSONParse(rawData);
-        if (!branchData || !branchData.semesters.length === 0) return;
+        if (!branchData || !branchData.semesters || branchData.semesters.length === 0) {
+            onChartLoaded();
+            return;
+        }
         
         const traces = branchData.branches.map(branch => ({
             x: branchData.semesters,
@@ -366,12 +631,19 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: { l: 50, r: 50, b: 80, t: 30, pad: 4 }
         };
         
-        Plotly.newPlot(container, traces, layout);
+        Plotly.newPlot(container, traces, layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateOverallBranchPieChart = () => {
         const container = document.querySelector('.branch-pie-chart .raw-data pre');
-        if (!container) return;
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
         
         const containerParent = container.parentElement.parentElement;
         
@@ -383,7 +655,10 @@ document.addEventListener('DOMContentLoaded', function() {
         containerParent.appendChild(chartDiv);
         
         const pieData = safeJSONParse(rawData);
-        if (!pieData || !pieData.data || !pieData.data.length) return;
+        if (!pieData || !pieData.data || !pieData.data.length) {
+            onChartLoaded();
+            return;
+        }
         
         const trace = {
             type: 'pie',
@@ -407,72 +682,93 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         
-        Plotly.newPlot('branch-pie-chart', [trace], layout);
+        Plotly.newPlot('branch-pie-chart', [trace], layout).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const generateSemesterDistributionPies = () => {
-      const container = document.querySelector('.semester-distribution-inner');
-      if (!container) return;
-      
-      const pieContainers = container.querySelectorAll('.semester-distribution-item');
-      if (!pieContainers.length) return;
-      
-      pieContainers.forEach(function(pieContainer, index) {
-          const rawData = pieContainer.querySelector('pre').textContent;
-          const pieData = safeJSONParse(rawData);
-          if (!pieData) return;
-          
-          pieContainer.innerHTML = '';
-          
-          const trace = {
-              type: 'pie',
-              labels: pieData.data.labels,
-              values: pieData.data.values,
-              marker: {
-                  colors: pieData.data.marker.colors
-              }
-          };
-          
-          const layout = {
-              title: pieData.layout.title,
-              template: "plotly_white",
-              height: pieData.layout.height || 300,
-              margin: pieData.layout.margin,
-              showlegend: pieData.layout.showlegend
-          };
-          
-          Plotly.newPlot(pieContainer, [trace], layout);
-      });
+        const container = document.querySelector('.semester-distribution-inner');
+        if (!container) {
+            onChartLoaded();
+            return;
+        }
+        
+        const pieContainers = container.querySelectorAll('.semester-distribution-item');
+        if (!pieContainers.length) {
+            onChartLoaded();
+            return;
+        }
+        
+        const plotPromises = [];
+        
+        pieContainers.forEach(function(pieContainer, index) {
+            const preElement = pieContainer.querySelector('pre');
+            if (!preElement) return;
+            
+            const rawData = preElement.textContent;
+            const pieData = safeJSONParse(rawData);
+            if (!pieData) return;
+            
+            pieContainer.innerHTML = '';
+            
+            const trace = {
+                type: 'pie',
+                labels: pieData.data.labels,
+                values: pieData.data.values,
+                marker: {
+                    colors: pieData.data.marker.colors
+                }
+            };
+            
+            const layout = {
+                title: pieData.layout.title,
+                template: "plotly_white",
+                height: pieData.layout.height || 300,
+                margin: pieData.layout.margin,
+                showlegend: pieData.layout.showlegend
+            };
+            
+            plotPromises.push(Plotly.newPlot(pieContainer, [trace], layout));
+        });
+        
+        Promise.all(plotPromises).then(() => {
+            onChartLoaded();
+        }).catch((error) => {
+            onChartLoaded();
+        });
     }
 
     const adjustChartsForSmallScreens = () => {
         if (window.innerWidth < 767) { 
             document.querySelectorAll('.js-plotly-plot').forEach(plot => {
-              Plotly.relayout(plot, {
-                showlegend: false,
-                width: window.innerWidth * 0.95, 
-                height: 400 ,
-                xaxis: {
-                  title: ''
-                },
-              });
+                Plotly.relayout(plot, {
+                    showlegend: false,
+                    width: window.innerWidth * 0.95, 
+                    height: 400 ,
+                    xaxis: {
+                        title: ''
+                    },
+                });
             });
         }
 
         if (window.innerWidth > 767 && window.innerWidth < 1025) {
             document.querySelectorAll('.js-plotly-plot').forEach(plot => {
-              Plotly.relayout(plot, {
-                xaxis: {
-                  title: ''
-                },
-              });
+                Plotly.relayout(plot, {
+                    xaxis: {
+                        title: ''
+                    },
+                });
             });
 
             const branchGPAChart = document.getElementById('branch-gpa-chart'); 
             if (branchGPAChart) {
-              Plotly.relayout(branchGPAChart, {
-                showlegend: false
-              });
+                Plotly.relayout(branchGPAChart, {
+                    showlegend: false
+                });
             }
 
             const lvlBoxplot = document.getElementById('level-boxplot-data');
@@ -481,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const coursePassChart = document.getElementById('pass-rate-data');
 
             [lvlBoxplot, semesterBoxplot, branchAvgChart, coursePassChart].forEach(plot => {
-              if (plot) Plotly.relayout(plot, { showlegend: false });
+                if (plot) Plotly.relayout(plot, { showlegend: false });
             });
 
             if (lvlBoxplot) {
@@ -510,6 +806,9 @@ document.addEventListener('DOMContentLoaded', function() {
         generateSemesterDistributionPies()
     }
 
-    initializeCharts()
-    adjustChartsForSmallScreens()
+    initializeCharts();
+    
+    setTimeout(() => {
+        adjustChartsForSmallScreens();
+    }, 1000);
 });

@@ -8,11 +8,17 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/visualizer.css' %}">
 
+<div id="fullscreen-loader" class="fullscreen-loader">
+  <div class="loader-content">
+    <h1 id="scramble-text" class="scramble-text">Edunalytica</h1>
+  </div>
+</div>
+
 <script>const neededData = JSON.parse('{{ needed_data|safe }}');</script>
 <script src="{% static 'js/visualizer/advisory.js' %}" defer></script>
 <script src="{% static 'js/visualizer/charts_render.js' %}" defer></script>
-
-<div class="chart-container"> 
+<div id="visualizer-page" style="opacity: 0;">
+  <div class="chart-container"> 
   <div class="chart-row">
     {% if branch_gpa_chart_data %}
       <div class="chart-section branch-gpa-chart">
@@ -135,11 +141,11 @@
       </div>
     </div>
   </div>
-</div>
-
-<br class="spacer">
-
-<aside class="advisory-section">
+  </div>
+  
+  <br class="spacer">
+  
+  <aside class="advisory-section">
   <button type="submit" id="view_analysis" class="btn btn-primary py-1 analysis-button">
    Click here to view detailed analysis of your result
   </button>
@@ -154,5 +160,6 @@
       Click here to minimize detailed analysis of your result
     </button>
   </content>
-</aside>
+  </aside>
+</div>
 {% endblock %}
