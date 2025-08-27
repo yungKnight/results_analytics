@@ -4,4 +4,4 @@ __pycache__/
 .env
 all_libraries.txt
 visualizer_soon.html
-test_advanced.py
+**/tests/
